@@ -21,3 +21,30 @@
 
 @media only screen and (min-width: 1500px) {
 }
+
+.headerTitleWithLogo {
+  color: #5d6589
+}
+
+.projectTitle {
+  color: black
+}
+
+.projectTitle small {
+  color: #8892bf
+}
+
+sup {
+  vertical-align: super;
+  font-size: 75%
+}
+
+sub {
+  vertical-align: sub;
+  font-size: 75%
+}
+
+.equation {
+  font-size: 120%;
+  font-family: "Times New Roman", Times, serif;
+}

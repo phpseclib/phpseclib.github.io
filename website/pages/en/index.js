@@ -35,10 +35,10 @@ class HomeSplash extends React.Component {
       </div>
     );
 
-    const ProjectTitle = props => (
+    const ProjectTitle = () => (
       <h2 className="projectTitle">
-        {props.title}
-        <small>{props.tagline}</small>
+        {siteConfig.title}
+        <small>{siteConfig.tagline}</small>
       </h2>
     );
 
@@ -60,13 +60,15 @@ class HomeSplash extends React.Component {
 
     return (
       <SplashContainer>
-        <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} />
         <div className="inner">
-          <ProjectTitle tagline={siteConfig.tagline} title={siteConfig.title} />
+          <ProjectTitle siteConfig={siteConfig} />
+          Pure-PHP implementations of:
           <PromoSection>
-            <Button href="#try">Try It Out</Button>
-            <Button href={docUrl('doc1.html')}>Example Link</Button>
-            <Button href={docUrl('doc2.html')}>Example Link 2</Button>
+            <Button href={docUrl('connect')}>SSH</Button>
+            <Button href={docUrl('sftp')}>SFTP</Button>
+            <Button href={docUrl('publickeys')}>RSA / DSA / Elliptic Curves</Button>
+            <Button href={docUrl('symmetric')}>AES / ChaCha20 / etc</Button>
+            <Button href={docUrl('x509')}>X.509</Button>
           </PromoSection>
         </div>
       </SplashContainer>

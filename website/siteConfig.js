@@ -21,28 +21,35 @@ const users = [
 ];
 
 const siteConfig = {
-  title: 'Test Site', // Title for your website.
-  tagline: 'A website for testing',
-  url: 'https://your-docusaurus-test-site.com', // Your website URL
+  title: 'phpseclib', // Title for your website.
+  tagline: 'PHP Secure Communications Library',
+  url: 'https://phpseclib.org', // Your website URL
   baseUrl: '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'test-site',
-  organizationName: 'facebook',
+  projectName: 'phpseclib',
+  organizationName: 'phpseclib',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    {doc: 'doc1', label: 'Docs'},
-    {doc: 'doc4', label: 'API'},
-    {page: 'help', label: 'Help'},
-    {blog: true, label: 'Blog'},
+    {doc: 'connect', label: 'Docs'},
+    {href: 'https://api.phpseclib.org/3.0/', label: 'API'},
+    {href: 'https://stackoverflow.com/questions/tagged/phpseclib', label: 'Support'},
+    {href: 'https://github.com/phpseclib/phpseclib', label: 'GitHub'},
+    {href: 'https://docs.google.com/document/d/1ny41IA9hatI3fqkNI8DdjFy2lw-Vcgwum5Fywv0WCSA/edit', label: 'For Enterprise'}
   ],
+
+  algolia: {
+    apiKey: '22ad7fe108506790086c025b80c5e65d',
+    indexName: 'phpseclib',
+    algoliaOptions: {} // Optional, if provided by Algolia
+  },
 
   // If you have users set above, you add it here:
   users,
@@ -54,8 +61,8 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: '#7b2f52',
-    secondaryColor: '#562039',
+    primaryColor: '#8892bf',//'#4a213c',
+    secondaryColor: '#475b93'//'#33172a',
   },
 
   /* Custom fonts for website */
@@ -73,7 +80,7 @@ const siteConfig = {
   */
 
   // This copyright info is used in /core/Footer.js and blog RSS/Atom feeds.
-  copyright: `Copyright © ${new Date().getFullYear()} Your Name or Your Company Name`,
+  copyright: `Copyright © ${new Date().getFullYear()} Jim Wigginton`,
 
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks.
@@ -104,7 +111,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
+     repoUrl: 'https://github.com/phpseclib/phpseclib',
 };
 
 module.exports = siteConfig;
