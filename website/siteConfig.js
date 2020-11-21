@@ -38,11 +38,10 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    {doc: 'connect', label: 'Docs'},
-    {href: 'https://api.phpseclib.org/3.0/', label: 'API'},
+    {doc: 'why', label: 'Docs'},
     {href: 'https://stackoverflow.com/questions/tagged/phpseclib', label: 'Support'},
     {href: 'https://github.com/phpseclib/phpseclib', label: 'GitHub'},
-    {href: 'https://docs.google.com/document/d/1ny41IA9hatI3fqkNI8DdjFy2lw-Vcgwum5Fywv0WCSA/edit', label: 'For Enterprise'}
+    {doc: 'for-enterprise', label: 'For Enterprise'}
   ],
 
   algolia: {

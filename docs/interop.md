@@ -385,6 +385,38 @@ See it in action at https://jsfiddle.net/u7ad10fn/
 
 ## Node.js
 
+### AES-128-CBC Decryption with CryptoJS
+
+Encryption with PHP:
+
+```php
+use phpseclib3\Crypt\AES;
+
+$cipher = new AES('cbc');
+$cipher->setKey(str_repeat('a', 16));
+$cipher->setIV(str_repeat('b', 16));
+
+echo bin2hex($cipher->encrypt('test'));
+```
+
+Decryption with Node.js / [CryptoJS](https://github.com/brix/crypto-js):
+
+```javascript
+var CryptoJS = require('crypto-js');
+
+var key = CryptoJS.enc.Utf8.parse('aaaaaaaaaaaaaaaa');
+var iv = CryptoJS.enc.Utf8.parse('bbbbbbbbbbbbbbbb');
+var ciphertext = CryptoJS.enc.Hex.parse('10f42fd95857ed2775cfbc4b471bc213');
+ciphertext = {ciphertext: ciphertext};
+
+var plaintext = CryptoJS.AES.decrypt(ciphertext, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC
+});
+
+console.log(plaintext.toString(CryptoJS.enc.Utf8));
+```
+
 ### RSA Decryption
 
 Encryption with PHP:
@@ -434,7 +466,100 @@ console.log(plaintext.toString('ascii'));
 
 PKCS8 keys are supported as well as OAEP padding.
 
+### RSA Decryption with NodeRSA
+
+Encryption with PHP:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----');
+$key = $key->withPadding(RSA::ENCRYPTION_PKCS1);
+echo base64_encode($key->encrypt('test'));
+```
+
+Decryption with Node.js / [NodeRSA](https://github.com/rzcoder/node-rsa):
+
+```javascript
+var NodeRSA = require('node-rsa');
+
+var key = new NodeRSA(`-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----`);
+key.setOptions({encryptionScheme: 'pkcs1'});
+
+var ciphertext = 'L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ==';
+
+var plaintext = key.decrypt(ciphertext, 'base64');
+plaintext = Buffer.from(plaintext, 'base64');
+console.log(plaintext.toString());
+```
+PKCS8 keys are supported as is OAEP padding.
+
 ## C#
+
+### AES-128-CBC Decryption
+
+Encrypting a string using AES-128-CBC with phpseclib:
+
+```php
+use phpseclib3\Crypt\AES;
+
+$cipher = new AES('cbc');
+$cipher->setKey(str_repeat('a', 16));
+$cipher->setIV(str_repeat('b', 16));
+
+echo bin2hex($cipher->encrypt('test'));
+```
+
+Decryption with C#:
+
+```c#
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.IO;
+
+class Test
+{
+    // from https://stackoverflow.com/a/311179/569976
+    public static byte[] StringToByteArray(String hex)
+    {
+        int NumberChars = hex.Length;
+        byte[] bytes = new byte[NumberChars / 2];
+        for (int i = 0; i < NumberChars; i += 2)
+            bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+          return bytes;
+    }
+
+    static void Main()
+    {
+        var ciphertext = StringToByteArray("10f42fd95857ed2775cfbc4b471bc213");
+
+        var aes = new AesManaged();
+        //aes.Mode = CipherMode.CBC;
+        var key = Encoding.ASCII.GetBytes("aaaaaaaaaaaaaaaa");
+        var iv = Encoding.ASCII.GetBytes("bbbbbbbbbbbbbbbb");
+
+        ICryptoTransform decryptor = aes.CreateDecryptor(key, iv);
+        MemoryStream msDecrypt = new MemoryStream(ciphertext);
+        CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+        StreamReader srDecrypt = new StreamReader(csDecrypt);
+        String plaintext = srDecrypt.ReadToEnd();
+
+        Console.WriteLine(plaintext);
+    }
+}
+```
 
 ### RSA Decryption
 
@@ -474,7 +599,7 @@ class Test
   <D>IJLixBy2qpFoS4DSmoEmo3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2kTQ==</D>
 </RSAKeyPair>";
 
-        var ciphertext= "L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ==";
+        var ciphertext = "L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ==";
 
         var ciphertextBytes = Convert.FromBase64String(ciphertext);
 
@@ -594,10 +719,22 @@ int main (void)
     EVP_PKEY* pkey = 0;
     PEM_read_bio_PrivateKey(bo, &pkey, 0, 0);
     BIO_free(bo);
-    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
-    char plaintext[RSA_size(rsa)];
 
-    RSA_private_decrypt(strlen(ciphertext), ciphertext, plaintext, rsa, RSA_PKCS1_PADDING);
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(pkey, NULL);
+    EVP_PKEY_decrypt_init(ctx);
+    EVP_PKEY_CTX_ctrl_str(ctx, "rsa_padding_mode", "pkcs1");
+
+    size_t plaintext_len;
+    unsigned char* plaintext;
+
+    // determine output size
+    EVP_PKEY_decrypt(ctx, NULL, &plaintext_len, ciphertext, strlen(ciphertext));
+
+    // allocate memory (+1 for terminating null-character)
+    plaintext = OPENSSL_malloc(plaintext_len + 1);
+    EVP_PKEY_decrypt(ctx, plaintext, &plaintext_len, ciphertext, strlen(ciphertext));
+    plaintext[plaintext_len] = '\0'; // required for %s
+
     printf("%s\n", plaintext);
 }
 ```
@@ -643,4 +780,4 @@ openssl_private_decrypt(base64_decode($ciphertext), $plaintext, $private, OPENSS
 
 echo $plaintext;
 ```
-OAEP padding is supported but [only with sha1 as the hash / MGF hash](https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466).
+OAEP padding is supported but [only with sha1 as the hash / MGF hash](https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466) (no doubt because php-src is using OpenSSL's [RSA_private_decrypt](https://www.openssl.org/docs/man1.0.2/man3/RSA_private_decrypt.html) is being used as opposed to OpenSSL's newer [EVP_PKEY_decrypt](https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_decrypt.html))
