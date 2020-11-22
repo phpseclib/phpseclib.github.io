@@ -23,7 +23,7 @@ const users = [
 const siteConfig = {
   title: 'phpseclib', // Title for your website.
   tagline: 'PHP Secure Communications Library',
-  url: 'https://phpseclib.org', // Your website URL
+  url: 'https://phpseclib.github.io', // Your website URL
   baseUrl: '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
