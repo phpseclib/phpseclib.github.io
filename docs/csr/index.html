@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>CSR · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="CSR · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>X.509</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">CSR</h1></header><article><div><span><script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/js/jquery.treeview.js"></script>
+<link rel="stylesheet" href="/css/jquery.treeview.css">
+<script>
+var showPath = function() {
+  path = '';
+  parents = $(this).parents('li:visible');
+  for (var i = parents.length - 1; i >= 0; i--) {
+    name = $('.name', parents[i])[0].textContent;
+    delimiter = isNaN(name) ? '\'' : '';
+    path+= '[' + delimiter + name + delimiter + ']';
+  }
+  $('#path').html('<code id="path">$csr' + path + '</code>:');
+};
+$(document).ready(function() {
+  $('.printr').treeview({
+     persist: "location",
+     collapsed: true,
+     unique: true
+   });
+   $('.name,.hitarea').click(showPath);
+   $('#path').html('<code id="path">$csr</code>');
+});
+</script>
+<h2><a class="anchor" aria-hidden="true" id="reading-csrs"></a><a href="#reading-csrs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reading CSRs</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">X509</span>;
+
+$x509 = <span class="hljs-keyword">new</span> X509();
+$csr = $x509-&gt;loadCSR(file_get_contents(<span class="hljs-string">'csr.csr'</span>));
+
+var_dump($csr);
+</code></pre>
+<p><span style="font-size: 11px">(<a href="/x509/csr.csr">download csr.csr</a>)</span></p>
+<p>Running the above will produce an array that looks something like this:</p>
+<p><code id="path">$csr</code></p>
+<ul class="printr"><li><span class="name">certificationRequestInfo</span><ul><li><span class="name">version</span><ul><li>v1</li></ul></li><li><span class="name">subject</span><ul><li><span class="name">rdnSequence</span><ul><li><span class="name">0</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-organizationName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">utf8String</span><ul><li>phpseclib demo cert</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li><span class="name">subjectPKInfo</span><ul><li><span class="name">algorithm</span><ul><li><span class="name">algorithm</span><ul><li>rsaEncryption</li></ul></li></ul></li><li><span class="name">subjectPublicKey</span><ul><li>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+MIGdMAsGCSqGSIb3DQEBAQOBjQAwgYkCgYEApQBlwwoORvSZqUmpL5poADLWsRBx
+<span class="hljs-number">55</span>tLs3Yq8ZfbkSo8nHetbPnOukIP/Nlxn3n/MGOvsXQa9NLisLQ6UmyLyJXXVW8F
+n6pCQIpnygjNbocgs6uj47UEXDwMwlfLKPZ80M7hmMphZZ4Ub/IBe0S5KN77YxYv
+FKGKfMNXKZWx1/<span class="hljs-number">8</span>CAwEAAQ==
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+</li></ul></li></ul></li></ul></li><li><span class="name">signatureAlgorithm</span><ul><li><span class="name">algorithm</span><ul><li>sha1WithRSAEncryption</li></ul></li></ul></li><li><span class="name">signature</span><ul><li>...</li></ul></li></ul>
+<h3><a class="anchor" aria-hidden="true" id="getdnprop"></a><a href="#getdnprop" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getDNProp()</h3>
+<pre><code class="hljs css language-php">print_r($x509-&gt;getDNProp(<span class="hljs-string">'O'</span>));
+</code></pre>
+<p>That will produce the following:</p>
+<ul class="printr"><li><span class="name">0</span><ul><li>phpseclib demo cert</li></ul></li></ul>
+<p>An array is returned because each distinguished name property can (in theory) have multiple values</p>
+<p>Valid property names are enumerated upon at <a href="/docs/dnsprops">Distinguished Property Names</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="getdn"></a><a href="#getdn" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getDN()</h3>
+<pre><code class="hljs css language-php">print_r($x509-&gt;getDN());
+</code></pre>
+<p><code>getDN()</code> accepts several different parameters:</p>
+<ul>
+<li><p><code>X509::DN_ARRAY</code> (the default value) returns an array who's keys are based on the ASN.1 syntax for X.509:</p>
+  <ul class="printr"><li><span class="name">rdnSequence</span><ul><li><span class="name">0</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-organizationName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">utf8String</span><ul><li>phpseclib demo cert</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul>
+</li>
+<li><p><code>X509::DN_STRING</code> returns an OpenSSL-style string:</p>
+<pre><code class="hljs"><span class="hljs-attr">O</span>=phpseclib demo cert
+</code></pre></li>
+<li><p><code>X509::DN_OPENSSL</code> returns an OpenSSL-style array:</p>
+  <ul class="printr"><li><span class="name">O</span><ul><li>phpseclib demo cert</li></ul></li></ul>
+</li>
+<li><p><code>X509::DN_ASN1</code> returns a DER encoded binary string</p></li>
+<li><p><code>X509::DN_CANON</code> returns a &quot;canonicalized&quot; DER encoded binary string wherein SEQUENCE around RDNs and all string values normalized as trimmed lowercase UTF-8 with all spacing as one blank. Constructed RDNs are not canonicalized.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="getpublickey"></a><a href="#getpublickey" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getPublicKey()</h3>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $x509-&gt;getPublicKey();
+</code></pre>
+<p>Returns a <code>\phpseclib3\Crypt\Common\PublicKey</code> object that, by default, gets cast to a PKCS8-encoded public key:</p>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQClAGXDCg5G9JmpSakvmmgAMtax
+EHHnm0uzdirxl9uRKjycd61s+c66Qg/<span class="hljs-number">82</span>XGfef8wY6+xdBr00uKwtDpSbIvIlddV
+bwWfqkJAimfKCM1uhyCzq6PjtQRcPAzCV8so9nzQzuGYymFlnhRv8gF7RLko3vtj
+Fi8UoYp8w1cplbHX/wIDAQAB
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="validating-signatures"></a><a href="#validating-signatures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Validating Signatures</h2>
+<p>CSR's are always self-signed.</p>
+<pre><code class="hljs css language-php">$x509 = <span class="hljs-keyword">new</span> X509();
+$csr = $x509-&gt;loadCSR(file_get_contents(<span class="hljs-string">'csr.csr'</span>));
+<span class="hljs-keyword">echo</span> $x509-&gt;validateSignature() ? <span class="hljs-string">'valid'</span> : <span class="hljs-string">'invalid'</span>;
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="creating-csrs-an-example"></a><a href="#creating-csrs-an-example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating CSRs: An Example</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">X509</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
+
+$privKey = RSA::createKey();
+
+$x509 = <span class="hljs-keyword">new</span> X509();
+$x509-&gt;setPrivateKey($privKey);
+$x509-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib demo cert'</span>);
+
+$csr = $x509-&gt;signCSR();
+
+<span class="hljs-keyword">echo</span> $x509-&gt;saveCSR($csr);
+</code></pre>
+<p>Domains can be added to a CSR by doing <code>$x509-&gt;setDomain('www.domain.tld')</code>. Note that whereas <code>$x509-&gt;setDomain()</code> can be used to add multiple domains for X.509 certificates only one domain can be added, with this approach, to CSRs. This is a limitation of phpseclib - not of the CSR format.</p>
+<p>Multiple domains may be added by doing the following (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-php"><span class="hljs-comment">#</span>
+<span class="hljs-comment">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-comment">#</span>
+$csr = $x509-&gt;signCSR();
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#-----[ BEFORE, ADD ]-----------------------------------</span>
+<span class="hljs-comment">#</span>
+$x509-&gt;loadCSR($x509-&gt;saveCSR($x509-&gt;signCSR()));
+$x509-&gt;setExtension(<span class="hljs-string">'id-ce-subjectAltName'</span>, [
+    [<span class="hljs-string">'dNSName'</span> =&gt; <span class="hljs-string">'www.domain.tld'</span>],
+    [<span class="hljs-string">'dNSName'</span> =&gt; <span class="hljs-string">'domain.tld'</span>]
+]);
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/x509"><span class="arrow-prev">← </span><span>X.509</span></a><a class="docs-next button" href="/docs/spkac"><span>SPKAC</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#reading-csrs">Reading CSRs</a><ul class="toc-headings"><li><a href="#getdnprop">getDNProp()</a></li><li><a href="#getdn">getDN()</a></li><li><a href="#getpublickey">getPublicKey()</a></li></ul></li><li><a href="#validating-signatures">Validating Signatures</a></li><li><a href="#creating-csrs-an-example">Creating CSRs: An Example</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Overview · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Best Practices"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Overview · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="## Best Practices"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Public Keys</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Overview</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="best-practices"></a><a href="#best-practices" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Best Practices</h2>
+<p>Elliptic Curves are the best practices solution for both signature creation / verification and for diffie-hellman key exchange. The specific curves that you ought to be using for signing are Ed25519 (for 128-bit comparable security) or Ed448 (for 256-bit comparable security). For diffie-hellman key exchange the curves that you ought to be using are Curve25519 (for 128-bit comparable security) or Curve448 (for 256-bit comparable security).</p>
+<h2><a class="anchor" aria-hidden="true" id="loading-keys"></a><a href="#loading-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Loading Keys</h2>
+<p>The recommended way to load public keys is to do so thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(file_get_contents(<span class="hljs-string">'/path/to/key.pem'</span>), $password = <span class="hljs-keyword">false</span>);
+</code></pre>
+<p>The password is optional.</p>
+<p>So let's say you have a key that looks like <code>-----BEGIN PRIVATE KEY-----</code>. Is that an RSA key, a DSA key, an EC key, or what? With this approach you don't need to know what type the key is - it'll be automatically determined for you. Even passing in an X.509 certificate will work - you'll get back the public key portion of that certificate <sup style="color: red"><strong>[1]</strong></sup></p>
+<p>If a key can't be load a <code>phpseclib3\Exception\NoKeyLoadedException</code> exception will be thrown.</p>
+<p>If you have a key that you believe should have been loadable but wasn't you can get more detailed information on why it didn't load if you know the key type (RSA, DSA, EC, etc) and the format. eg.</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
+
+$key = RSA::loadFormat(<span class="hljs-string">'PKCS1'</span>, file_get_contents(<span class="hljs-string">'/path/to/key.pem'</span>), <span class="hljs-string">'password'</span>);
+</code></pre>
+<p>(again, the password is optional)</p>
+<p>All successfully loaded keys are an instance of <code>phpseclib3\Crypt\Common\AsymmetricKey</code>.</p>
+<p>The format of a successfully loaded key can be determined by looking at <code>$key-&gt;getLoadedFormat()</code>. This will return a string. Note that keys embedded within X.509 certificates will not identify themselves as X.509 - rather, they'll identify themselves as PKCS8, due to various technical reasons.</p>
+<div style="font-size: 11px">
+<p><sup style="color: red"><strong>[1]</strong></sup> When an X.509 key is loaded <em>no</em> validation is performed. A public key will be returned even if the certificate is expired and even if the signature is invalid. The <em>best</em> way to get the public key in an X.509 cert is to use the explicit <a href="/docs/x509">X.509 functionality</a> that phpseclib provides but PublicKeyLoader does work, as well, albeit suboptimally.</p>
+</div>
+<h2><a class="anchor" aria-hidden="true" id="publickey-vs-privatekey"></a><a href="#publickey-vs-privatekey" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PublicKey vs. PrivateKey</h2>
+<p><code>PublicKeyLoader::load</code> will return either PublicKey objects, PrivateKey objects or Parameters objects (discussed in another section).</p>
+<p>Public and Private Keys can be distinguished as follows:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $key <span class="hljs-keyword">instanceof</span> \phpseclib3\Crypt\Common\PublicKey ? <span class="hljs-string">'public key'</span> : <span class="hljs-string">'private key'</span>;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $key <span class="hljs-keyword">instanceof</span> \phpseclib3\Crypt\Common\PrivateKey ? <span class="hljs-string">'private key'</span> : <span class="hljs-string">'public key'</span>;
+</code></pre>
+<p><code>PrivateKey</code> is an interface implementing the following methods:</p>
+<ul>
+<li><code>sign($message)</code></li>
+<li><code>getPublicKey()</code></li>
+<li><code>toString($type, array $options = [])</code></li>
+<li><code>withPassword($string)</code></li>
+</ul>
+<p>RSA PrivateKey objects also implement <code>decrypt($ciphertext)</code> but because EC and DSA PrivateKey objects do not support encryption / decryption the interface itself does not define it.</p>
+<p><code>PublicKey</code> is an interface implementing the following methods:</p>
+<ul>
+<li><code>verify($message, $signature)</code></li>
+<li><code>toString($type, array $options = [])</code></li>
+<li><code>getFingerprint($algorithm)</code></li>
+</ul>
+<p>RSA PublicKey objects also implement <code>encrypt($plaintext)</code> but because EC and DSA PrivateKey objects do not support encryption / decryption the interface itself does not define it.</p>
+<p>All of these methods are discussed elsewhere, either on this page or on the algorithm specific pages.</p>
+<h2><a class="anchor" aria-hidden="true" id="immutability"></a><a href="#immutability" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Immutability</h2>
+<p>All AsymmetricKey object are <a href="https://en.wikipedia.org/wiki/Immutable_object">immutable</a>. Consequently, if you want to set a parameter (eg. the hash) you do <code>$key = $key-&gt;withHash('sha256')</code> (instead of <code>$key-&gt;setHash('sha256')</code>).</p>
+<h2><a class="anchor" aria-hidden="true" id="supported-key-formats"></a><a href="#supported-key-formats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Supported Key Formats</h2>
+<p>Supported key formats for a given algorithm can be determined by doing <code>\phpseclib3\Crypt\RSA::getSupportedKeyFormats()</code> (replace <code>RSA</code> with <code>DSA</code> or <code>EC</code> or whatever, as appropriate). What's returned is an associative array wherein the key is the name of the format and the value is the namespaced classname of the plugin that enables phpseclib to read the format.</p>
+<h2><a class="anchor" aria-hidden="true" id="common-key-formats"></a><a href="#common-key-formats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Common Key Formats</h2>
+<p><strong>PKCS1</strong> keys supports <em>most</em> public key algorithms but not Ed25519 / Curve25519 <sup style="color: red"><strong>[1]</strong></sup>. Both private and public keys are supported as are <a href="https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail">PEM</a> (base64) encoded keys and binary encoded keys.</p>
+<p><strong><span style="color: green">PKCS8</span></strong> keys are the only keys that support all public key algorithms. Both private and public keys are supported <sup style="color: red"><strong>[2]</strong></sup> as are PEM encoded keys and binary encoded keys. <span style="color: green"><em>This is the default format that phpseclib uses</em></span>.</p>
+<p><strong>PuTTY</strong> keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported <sup style="color: red"><strong>[3]</strong></sup>.</p>
+<p><strong>OpenSSH</strong> keys have the same limitations as PuTTY keys and one additional limitation: encrypted private keys are not supported <sup style="color: red"><strong>[4]</strong></sup>. Both public and private keys are supported <sup style="color: red"><strong>[5]</strong></sup>.</p>
+<p><strong>XML</strong> keys only support private keys for RSA. Public keys are supported for all other algorithms, including RSA, but not Ed25519 / Curve25519 <sup style="color: red"><strong>[6]</strong></sup>.</p>
+<div style="font-size: 11px">
+<p><sup style="color: red"><strong>[1]</strong></sup> <a href="https://en.wikipedia.org/wiki/PKCS_1">PKCS1</a> only discusses the storage of RSA keys but there's not a formal specification I'm aware of for the <code>-----BEGIN DSA PRIVATE KEY-----</code> format. For Elliptic Curves there's <a href="https://tools.ietf.org/html/rfc5915">RFC5915</a> but we're already using PKCS1 for RSA and DSA keys and RFC5915 is a weird name anyway.</p>
+<p><sup style="color: red"><strong>[2]</strong></sup> <a href="https://en.wikipedia.org/wiki/PKCS_8">PKCS8</a> only discusses the storage of private keys but the concept can be extended more generally to public keys as well. The public key format conforms to <code>SubjectPublicKeyInfo</code> as defined in <a href="https://tools.ietf.org/html/rfc5280#page-117">RFC5280</a> and JavaScript's <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#SubjectPublicKeyInfo">SubtleCrypto API</a> and Java's <a href="https://docs.oracle.com/javase/7/docs/api/java/security/spec/X509EncodedKeySpec.html">X509EncodedKeySpec</a>, etc. In my opinion both X509 an SubjectPublicKeyInfo are pretty terrible names and since there's not a naming conflict with PKCS8 for public keys I've opted to use that name. They're spiritually very similar as is.</p>
+<p>In PKCS1 the &quot;<a href="https://tools.ietf.org/html/rfc1421#section-4.4">pre-encapsulation boundaries</a>&quot; for public and private keys is (by convention) <code>-----BEGIN RSA PRIVATE KEY-----</code> and <code>-----BEGIN RSA PUBLIC KEY-----</code>. In PKCS8 the pre-encapsulation boundary for a private key is (by convention) <code>-----BEGIN PRIVATE KEY-----</code>. If PKCS8 did discuss how to encode public keys it would no doubt use <code>-----BEGIN PUBLIC KEY-----</code> as the pre-encapsulation boundary.</p>
+<p><sup style="color: red"><strong>[3]</strong></sup> The public key format conforms to <a href="https://tools.ietf.org/html/rfc4716">RFC4716</a>. phpseclib calls it PuTTY because puttygen is package I've seen that supports this format and because PuTTY doesn't otherwise have a public key format.</p>
+<p><sup style="color: red"><strong>[4]</strong></sup> Encrypted keys are not supported (an exception will be thrown if you try to use them) because they use a customized version of <a href="https://en.wikipedia.org/wiki/Bcrypt">bcrypt</a>, which encrypts OxychromaticBlowfishSwatDynamite 64x instead of OrpheanBeholderScryDoubt. Because of this customization PHP's <a href="http://php.net/password-hash">built-in bcrypt implementation</a> cannot be used and a pure-PHP implementation is far to slow.</p>
+<p><sup style="color: red"><strong>[5]</strong></sup> Private keys conform to the format described in <a href="https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/PROTOCOL.key?rev=1.1">PROTOCOL.key</a>. Public keys are of the same format utilized by <code>~/.ssh/authorized_keys</code> and conform to <a href="https://tools.ietf.org/html/rfc4253#page-15">RFC4253</a> / <a href="https://tools.ietf.org/html/rfc5656#section-3.1">RFC5656</a>.</p>
+<p><sup style="color: red"><strong>[6]</strong></sup> RSA Private Keys conform to the format described in the <a href="https://en.wikipedia.org/wiki/XKMS">XML Key Management Specification (XKMS)</a>. Public keys (for all algorithms, save for Ed25519 / Curve25519) conform to the format described in the <a href="https://en.wikipedia.org/wiki/XML_Signature">XML Signature</a> standard.</p>
+</div>
+<h2><a class="anchor" aria-hidden="true" id="saving-keys"></a><a href="#saving-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Saving Keys</h2>
+<p>Keys can be saved (<a href="https://en.wikipedia.org/wiki/Serialization">serialized</a>) by casting the key objects to strings. eg. <code>file_put_contents('key.pem', $key)</code> or <code>echo $key</code>. When this approach is used the format utilized is PKCS8.</p>
+<p>To use a custom format one must call <code>$key-&gt;toString('PKCS1')</code> (changing that up as appropriate for the specific format you desire).</p>
+<p>Private keys can be encrypted (in formats that support encryption) by doing <code>$key-&gt;withPassword('demo')</code>. Calling <code>$key-&gt;withPassword()</code> on a public key will throw an exception since that method is not implemented for public keys (since no public key format supports encryption).</p>
+<p>Note that loading a key and then saving it may not yield the exact same sequence of bytes. In the case of encrypted keys, even though the password is preserved, the encryption parameters are not. So a PKCS8 key using pbeWithSHAAnd3-KeyTripleDES-CBC will be saved using id-PBES2 / aes128-CBC-PAD, unless you changed it. And even if you did load a id-PBES2 / aes128-CBC-PAD key the salt is randomly generated. OpenSSH keys have two random &quot;checkint&quot;'s that are supposed to match, ASN.1 encoded keys may have optional defaults that can either be explicitly or implicitly encoded, etc.</p>
+<h3><a class="anchor" aria-hidden="true" id="pkcs1"></a><a href="#pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PKCS1</h3>
+<p>By default, PKCS1 private keys uses AES-128-CBC as the encryption algorithm / mode. This can be configured thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Common</span>\<span class="hljs-title">Formats</span>\<span class="hljs-title">Keys</span>\<span class="hljs-title">PKCS1</span>;
+
+PKCS1::setEncryptionAlgorithm(<span class="hljs-string">'DES-EDE3-CBC'</span>);
+
+<span class="hljs-keyword">echo</span> $key-&gt;withPassword(<span class="hljs-string">'demo'</span>)-&gt;toString(<span class="hljs-string">'PKCS1'</span>);
+</code></pre>
+<p>Supported encryption algorithms for PKCS1 are as follows:</p>
+<ul>
+<li>AES-128</li>
+<li>AES-192</li>
+<li>AES-256</li>
+<li>DES-EDE3</li>
+<li>DES</li>
+</ul>
+<p>What you pass to <code>setEncryptionAlgorithm</code> needs to include the algorithm and the mode, separated by a dash. Supported modes for PKCS1 are as follows:</p>
+<ul>
+<li>CBC</li>
+<li>ECB</li>
+<li>CFB</li>
+<li>OFB</li>
+<li>CTR</li>
+</ul>
+<p>If you want to set the mode on a per-key basis instead of globally you can do this:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $key
+    -&gt;withPassword(<span class="hljs-string">'demo'</span>)
+    -&gt;toString(<span class="hljs-string">'PKCS1'</span>, [<span class="hljs-string">'encryptionAlgorithm'</span> =&gt; <span class="hljs-string">'DES-EDE3-CBC'</span>]);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="pkcs8"></a><a href="#pkcs8" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PKCS8</h3>
+<p>By default, PKCS8 private keys uses id-PBES2 as the encryption algorithm, aes128-CBC-PAD as the encryption scheme, id-hmacWithSHA256 as the pseudo-random function and 2048 as the iteration count.</p>
+<p>Valid options for <code>PKCS8::setEncryptionAlgorithm</code> are as follows:</p>
+<p><a href="https://tools.ietf.org/html/rfc2898#appendix-A.3">PBES1 encryption scheme</a>:</p>
+<ul>
+<li>pbeWithMD2AndDES-CBC</li>
+<li>pbeWithMD2AndRC2-CBC</li>
+<li>pbeWithMD5AndDES-CBC</li>
+<li>pbeWithMD5AndRC2-CBC</li>
+<li>pbeWithSHA1AndDES-CBC</li>
+<li>pbeWithSHA1AndRC2-CBC</li>
+<li>pbeWithSHAAnd3-KeyTripleDES-CBC</li>
+<li>pbeWithSHAAnd2-KeyTripleDES-CBC</li>
+<li>pbeWithSHAAnd128BitRC2-CBC</li>
+<li>pbeWithSHAAnd40BitRC2-CBC</li>
+<li>pbeWithSHAAnd128BitRC4</li>
+<li>pbeWithSHAAnd40BitRC4</li>
+</ul>
+<p><a href="https://tools.ietf.org/html/rfc2898#appendix-A.4">PBES2 encryption scheme</a>:</p>
+<ul>
+<li>id-PBES2</li>
+</ul>
+<p>PBES1 &quot;combines the PBKDF1 function&quot; (or a key deriviation function defined in <a href="https://tools.ietf.org/html/rfc7292#appendix-B">PKCS#12</a>) and &quot;is recommended only for compatibility with existing applications&quot;.</p>
+<p>PBES2 &quot;combines a password-based key derivation function, which shall be <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>&quot; and &quot;is recommended for new applications&quot;.</p>
+<p><code>PKCS8::setIterationCount</code> sets the iteration count.</p>
+<p>The rest of the methods discussed are only used for PBES2.</p>
+<p>Valid options for <code>PKCS8::setEncryptionScheme</code> are as follows:</p>
+<ul>
+<li>desCBC</li>
+<li>des-EDE3-CBC</li>
+<li>rc2CBC</li>
+<li>aes128-CBC-PAD</li>
+<li>aes192-CBC-PAD</li>
+<li>aes256-CBC-PAD</li>
+</ul>
+<p>Valid options for <code>PKCS8::setPRF</code> are as follows:</p>
+<ul>
+<li>id-hmacWithSHA1</li>
+<li>id-hmacWithSHA224</li>
+<li>id-hmacWithSHA256</li>
+<li>id-hmacWithSHA384</li>
+<li>id-hmacWithSHA512</li>
+<li>id-hmacWithSHA512-224</li>
+<li>id-hmacWithSHA512-256</li>
+</ul>
+<p>Putting everthing together here's a complete example of how you'd change these parameters up:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Common</span>\<span class="hljs-title">Formats</span>\<span class="hljs-title">Keys</span>\<span class="hljs-title">PKCS8</span>;
+
+PKCS8::setEncryptionAlgorithm(<span class="hljs-string">'id-PBES2'</span>);
+PKCS8::setEncryptionScheme(<span class="hljs-string">'aes256-CBC-PAD'</span>);
+PKCS8::setPRF(<span class="hljs-string">'id-hmacWithSHA512-256'</span>);
+PKCS8::setIterationCount(<span class="hljs-number">4096</span>);
+
+<span class="hljs-keyword">echo</span> $key-&gt;withPassword(<span class="hljs-string">'demo'</span>);
+</code></pre>
+<p>If you want to set the mode on a per-key basis instead of globally you can do this:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $key
+    -&gt;withPassword(<span class="hljs-string">'demo'</span>)
+    -&gt;toString(<span class="hljs-string">'PKCS8'</span>, [
+        <span class="hljs-string">'encryptionAlgorithm'</span> =&gt; <span class="hljs-string">'id-PBES2'</span>,
+        <span class="hljs-string">'encryptionScheme'</span> =&gt; <span class="hljs-string">'aes256-CBC-PAD'</span>,
+        <span class="hljs-string">'PRF'</span> =&gt; <span class="hljs-string">'id-hmacWithSHA512-256'</span>,
+        <span class="hljs-string">'iterationCount'</span> =&gt; <span class="hljs-number">4096</span>
+    ]);
+</code></pre>
+<p>Uniquely, the PKCS8 class has a <code>extractEncryptionAlgorithm</code> that'll let you see the encryption algorithm the key is using. This method does not exist for other key formats because, with other key formats, the format is in plain ASCII. In the case of PKCS8 it's embedded into the keys ASN.1 structure with OIDs. Here's an example of that:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Common</span>\<span class="hljs-title">Formats</span>\<span class="hljs-title">Keys</span>\<span class="hljs-title">PKCS8</span>;
+
+print_r(PKCS8::extractEncryptionAlgorithm($key));
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="putty"></a><a href="#putty" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PuTTY</h3>
+<p>PuTTY private keys only support one encryption algorithm (aes256-cbc) so there are no methods to change it.</p>
+<p>Both PuTTY public and private keys support comments, which can be changed thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Common</span>\<span class="hljs-title">Formats</span>\<span class="hljs-title">Keys</span>\<span class="hljs-title">PuTTY</span>;
+
+PuTTY::setComment(<span class="hljs-string">'whatever'</span>);
+<span class="hljs-keyword">echo</span> $key-&gt;toString(<span class="hljs-string">'PuTTY'</span>);
+</code></pre>
+<p>...or...</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $key-&gt;toString(<span class="hljs-string">'PuTTY'</span>, [<span class="hljs-string">'comment'</span> =&gt; <span class="hljs-string">'whatever'</span>]);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="openssh"></a><a href="#openssh" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>OpenSSH</h3>
+<p>Although OpenSSH private keys support encryption phpseclib does not support them, for various technical reasons.</p>
+<p>Both OpenSSH public and private keys support comments, which can be changed thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Common</span>\<span class="hljs-title">Formats</span>\<span class="hljs-title">Keys</span>\<span class="hljs-title">OpenSSH</span>;
+
+OpenSSH::setComment(<span class="hljs-string">'whatever'</span>);
+<span class="hljs-keyword">echo</span> $key-&gt;toString(<span class="hljs-string">'OpenSSH'</span>);
+</code></pre>
+<p>...or...</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $key-&gt;toString(<span class="hljs-string">'OpenSSH'</span>, [<span class="hljs-string">'comment'</span> =&gt; <span class="hljs-string">'whatever'</span>]);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="custom-key-formats"></a><a href="#custom-key-formats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Custom Key Formats</h2>
+<p>Custom key formats can be added by doing <code>\phpseclib3\Crypt\RSA::addFileFormat()</code>. So let's say you wanted to be able to load keys created by <a href="https://pear.php.net/package/Crypt_RSA">PEAR's Crypt_RSA</a>. The following would be sufficient:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Math</span>\<span class="hljs-title">BigInteger</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PEAR</span>
+</span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">load</span><span class="hljs-params">($key, $password = <span class="hljs-string">''</span>)</span>
+    </span>{
+        <span class="hljs-keyword">if</span> (!is_string($key)) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \UnexpectedValueException(<span class="hljs-string">'Key should be a string - not a '</span> . gettype($key));
+        }
+
+        <span class="hljs-comment">// should use ParagonIE\ConstantTime\Base64 but for brevity we won't</span>
+        $key = base64_decode($key);
+
+        <span class="hljs-keyword">if</span> (!is_string($key)) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \UnexpectedValueException(<span class="hljs-string">'Base64 decoding produced an error'</span>);
+        }
+
+        $key = unserialize($key);
+
+        <span class="hljs-keyword">if</span> (!is_array($key)) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \UnexpectedValueException(<span class="hljs-string">'Unserializing produced an error'</span>);
+        }
+
+        <span class="hljs-keyword">return</span> [
+            <span class="hljs-string">'modulus'</span> =&gt; <span class="hljs-keyword">new</span> BigInteger($key[<span class="hljs-number">0</span>], <span class="hljs-number">256</span>),
+            <span class="hljs-string">'publicExponent'</span> =&gt; <span class="hljs-keyword">new</span> BigInteger($key[<span class="hljs-number">1</span>], <span class="hljs-number">256</span>),
+            <span class="hljs-string">'isPublicKey'</span> =&gt; $key[<span class="hljs-number">2</span>] == <span class="hljs-string">'public'</span>
+        ];
+    }
+}
+
+$key = <span class="hljs-string">'YTozOntpOjA7czoxMjg6Ij3ZbmQEZuLuvDVxVo3FaoNI0gaOiDKguZqWKX+DTjW19umiCMf43onkCdsGp/wZ5Qyn+xTgBZ/1Dt4FM9z40HFq05fJCKtZFDxtBa5be5khtqqzvS6riXjCF3g7DDlvr1MCDytHxk42KnjWM/C32Qk5xl1PTUqkB8WMVICqLryhIjtpOjE7czoxMjg6IoXrTkH1481uyr/CNVnlLn0HwxE4HIIBJHzPiitvvVynqPwq8bUV3hfHrJ1W+4khgGbVhJjqtGtZGmsRnlLCK349aEb05occqCpNR//IcBvfLPZ0Db6jJ2+JdOTcVhjIw33/wPhPReAuIxmMBmItUot+68vxifq2fj46NdXQJ5ZNIjtpOjI7czo3OiJwcml2YXRlIjt9'</span>;
+
+RSA::addFileFormat(PEAR::class);
+
+$key = PublicKeyLoader::load($key);
+</code></pre>
+<p>Keys of this format can be generated with PEAR's Crypt_RSA thusly:</p>
+<pre><code class="hljs css language-php">$key_pair = <span class="hljs-keyword">new</span> Crypt_RSA_KeyPair(<span class="hljs-number">1024</span>);
+<span class="hljs-keyword">echo</span> $key_pair-&gt;getPrivateKey()-&gt;toString() . <span class="hljs-string">"\n\n\n"</span>;
+<span class="hljs-keyword">echo</span> $key_pair-&gt;getPublicKey()-&gt;toString() . <span class="hljs-string">"\n\n\n"</span>;
+</code></pre>
+<p><sup>(note that public keys won't correctly generate due to <a href="https://pear.php.net/bugs/bug.php?id=26925">Bug # 26925</a>)</sup></p>
+<p>To make it so that keys can be saved using these custom format plugins you'll need to add <code>savePublicKey</code> and <code>savePrivateKey</code> methods.</p>
+<p>The exact parameters and return values depend on the algorithm being used. Check the files in the <code>Crypt/*/Formats/Keys</code> directories for specific examples.</p>
+<h2><a class="anchor" aria-hidden="true" id="public-key-fingerprints"></a><a href="#public-key-fingerprints" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Key Fingerprints</h2>
+<p><a href="https://en.wikipedia.org/wiki/Public_key_fingerprint">Public key fingerprints</a> can be obtained by doing <code>$publicKey-&gt;getFingerprint($algorithm)</code>. The only supported values for <code>$algorithm</code> are <code>'sha256'</code> and <code>'md5'</code>. What phpseclib returns is identical to what you'd get by running <code>ssh-keygen -lf key.pub</code> on the command line.</p>
+<p>Due to the SSH2 tie-in a public key algorithm with parameters not supported by SSH2 will not generate a fingerprint.</p>
+<p>See <a href="https://tools.ietf.org/html/rfc4716#section-4">RFC4716</a> for more information.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/diagnosis"><span class="arrow-prev">← </span><span>Diagnosing Issues</span></a><a class="docs-next button" href="/docs/rsa"><span>RSA</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#best-practices">Best Practices</a></li><li><a href="#loading-keys">Loading Keys</a></li><li><a href="#publickey-vs-privatekey">PublicKey vs. PrivateKey</a></li><li><a href="#immutability">Immutability</a></li><li><a href="#supported-key-formats">Supported Key Formats</a></li><li><a href="#common-key-formats">Common Key Formats</a></li><li><a href="#saving-keys">Saving Keys</a><ul class="toc-headings"><li><a href="#pkcs1">PKCS1</a></li><li><a href="#pkcs8">PKCS8</a></li><li><a href="#putty">PuTTY</a></li><li><a href="#openssh">OpenSSH</a></li></ul></li><li><a href="#custom-key-formats">Custom Key Formats</a></li><li><a href="#public-key-fingerprints">Public Key Fingerprints</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>RSA · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Loading and saving keys is discussed in [Public Keys: Overview](/docs/publickeys)."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="RSA · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="Loading and saving keys is discussed in [Public Keys: Overview](/docs/publickeys)."/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Public Keys</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">RSA</h1></header><article><div><span><p>Loading and saving keys is discussed in <a href="/docs/publickeys">Public Keys: Overview</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="supported-formats"></a><a href="#supported-formats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Supported Formats</h2>
+<ul>
+<li><strong>PKCS1</strong> <sup style="color: red"><strong>[1]</strong></sup>
+<ul>
+<li>Keys start with <code>-----BEGIN RSA PRIVATE KEY-----</code> or <code>-----BEGIN RSA PUBLIC KEY-----</code></li>
+</ul></li>
+<li><strong>PKCS8</strong> <sup style="color: red"><strong>[1]</strong></sup>
+<ul>
+<li>Keys start with <code>-----BEGIN PRIVATE KEY-----</code> or <code>-----BEGIN ENCRYPTED PRIVATE KEY-----</code> or <code>-----BEGIN PUBLIC KEY-----</code></li>
+</ul></li>
+<li><strong>PSS</strong> <sup style="color: red"><strong>[1]</strong></sup><sup style="color: red"><strong>*</strong></sup>
+<ul>
+<li>Corresponds to the <code>openssl genpkey -algorithm rsa-pss</code> command</li>
+<li>Similar to PKCS8 but with <a href="https://tools.ietf.org/html/rfc4055#section-3.1">RSASSA-PSS-params</a> for the optional &quot;parameters&quot; attribute and a different OID (<code>id-RSASSA-PSS</code> vs <code>rsaEncryption</code>).</li>
+</ul></li>
+<li><strong>PuTTY</strong>
+<ul>
+<li>Public keys start off with <code>---- BEGIN SSH2 PUBLIC KEY ----</code></li>
+</ul></li>
+<li><strong>OpenSSH</strong>
+<ul>
+<li>Private keys start with <code>-----BEGIN OPENSSH PRIVATE KEY-----</code></li>
+</ul></li>
+<li><strong>XML</strong></li>
+<li><strong>MSBLOB</strong> <sup style="color: red"><strong>*</strong></sup>
+<ul>
+<li>Private keys correspond to the format described in <a href="https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs#private-key-blobs">Private Key BLOBs</a></li>
+<li>Public keys correspond to the format described in <a href="https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs#public-key-blobs">Public Key BLOBs</a></li>
+</ul></li>
+</ul>
+<p>A more in-depth discussion of the common formats (ie. ones that don't have a red asterisk<sup style="color: red"><strong>*</strong></sup> next to them) can be found in <a href="/docs/publickeys#common-key-formats">Common Key Formats</a>. See <a href="/docs/rsa-keys">Sample RSA Keys</a> for actual samples.</p>
+<div style="font-size: 11px">
+<p><sup style="color: red"><strong>[1]</strong></sup> These are the only formats that support <a href="https://tools.ietf.org/html/rfc8017#section-3">multi-prime RSA</a>.</p>
+</div>
+<h3><a class="anchor" aria-hidden="true" id="raw-rsa-public-keys"></a><a href="#raw-rsa-public-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Raw RSA Public Keys</h3>
+<p>Let's say you had the public key exponent and the public key modulo as distinct string values. Let's further say that they were hex-encoded. At that point you could load the key thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Math</span>\<span class="hljs-title">BigInteger</span>;
+
+$key = PublicKeyLoader::load([
+    <span class="hljs-string">'e'</span> =&gt; <span class="hljs-keyword">new</span> BigInteger($e, <span class="hljs-number">16</span>),
+    <span class="hljs-string">'n'</span> =&gt; <span class="hljs-keyword">new</span> BigInteger($n, <span class="hljs-number">16</span>)
+]);
+
+<span class="hljs-keyword">echo</span> $key;
+</code></pre>
+<p>The key that was output would be a PKCS8 key. <code>$key-&gt;getLoadedFormat()</code> would return <code>Raw</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="creating-keys"></a><a href="#creating-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating Keys</h2>
+<p>Keys can be created thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
+
+$private = RSA::createKey();
+$public = $private-&gt;getPublicKey();
+</code></pre>
+<p>By default keys are 2048 bits. Alternate key lengths can be specified by doing <code>RSA::createKey(1024)</code> or whatever.</p>
+<p>The exponent, by default, is <a href="https://en.wikipedia.org/wiki/65,537#Applications">65537</a>. It can be set by doing <code>RSA::setExponent(37)</code> or whatever (37 is what puttygen uses for the RSA keys it creates).</p>
+<p>Multi-prime RSA can be employed by calling <code>RSA::setSmallestPrime(256)</code>. By default it is 4096. As for why you'd want to use multi-prime RSA...  generating a 2048 bit RSA key, without GMP or OpenSSL installed, can be a time consuming process as it requires 2x 1024-bit prime numbers be generated. Generating 8x 256-bit prime numbers is considerably faster.</p>
+<h2><a class="anchor" aria-hidden="true" id="creating--verifying-signatures"></a><a href="#creating--verifying-signatures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating / Verifying Signatures</h2>
+<p>Signatures can be created / verified thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-comment">//$private = $private-&gt;withPadding(RSA::SIGNATURE_PSS);</span>
+$signature = $private-&gt;sign($message);
+<span class="hljs-keyword">echo</span> $private-&gt;getPublicKey()-&gt;verify($message, $signature) ?
+    <span class="hljs-string">'valid signature'</span> :
+    <span class="hljs-string">'invalid signature'</span>;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="rsasignature_pss"></a><a href="#rsasignature_pss" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::SIGNATURE_PSS</h3>
+<p>The <a href="https://en.wikipedia.org/wiki/Probabilistic_signature_scheme">Probabilistic Signature Scheme</a>. <span style="color: green">This is the default method.</span> It is more secure than the other methods but is less commonly used.</p>
+<p>The following methods can be used to configure this method:</p>
+<ul>
+<li><code>withHash</code> (defaults to sha256)</li>
+<li><code>withMGFHash</code> (defaults to sha256)</li>
+<li><code>withSaltLength</code> (defaults to 0)</li>
+</ul>
+<p>The minimum key length (<code>$key-&gt;getLength()</code>) is <code>8 * ($key-&gt;getHash()-&gt;getLengthInBytes() + $key-&gt;getSaltLength() + 2)</code>.</p>
+<p>Employs randomized padding so signing the same message twice will <em>not</em> yield the same signature twice.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsasignature_pkcs1"></a><a href="#rsasignature_pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::SIGNATURE_PKCS1</h3>
+<p>More commonly used, less secure.</p>
+<p>Uses <code>withHash</code>, which defaults to sha256.</p>
+<p>The minimum key length (<code>$key-&gt;getLength()</code>) depends on the hash being used:</p>
+<table>
+<thead>
+<tr><th>Hash</th><th>Min Key Length (in bits)</th></tr>
+</thead>
+<tbody>
+<tr><td>md2</td><td>360</td></tr>
+<tr><td>md5</td><td>360</td></tr>
+<tr><td>sha1</td><td>368</td></tr>
+<tr><td>sha256</td><td>496</td></tr>
+<tr><td>sha384</td><td>624</td></tr>
+<tr><td>sha512</td><td>752</td></tr>
+<tr><td>sha224</td><td>464</td></tr>
+<tr><td>sha512/224</td><td>464</td></tr>
+<tr><td>sha512/256</td><td>496</td></tr>
+</tbody>
+</table>
+<p>A &quot;simple&quot; formula isn't possible because, for this format, the &quot;DigestInfo&quot; of the hash algorithm is encoded in the base number, prior to modular exponentiation, and the length of this &quot;DigestInfo&quot; varies depending on the hash algorithm used (for example, for sha1, it's 15 bytes, and for sha256, it's 19 bytes).</p>
+<p>Does <em>not</em> employee randomized padding so signing the same message twice <em>will</em> yield the same signature twice.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsasignature_relaxed_pkcs1"></a><a href="#rsasignature_relaxed_pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::SIGNATURE_RELAXED_PKCS1</h3>
+<p>This is basically the same as PKCS1 with the caveat that the &quot;DigestInfo&quot; no longer has a fixed length.</p>
+<p><a href="https://tools.ietf.org/html/rfc8017#page-46">PKCS#1 § 9.2. EMSA-PKCS1-v1_5</a> says the following:</p>
+<pre><code class="hljs">  2.  Encode the algorithm ID for the hash function and the hash
+      value into an ASN.1 value of type DigestInfo (see
+      Appendix A.2.4) with the DER, where the type DigestInfo has
+      the syntax
+
+           DigestInfo ::= SEQUENCE {
+               digestAlgorithm AlgorithmIdentifier,
+               digest OCTET STRING
+           }
+
+      The first field identifies the hash function and the second
+      contains the hash value.  Let T be the DER encoding of the
+      DigestInfo value (see the notes below), and let tLen be the
+      length in octets of T.
+</code></pre>
+<p>DER in this case refers to the <a href="https://en.wikipedia.org/wiki/X.690#DER_encoding">Distinguished Encoding Rules</a>, a subset of the <a href="https://en.wikipedia.org/wiki/X.690#BER_encoding">Basic Encoding Rules</a> (BER). Anything encoding using DER is valid BER but not everything encoded in BER is valid DER. Signatures phpseclib creates are valid DER regardless of whether or not PKCS1 or RELAXED_PKCS1 modes are used but when it comes to signature verification RELAXED_PKCS1 actually decodes the BER instead of just matching strings of fixed length.</p>
+<h2><a class="anchor" aria-hidden="true" id="encryption--decryption"></a><a href="#encryption--decryption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Encryption / Decryption</h2>
+<p>Encryption / decryption can be done thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-comment">//$private = $private-&gt;withPadding(RSA::ENCRYPTION_OAEP);</span>
+$ciphertext = $private-&gt;getPublicKey()-&gt;encrypt($plaintext);
+<span class="hljs-keyword">echo</span> $private-&gt;decrypt($ciphertext);
+</code></pre>
+<p>All encryption schemes (save for <code>RSA::ENCRYPTION_NONE</code>) employ randomized padding so encrypting the same plaintext twice will yield different ciphertext's each time.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsaencryption_oaep"></a><a href="#rsaencryption_oaep" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::ENCRYPTION_OAEP</h3>
+<p><a href="https://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding">Optimal Asymmetric Encryption Padding</a>. <span style="color: green">This is the default method.</span> It is more secure than the other methods but is less commonly used.</p>
+<p>The following methods can be used to configure this method:</p>
+<ul>
+<li><code>withHash</code> (defaults to sha256)</li>
+<li><code>withMGFHash</code> (defaults to sha256)</li>
+<li><code>withLabel</code> (defaults to the empty string)</li>
+</ul>
+<p>The maxmimum plaintext length (in bytes) is <code>($key-&gt;getLength() - 2 * $key-&gt;getHash()-&gt;getLength() - 16) &gt;&gt; 3</code></p>
+<h3><a class="anchor" aria-hidden="true" id="rsaencryption_pkcs1"></a><a href="#rsaencryption_pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::ENCRYPTION_PKCS1</h3>
+<p>More commonly used, less secure.</p>
+<p>No methods can be used to configure this method.</p>
+<p>The maximum plaintext length (in bytes) is <code>($key-&gt;getLength() - 88) &gt;&gt; 3</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsaencryption_none"></a><a href="#rsaencryption_none" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::ENCRYPTION_NONE</h3>
+<p>Performs textbook RSA / basic modular exponentiation. This is not at all secure but may sometimes be needed for interoperability and also just general diagnosing of why ciphertext's aren't successfully decrypting even if the correct keys are being used (eg. it can be be used to provide insight into the &quot;structure&quot; of the decrypted message)</p>
+<p>The maximum plaintext length (in bytes) is <code>$key-&gt;getLength() &gt;&gt; 3</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="key-attributes"></a><a href="#key-attributes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Key Attributes</h2>
+<p>The bit length of the key (well, the modulus) can be determined by calling <code>$key-&gt;getLength()</code>.</p>
+<p>All the <code>with</code> methods have corresponding <code>get</code> methods as follows:</p>
+<table>
+<thead>
+<tr><th>Setter</th><th>Getter</th></tr>
+</thead>
+<tbody>
+<tr><td><code>withHash</code></td><td><code>getHash</code></td></tr>
+<tr><td><code>withMGFHash</code></td><td><code>getMGFHash</code></td></tr>
+<tr><td><code>withSaltLength</code></td><td><code>getSaltLength</code></td></tr>
+<tr><td><code>withLabel</code></td><td><code>getLabel</code></td></tr>
+<tr><td><code>withPadding</code></td><td><code>getPadding</code></td></tr>
+</tbody>
+</table>
+<p>While <code>withHash</code> and <code>withMGFHash</code> accept strings, <code>getHash</code> and <code>getMGFHash</code> return a Hash object (that can be cast to a string via <a href="https://www.php.net/manual/en/language.oop5.magic.php#object.tostring">__toString</a>). This enables you to do such things as determine what the minimum size of a key is by formula, as depicted in the <a href="/docs/rsa#rsasignature_pss">RSA::SIGNATURE_PSS</a> and <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a> sections.</p>
+<p>Padding is, internally, denoted as a bitmask. So the default value returned by <code>getPadding()</code> is <code>RSA::ENCRYPTION_OAEP | RSA::SIGNATURE_PSS</code>. Only one encryption mode and one signature mode can be set at a time.</p>
+<h2><a class="anchor" aria-hidden="true" id="public-keys-as-private-keys"></a><a href="#public-keys-as-private-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Keys as Private Keys</h2>
+<p>In theory, RSA public and private keys are indistinguishable from one another and are interchangeable. In theory, both consist simply of an exponent and a modulo.</p>
+<p>In practice, RSA private keys have additional parameters to speed up computation by means of the <a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem">Chinese Remainder Theorem</a>.</p>
+<p>For the sake of argument, however, let's say you had a key that just had the public key parameters but you wanted to use it as a private key. You could do so by doing <code>$key-&gt;asPrivateKey()</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="blinding"></a><a href="#blinding" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Blinding</h2>
+<p><a href="https://en.wikipedia.org/wiki/Blind_signature#Blind_RSA_signatures">Blinding</a> is enabled by default. It can be disabled / enabled by doing <code>RSA::disableBlinding()</code> / <code>RSA::enableBlinding()</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/publickeys"><span class="arrow-prev">← </span><span>Overview</span></a><a class="docs-next button" href="/docs/dsa"><span>DSA</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#supported-formats">Supported Formats</a><ul class="toc-headings"><li><a href="#raw-rsa-public-keys">Raw RSA Public Keys</a></li></ul></li><li><a href="#creating-keys">Creating Keys</a></li><li><a href="#creating--verifying-signatures">Creating / Verifying Signatures</a><ul class="toc-headings"><li><a href="#rsasignature_pss">RSA::SIGNATURE_PSS</a></li><li><a href="#rsasignature_pkcs1">RSA::SIGNATURE_PKCS1</a></li><li><a href="#rsasignature_relaxed_pkcs1">RSA::SIGNATURE_RELAXED_PKCS1</a></li></ul></li><li><a href="#encryption--decryption">Encryption / Decryption</a><ul class="toc-headings"><li><a href="#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a></li><li><a href="#rsaencryption_pkcs1">RSA::ENCRYPTION_PKCS1</a></li><li><a href="#rsaencryption_none">RSA::ENCRYPTION_NONE</a></li></ul></li><li><a href="#key-attributes">Key Attributes</a></li><li><a href="#public-keys-as-private-keys">Public Keys as Private Keys</a></li><li><a href="#blinding">Blinding</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

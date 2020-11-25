@@ -1,0 +1,371 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Running Commands · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## One-off commands"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Running Commands · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="## One-off commands"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>SSH2</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Running Commands</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="one-off-commands"></a><a href="#one-off-commands" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>One-off commands</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'pwd'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'ls -la'</span>);
+</code></pre>
+<p>By default <code>$ssh-&gt;exec()</code> returns both stdout and stderr. To suppress stderr you can call <code>$ssh-&gt;enableQuietMode()</code>. To re-enable it call <code>$ssh-&gt;disableQuietMode()</code>.</p>
+<p>To get stderr separately from stdout you'll need to call <code>$ssh-&gt;enableQuietMode()</code> and then call <code>$ssh-&gt;getStdError()</code>. These functions do <em>not</em> work with <code>$ssh-&gt;read()</code> (ie. when a PTY is enabled) for reasons described <a href="https://superuser.com/a/1581769/172193">here</a>.</p>
+<p>To get the exit status you can call <code>$ssh-&gt;getExitStatus()</code>.</p>
+<p>To see whether or not &quot;quiet mode&quot; is enabled do <code>$ssh-&gt;isQuietModeEnabled()</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="gotcha-successive-calls-to-exec"></a><a href="#gotcha-successive-calls-to-exec" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Gotcha: Successive calls to exec()</h3>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'pwd'</span>); <span class="hljs-comment">// outputs /home/username</span>
+$ssh-&gt;exec(<span class="hljs-string">'cd /'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'pwd'</span>); <span class="hljs-comment">// (despite the previous command) outputs /home/username</span>
+</code></pre>
+<p>If done on an interactive shell, the output you'd receive for the first pwd would (depending on how your system is setup) be different than the output of the second pwd. The above code snippet, however, will yield two identical lines.</p>
+<p>The reason for this is that any &quot;state changes&quot; you make to the one-time shell are gone once the exec() has been ran and the channel has been deleted.</p>
+<p>You can workaround this on Linux by doing <code>$ssh-&gt;exec('cd /; pwd')</code> or <code>$ssh-&gt;exec('cd / &amp;&amp; pwd')</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="interactive-shell"></a><a href="#interactive-shell" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interactive Shell</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+$ssh-&gt;write(<span class="hljs-string">"ls -la\n"</span>); <span class="hljs-comment">// note the "\n"</span>
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+</code></pre>
+<p>On a terminal you normally don't just type the command and expect to get the output. You type the command and then hit enter. To simulate that you'll need to add <code>&quot;\n&quot;</code> to the commands you send via <code>write()</code></p>
+<h3><a class="anchor" aria-hidden="true" id="gotcha-writing-without-first-reading"></a><a href="#gotcha-writing-without-first-reading" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Gotcha: Writing without first reading</h3>
+<p>You should always <code>$ssh-&gt;read()</code> the prompt <em>before</em> <code>$ssh-&gt;write()</code>'ing the command. Consider the following:</p>
+<pre><code class="hljs css language-php">$ssh = <span class="hljs-keyword">new</span> SSH2(<span class="hljs-string">'localhost'</span>);
+$ssh-&gt;login(<span class="hljs-string">'user'</span>, <span class="hljs-string">'pass'</span>);
+
+$ssh-&gt;write(<span class="hljs-string">"ping -c 5 127.0.0.1\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+</code></pre>
+<p>In this example the initial <code>$ssh-&gt;read('username@username:~$')</code> is being skipped. Superficially, this might seem reasonable enough, but in practice, it won't work.</p>
+<p>Here's the output of the code, as written:</p>
+<pre><code class="hljs">ping -c <span class="hljs-number">5</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>
+Last login: Thu Feb  <span class="hljs-number">6</span> <span class="hljs-number">06</span>:<span class="hljs-number">51</span>:<span class="hljs-number">26</span> <span class="hljs-number">2020</span> <span class="hljs-keyword">from</span> <span class="hljs-number">10.0</span><span class="hljs-number">.2</span><span class="hljs-number">.2</span>
+<span class="hljs-symbol">username@</span>username:~$
+</code></pre>
+<p>Here's the output if <code>$ssh-&gt;read('username@username:~$');</code> had been done before:</p>
+<pre><code class="hljs">ping -c <span class="hljs-number">5</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>
+PING <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span> (<span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>) <span class="hljs-number">56</span>(<span class="hljs-number">84</span>) bytes of data.
+<span class="hljs-number">64</span> bytes <span class="hljs-keyword">from</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>: icmp_seq=<span class="hljs-number">1</span> ttl=<span class="hljs-number">64</span> time=<span class="hljs-number">0.015</span> ms
+<span class="hljs-number">64</span> bytes <span class="hljs-keyword">from</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>: icmp_seq=<span class="hljs-number">2</span> ttl=<span class="hljs-number">64</span> time=<span class="hljs-number">0.038</span> ms
+<span class="hljs-number">64</span> bytes <span class="hljs-keyword">from</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>: icmp_seq=<span class="hljs-number">3</span> ttl=<span class="hljs-number">64</span> time=<span class="hljs-number">0.074</span> ms
+<span class="hljs-number">64</span> bytes <span class="hljs-keyword">from</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>: icmp_seq=<span class="hljs-number">4</span> ttl=<span class="hljs-number">64</span> time=<span class="hljs-number">0.038</span> ms
+<span class="hljs-number">64</span> bytes <span class="hljs-keyword">from</span> <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span>: icmp_seq=<span class="hljs-number">5</span> ttl=<span class="hljs-number">64</span> time=<span class="hljs-number">0.044</span> ms
+
+--- <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span> ping statistics ---
+<span class="hljs-number">5</span> packets transmitted, <span class="hljs-number">5</span> received, <span class="hljs-number">0</span>% packet loss, time <span class="hljs-number">4093</span>ms
+rtt min/avg/max/mdev = <span class="hljs-number">0.015</span>/<span class="hljs-number">0.041</span>/<span class="hljs-number">0.074</span>/<span class="hljs-number">0.020</span> ms
+<span class="hljs-symbol">username@</span>username:~$
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="gotcha-echoing-out-stdin"></a><a href="#gotcha-echoing-out-stdin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Gotcha: echo'ing out stdin</h3>
+<p>Let's say you wanted to &quot;stream&quot; a bunch of bytes into a file via stdin. Superficially one might think this would work:</p>
+<pre><code class="hljs"><span class="hljs-variable">$ssh</span>-&gt;exec(<span class="hljs-string">'cat &gt; filename.ext'</span>);
+<span class="hljs-variable">$ssh</span>-&gt;write(<span class="hljs-string">"asdfasdf\n"</span>);
+</code></pre>
+<p>For non-binary data it does but it does so with a few caveats.</p>
+<ol>
+<li>Any data you send to it via <code>$ssh-&gt;write()</code> will be echo'd out, so you'll also want to do <code>$ssh-&gt;read('asdfasdf')</code>. This makes sense when you consider that there are times when Linux does <em>not</em> echo out the keys you type. eg. when you're in <a href="https://en.wikibooks.org/wiki/Learning_the_vi_Editor/Vim/Modes#normal_(command)">normal mode</a> in vim. If you hit <kbd>i</kbd> or <kbd>a</kbd> you'll enter into  <a href="https://en.wikibooks.org/wiki/Learning_the_vi_Editor/Vim/Modes#insert_(and_replace)">insert mode</a> without those characters being echo'd out. Whether or not the keystrokes you enter are echo'd out to you depends on the context.</li>
+<li>This doesn't work well with binary data. The <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/faq.html#faq-puttyputty">PuTTYPuTTYPuTTY</a> question in the PuTTY FAQ addresses this.</li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="read-with-regular-expressions-sudo"></a><a href="#read-with-regular-expressions-sudo" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>read() with regular expressions: sudo</h2>
+<p>Technically, <a href="http://en.wikipedia.org/wiki/Sudo">sudo</a> is as easy as doing <code>echo 'password' | sudo -S command</code> but sudo also provides a good example of how to use regular expressions with <code>$ssh-&gt;read()</code>:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+$ssh-&gt;write(<span class="hljs-string">"sudo ls -la\n"</span>);
+$output = $ssh-&gt;read(<span class="hljs-string">'#[pP]assword[^:]*:|username@username:~\$#'</span>, SSH2::READ_REGEX);
+<span class="hljs-keyword">echo</span> $output;
+<span class="hljs-keyword">if</span> (preg_match(<span class="hljs-string">'#[pP]assword[^:]*:#'</span>, $output)) {
+    $ssh-&gt;write(<span class="hljs-string">"password\n"</span>);
+    <span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+}
+</code></pre>
+<p>By default, sudo caches passwords for 5 minutes after they've been entered. So while <code>$ssh-&gt;read('Password:')</code> will work the first time you try it, it won't work if you try it within a five minutes after having initially ran it.</p>
+<h2><a class="anchor" aria-hidden="true" id="settimeout"></a><a href="#settimeout" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>setTimeout()</h2>
+<pre><code class="hljs css language-php">$ssh-&gt;setTimeout(<span class="hljs-number">1</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read();
+</code></pre>
+<p>After each <code>$ssh-&gt;read()</code> the timeout resets to what you set it to last. By default the &quot;channel&quot; remains open so if you do <code>$ssh-&gt;write(&quot;ping 127.0.0.1\n&quot;)</code> and do two successive <code>$ssh-&gt;read()</code> you'll get ping output in both of those calls. If you don't want it to do that you can either send Ctrl + C via <code>$ssh-&gt;write(&quot;\x03&quot;)</code> or you can reset the whole channel by calling <code>$ssh-&gt;reset()</code>.</p>
+<p><code>$ssh-&gt;isTimeout()</code> will return true if the result of the last <code>$ssh-&gt;read()</code> or <code>$ssh-&gt;exec()</code> was due to a timeout. Otherwise it will return false.</p>
+<p><code>$ssh-&gt;setTimeout()</code> works with <code>$ssh-&gt;read()</code> and <code>$ssh-&gt;exec()</code>.</p>
+<p>Unfortunately, commands like <code>$ssh-&gt;exec('sleep 10')</code> don't work well with <code>$ssh-&gt;setTimeout()</code> as discussed in <a href="https://github.com/phpseclib/phpseclib/issues/1440">issue # 1440</a>. This can somewhat be worked around by doing <code>$ssh-&gt;exec('nohup sleep 10 &gt; /dev/null 2&gt;&amp;1 &amp;')</code> or <code>$ssh-&gt;exec('timeout 5 sleep 10')</code>, depending on what you're trying to do.</p>
+<h2><a class="anchor" aria-hidden="true" id="determining-what-to-read-passwd"></a><a href="#determining-what-to-read-passwd" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Determining what to read(): passwd</h2>
+<p>Let's say you want to change your password. Technically, SSH has <a href="https://tools.ietf.org/html/rfc4252#page-11">built-in OS-independent functionality</a> to accomodate this but phpseclib doesn't (currently) support it so we'll just use <a href="https://en.wikipedia.org/wiki/Passwd">passwd</a>. So how would that work? Normally you're presented with a series of prompts but what are those prompts? Let's find out.</p>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read();
+</code></pre>
+<p>This outputs <code>(current) UNIX password</code> so we'll wait for <code>password:</code> to appear. But what comes after that?</p>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"oldpassword\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read();
+</code></pre>
+<p>This outputs <code>Enter new UNIX password:</code> so we'll, once again, wait for <code>password:</code> to appear. But what about after that?</p>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"oldpassword\n"</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"newpassword\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read();
+</code></pre>
+<p>This outputs <code>Retype new UNIX password:</code> so we'll, once again, wait for <code>password:</code> to appear. But what about after that?</p>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">3</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"oldpassword\n"</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"newpassword\n"</span>);
+$ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"newpassword\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read();
+</code></pre>
+<p>This outputs <code>passwd: password updated successfully</code> so I guess we're done! At this point <code>$ssh-&gt;setTimeout(3)</code> is unneccessary. The last <code>$ssh-&gt;read()</code>, in my testing, returns immediately.</p>
+<h2><a class="anchor" aria-hidden="true" id="ansi-escape-codes"></a><a href="#ansi-escape-codes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ANSI Escape Codes</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">ANSI</span>;
+
+$ansi = <span class="hljs-keyword">new</span> ANSI;
+
+$ansi-&gt;appendString($ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>));
+$ssh-&gt;write(<span class="hljs-string">"top\n"</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">5</span>);
+$ansi-&gt;appendString($ssh-&gt;read());
+<span class="hljs-keyword">echo</span> $ansi-&gt;getScreen(); <span class="hljs-comment">// outputs HTML</span>
+</code></pre>
+<p>Some commands issued to a terminal may yield <a href="http://en.wikipedia.org/wiki/ANSI_escape_code">ANSI escape codes</a>. eg. <code>^[[H</code>. These provide the terminal with information on the formating of the characters and their positioning.</p>
+<p>Since \phpseclib3\Net\SSH2 uses vt100 as the &quot;TERM environment variable value&quot; a <a href="http://en.wikipedia.org/wiki/VT100">VT100</a> <a href="http://en.wikipedia.org/wiki/Terminal_emulator">terminal emulator</a> is needed to properly handle the ANSI escape codes. \phpseclib3\File\ANSI aims to be such an emulator. The default screen size is 80x24.</p>
+<p><code>$ansi-&gt;getScreen()</code> returns what'd be seen on the current screen. In the case of top this is desirable as it'll produce output like this:</p>
+<pre style="color: white; background: black; font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace; font-size: 13px; line-height: 13px">top - 23:39:24 up 77 days,  1:13,  1 user,  load average: 0.00, 0.00, 0.00
+Tasks:  45 total,   2 running,  43 sleeping,   0 stopped,   0 zombie
+Cpu(s):  0.0%us,  0.0%sy,  0.0%ni,100.0%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st
+Mem:   1740956k total,  1079288k used,   661668k free,   221240k buffers
+Swap:        0k total,        0k used,        0k free,   399940k cached
+&nbsp;
+<span style="color: black; background: white">  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND            </span>
+    1 root      16   0  2128  696  600 S  0.0  0.0   0:01.10 init               
+    2 root      RT   0     0    0    0 S  0.0  0.0   0:00.00 migration/0        
+    3 root      34  19     0    0    0 S  0.0  0.0   0:00.05 ksoftirqd/0        
+    4 root      RT   0     0    0    0 S  0.0  0.0   0:00.01 watchdog/0         
+    5 root      10  -5     0    0    0 S  0.0  0.0   0:00.25 events/0           
+    6 root      11  -5     0    0    0 S  0.0  0.0   0:00.63 khelper            
+    7 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 kthread            
+    8 root      14  -5     0    0    0 S  0.0  0.0   0:00.00 xenwatch           
+    9 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 xenbus             
+   17 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 kblockd/0          
+   46 root      20  -5     0    0    0 S  0.0  0.0   0:00.00 aio/0              
+   45 root      15   0     0    0    0 S  0.0  0.0   0:00.64 kswapd0            
+  562 root      20  -5     0    0    0 S  0.0  0.0   0:00.00 kseriod            
+  657 root      15   0     0    0    0 S  0.0  0.0   0:04.23 kjournald          
+  718 root      13  -4  2360  656  424 S  0.0  0.0   0:00.18 udevd              
+ 1592 root      14  -2  2396  848  560 S  0.0  0.0   0:00.03 dhclient           
+ 1647 root      15   0     0    0    0 S  0.0  0.0   0:00.16 kjournald</pre>
+<p>In the case of <a href="http://en.wikipedia.org/wiki/Ls">ls</a>, however, it is less desirable. For commands like ls it may be preferable to do <code>$ansi-&gt;getHistory()</code>. For top, that'd return the following:</p>
+<pre style="color: white; background: black; font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace; font-size: 13px; line-height: 13px">         __|  __|_  )  Fedora 8
+         _|  (     /    32-bit
+        ___|\___|___|
+&nbsp;
+ Welcome to an EC2 Public Image
+                       :-)
+&nbsp;
+   Base
+&nbsp;
+ --[ see /etc/ec2/release-notes ]--
+&nbsp;
+[username@username:~$]$top
+&nbsp;
+top - 23:51:56 up 77 days,  1:25,  1 user,  load average: 0.00, 0.00, 0.00
+Tasks:  45 total,   2 running,  43 sleeping,   0 stopped,   0 zombie
+Cpu(s):  0.0%us,  0.0%sy,  0.0%ni,100.0%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st
+Mem:   1740956k total,  1079256k used,   661700k free,   221240k buffers
+Swap:        0k total,        0k used,        0k free,   399940k cached
+&nbsp;
+<span style="color: black; background: white">  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND            </span>
+    1 root      16   0  2128  696  600 S  0.0  0.0   0:01.10 init               
+    2 root      RT   0     0    0    0 S  0.0  0.0   0:00.00 migration/0        
+    3 root      34  19     0    0    0 S  0.0  0.0   0:00.05 ksoftirqd/0        
+    4 root      RT   0     0    0    0 S  0.0  0.0   0:00.01 watchdog/0         
+    5 root      10  -5     0    0    0 S  0.0  0.0   0:00.25 events/0           
+    6 root      11  -5     0    0    0 S  0.0  0.0   0:00.63 khelper            
+    7 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 kthread            
+    8 root      14  -5     0    0    0 S  0.0  0.0   0:00.00 xenwatch           
+    9 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 xenbus             
+   17 root      10  -5     0    0    0 S  0.0  0.0   0:00.00 kblockd/0          
+   46 root      20  -5     0    0    0 S  0.0  0.0   0:00.00 aio/0              
+   45 root      15   0     0    0    0 S  0.0  0.0   0:00.64 kswapd0            
+  562 root      20  -5     0    0    0 S  0.0  0.0   0:00.00 kseriod            
+  657 root      15   0     0    0    0 S  0.0  0.0   0:04.23 kjournald          
+  718 root      13  -4  2360  656  424 S  0.0  0.0   0:00.18 udevd              
+ 1592 root      14  -2  2396  848  560 S  0.0  0.0   0:00.03 dhclient           
+ 1647 root      15   0     0    0    0 S  0.0  0.0   0:00.16 kjournald</pre>
+<p>The history, by default, stores 200 lines (not including the current screen). This can be changed by doing <code>$ansi-&gt;setHistory(100)</code> or whatever.</p>
+<p>Both functions return HTML with the various formatting properties specified by HTML. If you don't want HTML and want just the raw text of the terminal without any formatting do <code>htmlspecialchars_decode(strip_tags($ansi-&gt;getScreen()))</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="sending-special-characters"></a><a href="#sending-special-characters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Sending Special Characters</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">ANSI</span>;
+
+$ssh-&gt;setTimeout(<span class="hljs-number">2</span>);
+$ssh-&gt;read();
+$ssh-&gt;write(<span class="hljs-string">"vim\n"</span>);
+$ssh-&gt;read();
+$ssh-&gt;write(<span class="hljs-string">"\x1BOP"</span>); <span class="hljs-comment">// send F1</span>
+
+$ansi = <span class="hljs-keyword">new</span> ANSI;
+$ansi-&gt;appendString($ssh-&gt;read());
+</code></pre>
+<p>A table of special characters and the keys they correspond to can be found at <a href="/docs/special-chars">SSH2 Special Characters</a>. The output of the above program is as follows:</p>
+<pre style="color: white; background: black; font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace; font-size: 13px; line-height: 13px">*<u>help.txt</u>*      For <u>Vim version 7.3.</u>  Last change: 2010 Jul 20
+&nbsp;
+  VIM - main help file
+  k
+      Move around:  Use the cursor keys, or &quot;h&quot; to go left, h   l
+  &quot;j&quot; to go down, &quot;k&quot; to go up, &quot;l&quot; to go right.       j
+Close this window:  Use &quot;:q<b>&lt;Enter&gt;</b>&quot;.
+   Get out of Vim:  Use &quot;:qa!<b>&lt;Enter&gt;</b>&quot; (careful, all changes are lost!).
+&nbsp;
+Jump to a subject:  Position the cursor on a tag (e.g. |<u>bars</u>|) and hit <b>CTRL-]</b>.
+   With the mouse:  &quot;:set mouse=a&quot; to enable the mouse (in xterm or GUI).
+  Double-click the left mouse button on a tag, e.g. |<u>bars</u>|.
+        Jump back:  Type <b>CTRL-T</b> or <b>CTRL-O</b> (repeat to go further back).
+&nbsp;
+Get specific help:  It is possible to go directly to whatever you want help
+     on, by giving an argument to the |<u>:help</u>| command.
+     It is possible to further specify the context:
+                                         *<u>help-context</u>*
+  <u>WHAT                  PREPEND    EXAMPLE</u>      ~
+  Normal mode command      (nothing)   :help x
+<span style="color: black; background: white">help.txt [Help][RO]                                           1,1            Top</span>
+&nbsp;
+<span style="color: black; background: white">[No Name]                                                     0,0-1          All</span>
+&quot;help.txt&quot; [readonly] 221L, 8239C</pre>
+<p>The output may look different than vim when ran through, for example, PuTTY, because PuTTY uses <code>xterm</code> as it's shell whereas phpseclib uses <code>vt100</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="callbacks"></a><a href="#callbacks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Callbacks</h2>
+<pre><code class="hljs css language-php">$ssh-&gt;exec(<span class="hljs-string">'ping 127.0.0.1'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($str)</span> </span>{
+    <span class="hljs-keyword">echo</span> $str;
+    <span class="hljs-comment">//if (strpos($str, 'icmp_seq=5') !== false) {</span>
+    <span class="hljs-comment">//    return true;</span>
+    <span class="hljs-comment">//}</span>
+});
+</code></pre>
+<p>This example is best run via the CLI. Run it via the webbrowser and you may need to <a href="http://php.net/flush">flush</a> the output buffer and even then YMMV.</p>
+<p>The commented out code shows how you could use a callback method to return early based on whatever your criteria might be. ie. if the callback method returns <code>bool(true)</code> then <code>exec()</code> will return early.</p>
+<h2><a class="anchor" aria-hidden="true" id="exec-with-and-without-a-pty-vs-interactive-shells"></a><a href="#exec-with-and-without-a-pty-vs-interactive-shells" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>exec() with and without a PTY vs Interactive Shells</h2>
+<h3><a class="anchor" aria-hidden="true" id="passwd"></a><a href="#passwd" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>passwd</h3>
+<p>Some commands require a PTY to work correctly with <code>exec()</code>. Examples follow:</p>
+<h4><a class="anchor" aria-hidden="true" id="exec"></a><a href="#exec" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>exec():</h4>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+</code></pre>
+<p>Stalls. If you use a <a href="#callbacks">callback function</a> or <a href="#settimeout">setTimeout()</a> you'll see that it's outputting <code>(current) UNIX password:</code> and waiting for input that can't ever come.</p>
+<h4><a class="anchor" aria-hidden="true" id="exec-with-pty"></a><a href="#exec-with-pty" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>exec() with PTY:</h4>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;exec(<span class="hljs-string">'passwd'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"badpw\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'password unchanged'</span>);
+</code></pre>
+<p>Runs as one might expect. There may be a three second delay before the &quot;password unchanged&quot; dialog that's implemented by Linux to protect against brute force attacks (per &quot;man pam_unix&quot;).</p>
+<h4><a class="anchor" aria-hidden="true" id="read--write"></a><a href="#read--write" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>read() / write():</h4>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>);
+$ssh-&gt;write(<span class="hljs-string">"passwd\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'password:'</span>);
+$ssh-&gt;write(<span class="hljs-string">"badpw\n"</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;read(<span class="hljs-string">'password unchanged'</span>);
+</code></pre>
+<p>Pretty much the same output as exec() with PTY.</p>
+<h3><a class="anchor" aria-hidden="true" id="top"></a><a href="#top" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>top</h3>
+<h4><a class="anchor" aria-hidden="true" id="exec-1"></a><a href="#exec-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>exec():</h4>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'top'</span>);
+</code></pre>
+<p>Outputs <code>TERM environment variable not set</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="exec-with-pty-1"></a><a href="#exec-with-pty-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>exec() with PTY:</h4>
+<pre><code class="hljs css language-php">$ssh-&gt;enablePTY();
+$ssh-&gt;exec(<span class="hljs-string">'top'</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">5</span>);
+$ansi-&gt;appendString($ssh-&gt;read());
+<span class="hljs-keyword">echo</span> $ansi-&gt;getScreen();
+</code></pre>
+<p>See <a href="#ansi-escape-codes">ANSI Escape Codes</a> for the output.</p>
+<h4><a class="anchor" aria-hidden="true" id="read--write-1"></a><a href="#read--write-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>read() / write():</h4>
+<pre><code class="hljs css language-php">$ansi-&gt;appendString($ssh-&gt;read(<span class="hljs-string">'username@username:~$'</span>));
+$ssh-&gt;write(<span class="hljs-string">"top\n"</span>);
+$ssh-&gt;setTimeout(<span class="hljs-number">5</span>);
+$ansi-&gt;appendString($ssh-&gt;read());
+<span class="hljs-keyword">echo</span> $ansi-&gt;getScreen();
+</code></pre>
+<p>Pretty much the same output as exec() with PTY.</p>
+<h2><a class="anchor" aria-hidden="true" id="window-size"></a><a href="#window-size" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Window Size</h2>
+<p>The default window size is 80x24 (80 columns, 24 rows).</p>
+<p>The number of rows can be adjusted by calling <code>$ssh-&gt;setWindowRows()</code>. The number of columns can be adjusted by calling <code>$ssh-&gt;setWindowColumns()</code>. Both can be adjusted at the same time by calling <code>$ssh-&gt;setWindowSize(80, 24)</code>.</p>
+<p>The number of rows and columns can be determined by calling <code>$ssh-&gt;getWindowRows()</code> and <code>$ssh-&gt;getWindowColumns()</code>, respectively.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/auth"><span class="arrow-prev">← </span><span>Authenticating</span></a><a class="docs-next button" href="/docs/sftp"><span>SFTP</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#one-off-commands">One-off commands</a><ul class="toc-headings"><li><a href="#gotcha-successive-calls-to-exec">Gotcha: Successive calls to exec()</a></li></ul></li><li><a href="#interactive-shell">Interactive Shell</a><ul class="toc-headings"><li><a href="#gotcha-writing-without-first-reading">Gotcha: Writing without first reading</a></li><li><a href="#gotcha-echoing-out-stdin">Gotcha: echo'ing out stdin</a></li></ul></li><li><a href="#read-with-regular-expressions-sudo">read() with regular expressions: sudo</a></li><li><a href="#settimeout">setTimeout()</a></li><li><a href="#determining-what-to-read-passwd">Determining what to read(): passwd</a></li><li><a href="#ansi-escape-codes">ANSI Escape Codes</a></li><li><a href="#sending-special-characters">Sending Special Characters</a></li><li><a href="#callbacks">Callbacks</a></li><li><a href="#exec-with-and-without-a-pty-vs-interactive-shells">exec() with and without a PTY vs Interactive Shells</a><ul class="toc-headings"><li><a href="#passwd">passwd</a></li><li><a href="#top">top</a></li></ul></li><li><a href="#window-size">Window Size</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

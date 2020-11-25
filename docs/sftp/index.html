@@ -1,0 +1,304 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>SFTP · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="SFTP · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>SSH2</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">SFTP</h1></header><article><div><span><script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/js/jquery.treeview.js"></script>
+<link rel="stylesheet" href="/css/jquery.treeview.css">
+<script>
+$(document).ready(function() {
+  $('.printr').treeview({
+     persist: "location",
+     collapsed: true,
+     unique: true
+   });
+})
+</script>
+<p>To use SFTP you'll need to use the SFTP class instead of the SSH2 class. eg.</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SFTP</span>;
+
+$sftp = <span class="hljs-keyword">new</span> SFTP(<span class="hljs-string">'localhost'</span>);
+$sftp-&gt;login(<span class="hljs-string">'username'</span>, <span class="hljs-string">'password'</span>);
+</code></pre>
+<p>Because the SFTP class extends the SSH2 class the SFTP class has all the methods that the SSH2 class does.</p>
+<h2><a class="anchor" aria-hidden="true" id="uploading-files"></a><a href="#uploading-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Uploading Files</h2>
+<pre><code class="hljs css language-php"><span class="hljs-comment">// puts a three-byte file named filename.remote on the SFTP server</span>
+$sftp-&gt;put(<span class="hljs-string">'filename.remote'</span>, <span class="hljs-string">'xxx'</span>);
+<span class="hljs-comment">// puts an x-byte file named filename.remote on the SFTP server,</span>
+<span class="hljs-comment">// where x is the size of filename.local</span>
+$sftp-&gt;put(<span class="hljs-string">'filename.remote'</span>, <span class="hljs-string">'filename.local'</span>, SFTP::SOURCE_LOCAL_FILE);
+</code></pre>
+<p>The function definition for <code>put()</code> is as follows:</p>
+<pre><code class="hljs css language-php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">put</span><span class="hljs-params">($remote_file, $data, $mode = SFTP::SOURCE_STRING, $start = <span class="hljs-number">-1</span>, $local_start = <span class="hljs-number">-1</span>, $progressCallback = null)</span>
+</span></code></pre>
+<h3><a class="anchor" aria-hidden="true" id="uploading-strings-vs-files"></a><a href="#uploading-strings-vs-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Uploading strings vs. files</h3>
+<p><code>$sftp-&gt;put('filename.remote', 'filename.local')</code> creates filename.remote on the remote server with 'filename.local' as the contents.</p>
+<p><code>$sftp-&gt;put('filename.remote', 'filename.local', SFTP::SOURCE_LOCAL_FILE)</code> creates filename.remote on the remote server such that the contents of it and filename.local match. ie. with <code>SFTP::SOURCE_LOCAL_FILE</code> it uploads a file and without it it uploads a string.</p>
+<h3><a class="anchor" aria-hidden="true" id="resuming-transfers"></a><a href="#resuming-transfers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Resuming transfers</h3>
+<p><code>$sftp-&gt;put('filename.remote', 'xxx', SFTP::RESUME)</code> will append 'xxx' to filename.remote.</p>
+<p><code>$sftp-&gt;put('filename.remote', 'filename.local', SFTP::SOURCE_LOCAL_FILE | SFTP::RESUME_START)</code> will append filename.remote to filename.local.</p>
+<p><code>$sftp-&gt;put('filename.remote', 'filename.local', SFTP::SOURCE_LOCAL_FILE | SFTP::RESUME)</code> will append all but the first <code>$sftp-&gt;size('filename.remote')</code> bytes of filename.local to filename.remote. The idea being that if your transfer is interupted you can restart it.</p>
+<h3><a class="anchor" aria-hidden="true" id="positional-control"></a><a href="#positional-control" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Positional control</h3>
+<p><code>$start</code> and <code>$local_start</code> give you more fine grained control over this process and take precident over <code>SFTP::RESUME</code> when they're non-negative. ie. <code>$start</code> could let you write at the end of a file (like <code>SFTP::RESUME</code>) or in the middle of one. <code>$local_start</code> could let you start your reading from the end of a file (like <code>SFTP::RESUME_START</code>) or in the middle of one.</p>
+<h2><a class="anchor" aria-hidden="true" id="downloading-files"></a><a href="#downloading-files" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Downloading Files</h2>
+<pre><code class="hljs css language-php"><span class="hljs-comment">// outputs the contents of filename.remote to the screen</span>
+<span class="hljs-keyword">echo</span> $sftp-&gt;get(<span class="hljs-string">'filename.remote'</span>);
+<span class="hljs-comment">// copies filename.remote to filename.local from the SFTP server</span>
+$sftp-&gt;get(<span class="hljs-string">'filename.remote'</span>, <span class="hljs-string">'filename.local'</span>);
+</code></pre>
+<p>The function definition for <code>get()</code> is as follows:</p>
+<pre><code class="hljs css language-php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">get</span><span class="hljs-params">($remote_file, $local_file = false, $offset = <span class="hljs-number">0</span>, $length = <span class="hljs-number">-1</span>, $progressCallback = null)</span>
+</span></code></pre>
+<p>Returns a string containing the contents of <code>$remote_file</code> if <code>$local_file</code> is left undefined or a boolean false if the operation was unsuccessful. If <code>$local_file</code> is defined, returns true or false depending on the success of the operation.</p>
+<h2><a class="anchor" aria-hidden="true" id="preserving-the-date"></a><a href="#preserving-the-date" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Preserving the Date</h2>
+<p>If you want the uploaded or downloaded file to have the same last modified / accessed time as the original file by doing <code>$sftp-&gt;enableDatePreservation()</code>. <code>$sftp-&gt;disableDatePreservation()</code> will turn this behavior off. The default status is &quot;off&quot;.</p>
+<h2><a class="anchor" aria-hidden="true" id="directory-management"></a><a href="#directory-management" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Directory Management</h2>
+<pre><code class="hljs css language-php">$sftp-&gt;mkdir(<span class="hljs-string">'test'</span>); <span class="hljs-comment">// create directory 'test'</span>
+$sftp-&gt;chdir(<span class="hljs-string">'test'</span>); <span class="hljs-comment">// open directory 'test'</span>
+<span class="hljs-keyword">echo</span> $sftp-&gt;pwd(); <span class="hljs-comment">// show that we're in the 'test' directory</span>
+$sftp-&gt;chdir(<span class="hljs-string">'..'</span>); <span class="hljs-comment">// go back to the parent directory</span>
+$sftp-&gt;rmdir(<span class="hljs-string">'test'</span>); <span class="hljs-comment">// delete the directory</span>
+<span class="hljs-comment">// if the directory had files in it we'd need to do a recursive delete</span>
+<span class="hljs-comment">//$sftp-&gt;delete('test');</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="mkdir"></a><a href="#mkdir" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>mkdir</h3>
+<p>phpseclib's mkdir accepts the same parameters as PHP's <a href="https://www.php.net/mkdir">mkdir</a>. Here's the method definition:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">mkdir</span><span class="hljs-params">($dir, $mode = <span class="hljs-number">-1</span>, $recursive = false)</span>
+</span></code></pre>
+<p>If <code>$mode</code> isn't specified (or if it's -1) then the operating system will most likely use the <a href="https://en.wikipedia.org/wiki/Umask">umask</a>. If you do want to specify the permission note that it needs to be in octal. So instead of passing <code>777</code> you'd pass in <code>0777</code>. The preceeding 0 is how PHP knows to treat an integer as an octal number as opposed to a decimal number.</p>
+<p><code>$recursive</code> allows the creation of nested directories specified in the pathname.</p>
+<h2><a class="anchor" aria-hidden="true" id="directory-listing"></a><a href="#directory-listing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Directory Listing</h2>
+<pre><code class="hljs css language-php">print_r($sftp-&gt;nlist()); <span class="hljs-comment">// == $sftp-&gt;nlist('.')</span>
+print_r($sftp-&gt;rawlist()); <span class="hljs-comment">// == $sftp-&gt;rawlist('.')</span>
+</code></pre>
+<p><code>$sftp-&gt;nlist()</code>:</p>
+<ul class="printr" style="margin-bottom: 15px"><li><span class="name">0</span><ul><li>uploads</li></ul></li><li><span class="name">1</span><ul><li>..</li></ul></li><li><span class="name">2</span><ul><li>.</li></ul></li><li><span class="name">3</span><ul><li>.profile</li></ul></li><li><span class="name">4</span><ul><li>.bashrc</li></ul></li><li><span class="name">5</span><ul><li>.bash_logout</li></ul></li></ul>
+<p><code>$sftp-&gt;rawlist()</code>:</p>
+<ul class="printr" style="margin-bottom: 15px"><li><span class="name">uploads</span><ul><li><span class="name">size</span><ul><li>4096</li></ul></li><li><span class="name">uid</span><ul><li>1001</li></ul></li><li><span class="name">gid</span><ul><li>1002</li></ul></li><li><span class="name">mode</span><ul><li>16877</li></ul></li><li><span class="name">type</span><ul><li>2</li></ul></li><li><span class="name">atime</span><ul><li>1338498490</li></ul></li><li><span class="name">mtime</span><ul><li>1338497853</li></ul></li><li><span class="name">filename</span><ul><li>uploads</li></ul></li></ul></li><li><span class="name">..</span><ul><li><span class="name">size</span><ul><li>4096</li></ul></li><li><span class="name">uid</span><ul><li>0</li></ul></li><li><span class="name">gid</span><ul><li>0</li></ul></li><li><span class="name">mode</span><ul><li>16877</li></ul></li><li><span class="name">type</span><ul><li>2</li></ul></li><li><span class="name">atime</span><ul><li>1338499576</li></ul></li><li><span class="name">mtime</span><ul><li>1338497853</li></ul></li><li><span class="name">filename</span><ul><li>..</li></ul></li></ul></li><li><span class="name">.</span><ul><li><span class="name">size</span><ul><li>4096</li></ul></li><li><span class="name">uid</span><ul><li>0</li></ul></li><li><span class="name">gid</span><ul><li>0</li></ul></li><li><span class="name">mode</span><ul><li>16877</li></ul></li><li><span class="name">type</span><ul><li>2</li></ul></li><li><span class="name">atime</span><ul><li>1338499576</li></ul></li><li><span class="name">mtime</span><ul><li>1338497853</li></ul></li><li><span class="name">filename</span><ul><li>.</li></ul></li></ul></li><li><span class="name">.profile</span><ul><li><span class="name">size</span><ul><li>675</li></ul></li><li><span class="name">uid</span><ul><li>1012</li></ul></li><li><span class="name">gid</span><ul><li>1013</li></ul></li><li><span class="name">mode</span><ul><li>33188</li></ul><li><span class="name">type</span><ul><li>1</li></ul></li></li><li><span class="name">atime</span><ul><li>1338497357</li></ul></li><li><span class="name">mtime</span><ul><li>1338497357</li></ul></li><li><span class="name">filename</span><ul><li>.profile</li></ul></li></ul></li><li><span class="name">bashrc</span><ul><li><span class="name">size</span><ul><li>3353</li></ul></li><li><span class="name">uid</span><ul><li>1012</li></ul></li><li><span class="name">gid</span><ul><li>1013</li></ul></li><li><span class="name">mode</span><ul><li>33188</li></ul></li><li><span class="name">type</span><ul><li>1</li></ul></li><li><span class="name">atime</span><ul><li>1338497357</li></ul></li><li><span class="name">mtime</span><ul><li>1338497357</li></ul></li><li><span class="name">filename</span><ul><li>bashrc</li></ul></li></ul></li><li><span class="name">.bash_logout</span><ul><li><span class="name">size</span><ul><li>270</li></ul></li><li><span class="name">uid</span><ul><li>1012</li></ul></li><li><span class="name">gid</span><ul><li>1013</li></ul></li><li><span class="name">mode</span><ul><li>33188</li></ul></li><li><span class="name">type</span><ul><li>1</li></ul></li><li><span class="name">atime</span><ul><li>1338497357</li></ul></li><li><span class="name">mtime</span><ul><li>1338497357</li></ul></li><li><span class="name">filename</span><ul><li>.bash_logout</li></ul></li></ul></li></ul>
+The type index corresponds to one of the following named constants:
+<ul>
+<li><code>NET_SFTP_TYPE_REGULAR</code> (1)</li>
+<li><code>NET_SFTP_TYPE_DIRECTORY</code> (2)</li>
+<li><code>NET_SFTP_TYPE_SYMLINK</code> (3)</li>
+<li><code>NET_SFTP_TYPE_SPECIAL</code> (4)</li>
+<li><code>NET_SFTP_TYPE_UNKNOWN</code> (5)</li>
+<li><code>NET_SFTP_TYPE_SOCKET</code> (6)</li>
+<li><code>NET_SFTP_TYPE_CHAR_DEVICE</code> (7)</li>
+<li><code>NET_SFTP_TYPE_FIFO</code> (8)</li>
+</ul>
+<p>Both <code>nlist</code> and <code>rawlist</code> accept an optional second parameter - <code>$recursive</code> - that, if set to <code>bool(true)</code>, will return a list of all the files in the specified directory <em>and</em> all subdirectories contained therein (and all subdirectories contained within those subdirectories, etc).</p>
+<h3><a class="anchor" aria-hidden="true" id="setting-list-order"></a><a href="#setting-list-order" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setting List Order</h3>
+<p>Directory output is not sorted by default.</p>
+<p>If sorting is enabled directories and files will be sorted independently with directories appearing before files in the resultant array that is returned.</p>
+<p>Any parameter returned by stat is a valid sort parameter for this function. Filename comparisons are case insensitive.</p>
+<p>Examples:</p>
+<pre><code class="hljs css language-php">$sftp-&gt;setListOrder(<span class="hljs-string">'filename'</span>, SORT_ASC);
+$sftp-&gt;setListOrder(<span class="hljs-string">'size'</span>, SORT_DESC, <span class="hljs-string">'filename'</span>, SORT_ASC);
+<span class="hljs-comment">// separates directories from files but doesn't do any sorting beyond that:</span>
+$sftp-&gt;setListOrder(<span class="hljs-keyword">true</span>);
+<span class="hljs-comment">// don't do any sort of sorting:</span>
+$sftp-&gt;setListOrder();
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="empty-directories"></a><a href="#empty-directories" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Empty Directories</h3>
+<p>In 1.0 / 2.0 <code>$sftp-&gt;nlist()</code> doesn't return empty directories in recursive mode. Here's the sample output you'd get back from <code>nlist()</code>:</p>
+<pre><code class="hljs"><span class="hljs-keyword">dir</span>/<span class="hljs-keyword">file</span>.ext
+<span class="hljs-keyword">file</span>.ext
+.
+..
+</code></pre>
+<p>If <code>dir</code> was an empty directory you wouldn't see it because . and .. were only included in the root directory - not in subdirectories.
+Here's the output you'll get in 3.0:</p>
+<pre><code class="hljs"><span class="hljs-keyword">dir</span>/.
+<span class="hljs-keyword">dir</span>/..
+<span class="hljs-keyword">dir</span>/<span class="hljs-keyword">file</span>.ext
+<span class="hljs-keyword">file</span>.ext
+.
+..
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="permissions"></a><a href="#permissions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Permissions</h3>
+<p>If you expand the <code>$sftp-&gt;rawlist()</code> output in the earlier example you'll see a key: <code>mode</code>. For .profile that value is set to 33188. What does that mean? To understand let's first convert that to binary: <code>chunk_split(decbin(33188), 4, ' ')</code>. That gives us the following:</p>
+<pre><code class="hljs"><span class="hljs-symbol">1000 </span><span class="hljs-number">0001</span> <span class="hljs-number">1010</span> <span class="hljs-number">0100</span>
+</code></pre>
+<p>Each bit corresponds to the following:</p>
+<p><img src="/img/perms.png" alt=""></p>
+<p>This first four bits mean that it's a regular file (<code>NET_SFTP_TYPE_REGULAR</code>). The last nine bits mean that the file's permissions, in numeric notation, are 644 or, in symbolic notation, <code>-rw-r--r-</code>. Here are a few scenarios;</p>
+<p>Here are a few scenarios:</p>
+<ul>
+<li>&quot;Others&quot; permissions: <code>33188 &amp; 07 == 4</code> or 100.</li>
+<li>&quot;Owners&quot; permissions: <code>(33188 &gt;&gt; 6) &amp; 07 == 6</code> or 110.</li>
+<li>Test to see if g+r is set: <code>(33188 &gt;&gt; 5) &amp; 1</code></li>
+</ul>
+<p>The special modes are <a href="https://en.wikipedia.org/wiki/File_system_permissions#Changing_permission_behavior_with_setuid,_setgid,_and_sticky_bits">setuid, setgid and sticky</a>.</p>
+<p>You can learn more about the file type by looking at the implementation of <code>parseMode()</code> in Net/SFTP.php or by looking at the &quot;<em>mode</em> <strong>file types</strong>&quot; table in <a href="https://www.php.net/stat#refsect1-function.stat-returnvalues">PHP: stat - Manual</a></p>
+<p>For further reading see <a href="https://www.php.net/manual/en/function.fileperms.php">PHP: fileperms - Manual</a></p>
+<h2><a class="anchor" aria-hidden="true" id="file-attributes"></a><a href="#file-attributes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>File Attributes</h2>
+<pre><code class="hljs css language-php">$sftp-&gt;chmod(<span class="hljs-number">0777</span>, <span class="hljs-string">'filename.remote'</span>);
+<span class="hljs-comment">//$sftp-&gt;chmod(0777, 'dirname.remote', true); // recursively change permissions on a directory</span>
+<span class="hljs-comment">// has the same syntax as http://php.net/touch</span>
+$sftp-&gt;touch(<span class="hljs-string">'filename.remote'</span>);
+$sftp-&gt;chown(<span class="hljs-string">'filename.remote'</span>, $uid);
+<span class="hljs-comment">//$sftp-&gt;chown('filename.remote', $uid, true); // recursively change the owner</span>
+$sftp-&gt;chgrp(<span class="hljs-string">'filename.remote'</span>, $gid);
+<span class="hljs-comment">//$sftp-&gt;chgrp('filename.remote', $gid, true); // recursively change the group</span>
+$sftp-&gt;truncate(<span class="hljs-string">'filename.remote'</span>, $size);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="file-information"></a><a href="#file-information" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>File Information</h2>
+<pre><code class="hljs css language-php">print_r($sftp-&gt;stat(<span class="hljs-string">'filename.remote'</span>));
+print_r($sftp-&gt;lstat(<span class="hljs-string">'filename.remote'</span>));
+<span class="hljs-keyword">echo</span> $sftp-&gt;fileatime(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>; <span class="hljs-comment">// last accessed time</span>
+<span class="hljs-keyword">echo</span> $sftp-&gt;filemtime(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>; <span class="hljs-comment">// last modified time</span>
+<span class="hljs-keyword">echo</span> $sftp-&gt;fileperms(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;fileowner(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;filegroup(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;filesize(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;filetype(<span class="hljs-string">'filename.remote'</span>) . <span class="hljs-string">"\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;file_exists(<span class="hljs-string">'filename.remote'</span>) ? <span class="hljs-string">"exists\n"</span> : <span class="hljs-string">"doesn't exist\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;is_dir(<span class="hljs-string">'filename.remote'</span>) ? <span class="hljs-string">"is dir\n"</span> : <span class="hljs-string">"is not dir\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;is_file(<span class="hljs-string">'filename.remote'</span>) ? <span class="hljs-string">"is file\n"</span> : <span class="hljs-string">"is not file\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;is_readable(<span class="hljs-string">'filename.remote'</span>) ? <span class="hljs-string">"is readable\n"</span> : <span class="hljs-string">"is not readable\n"</span>;
+<span class="hljs-keyword">echo</span> $sftp-&gt;is_writeable(<span class="hljs-string">'filename.remote'</span>) ? <span class="hljs-string">"is writeable\n"</span> : <span class="hljs-string">"is not writeable\n"</span>;
+<span class="hljs-comment">// $sftp-&gt;is_writable() works as well</span>
+</code></pre>
+<p><code>stat()</code> and <code>lstat()</code> return associative arrays with misc information about the files. <code>lstat()</code> and <code>stat()</code> are identical with the caveat that when the file in question is a <a href="http://en.wikipedia.org/wiki/Symbolic_link">symbolic link</a> the information returned refers to the link itself and not the file (or directory) being linked to.</p>
+<p><code>stat()</code> example:</p>
+<ul class="printr"><li><span class="name">size</span><ul><li>856</li></ul></li><li><span class="name">uid</span><ul><li>1000</li></ul></li><li><span class="name">gid</span><ul><li>1000</li></ul></li><li><span class="name">mode</span><ul><li>33188</li></ul></li><li><span class="name">type</span><ul><li>1</li></ul></li><li><span class="name">atime</span><ul><li>1580971886</li></ul></li><li><span class="name">mtime</span><ul><li>1555785478</li></ul></li></ul>
+<p>See <a href="#permissions">Permissions</a> for more information on <code>mode</code> or <code>fileperms()</code>.</p>
+<p><code>filetype()</code> returns string translations of what <code>stat()['type']</code> does.</p>
+<p><code>is_readable()</code> and <code>is_writeable()</code> only work on files. They work by actually opening up a file for reading or writing and then closing the file immediately thereafter. The same technique does not work for directories.</p>
+<h2><a class="anchor" aria-hidden="true" id="delete-and-rename"></a><a href="#delete-and-rename" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Delete and Rename</h2>
+<pre><code class="hljs css language-php">$sftp-&gt;delete(<span class="hljs-string">'filename.remote'</span>); <span class="hljs-comment">// deletes directories recursively</span>
+<span class="hljs-comment">// non-recursive delete</span>
+$sftp-&gt;delete(<span class="hljs-string">'dirname.remote'</span>, <span class="hljs-keyword">false</span>);
+$sftp-&gt;rename(<span class="hljs-string">'filename.remote'</span>, <span class="hljs-string">'newname.remote'</span>);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="stream-wrapper"></a><a href="#stream-wrapper" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Stream Wrapper</h2>
+<p>Files can alternatively be accessed with a stream wrapper:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SFTP</span>\<span class="hljs-title">Stream</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SFTP</span>;
+
+Stream::register();
+
+$fp = fopen(<span class="hljs-string">'sftp://user:pass@127.0.0.1:22/home/user/filename.ext'</span>, <span class="hljs-string">'r'</span>); <span class="hljs-comment">// the port number is optional</span>
+
+$temp = <span class="hljs-string">''</span>;
+<span class="hljs-keyword">while</span> (!feof($fp)) {
+    $temp.= fread($fp, <span class="hljs-number">1024</span>);
+}
+fclose($fp);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="customizing-the-protocol"></a><a href="#customizing-the-protocol" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Customizing the Protocol</h3>
+<p>You can change the protocol (which defaults to <code>sftp://</code>) thusly:</p>
+<pre><code class="hljs css language-php">Stream::register(<span class="hljs-string">'ssh2.sftp'</span>);
+
+$fp = fopen(<span class="hljs-string">"ssh2.sftp://$sftp/home/vagrant/1mb"</span>, <span class="hljs-string">'r'</span>);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="non-password-authentication"></a><a href="#non-password-authentication" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Non-Password Authentication</h3>
+<pre><code class="hljs css language-php">$sftp = <span class="hljs-keyword">new</span> SFTP(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">22</span>); <span class="hljs-comment">// the port number is optional</span>
+$sftp-&gt;login(<span class="hljs-string">'username'</span>, $key);
+
+$fp = fopen(<span class="hljs-string">"sftp://$sftp/home/user/filename.ext"</span>, <span class="hljs-string">'r'</span>);
+
+$temp = <span class="hljs-string">''</span>;
+<span class="hljs-keyword">while</span> (!feof($fp)) {
+    $temp.= fread($fp, <span class="hljs-number">1024</span>);
+}
+fclose($fp);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="with-stream-context"></a><a href="#with-stream-context" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>With Stream Context</h3>
+<pre><code class="hljs css language-php">$protocol = <span class="hljs-string">'sftp'</span>;
+
+Stream::register($protocol);
+
+$context = [
+    $protocol =&gt; [<span class="hljs-string">'sftp'</span> =&gt; $sftp]
+];
+$context = stream_context_create($context);
+
+$fp = fopen($protocol . <span class="hljs-string">'://dummy.com/home/user/filename.txt'</span>, <span class="hljs-string">'r'</span>, <span class="hljs-keyword">false</span>, $context);
+</code></pre>
+<p><strong>Context options</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Usage</th></tr>
+</thead>
+<tbody>
+<tr><td><em>session</em></td><td>Preconnected sftp resource to be reused</td></tr>
+<tr><td><em>sftp</em></td><td>Preconnected sftp resource to be reused</td></tr>
+<tr><td><em>username</em></td><td>Username to connect as</td></tr>
+<tr><td><em>password</em></td><td>Password to use with password authentication</td></tr>
+<tr><td><em>privkey</em></td><td>Public key resource to be used</td></tr>
+</tbody>
+</table>
+<p><em>(inspired by <a href="https://www.php.net/manual/en/wrappers.ssh2.php">PHP: ssh2:// - Manual</a>)</em></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/commands"><span class="arrow-prev">← </span><span>Running Commands</span></a><a class="docs-next button" href="/docs/diagnosis"><span>Diagnosing Issues</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#uploading-files">Uploading Files</a><ul class="toc-headings"><li><a href="#uploading-strings-vs-files">Uploading strings vs. files</a></li><li><a href="#resuming-transfers">Resuming transfers</a></li><li><a href="#positional-control">Positional control</a></li></ul></li><li><a href="#downloading-files">Downloading Files</a></li><li><a href="#preserving-the-date">Preserving the Date</a></li><li><a href="#directory-management">Directory Management</a><ul class="toc-headings"><li><a href="#mkdir">mkdir</a></li></ul></li><li><a href="#directory-listing">Directory Listing</a><ul class="toc-headings"><li><a href="#setting-list-order">Setting List Order</a></li><li><a href="#empty-directories">Empty Directories</a></li><li><a href="#permissions">Permissions</a></li></ul></li><li><a href="#file-attributes">File Attributes</a></li><li><a href="#file-information">File Information</a></li><li><a href="#delete-and-rename">Delete and Rename</a></li><li><a href="#stream-wrapper">Stream Wrapper</a><ul class="toc-headings"><li><a href="#customizing-the-protocol">Customizing the Protocol</a></li><li><a href="#non-password-authentication">Non-Password Authentication</a></li><li><a href="#with-stream-context">With Stream Context</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

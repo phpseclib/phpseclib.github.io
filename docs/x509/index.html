@@ -1,0 +1,361 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>X.509 · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="X.509 · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="&lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>X.509</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">X.509</h1></header><article><div><span><script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/js/jquery.treeview.js"></script>
+<link rel="stylesheet" href="/css/jquery.treeview.css">
+<script>
+var showPath = function() {
+  path = '';
+  parents = $(this).parents('li:visible');
+  for (var i = parents.length - 1; i >= 0; i--) {
+    name = $('.name', parents[i])[0].textContent;
+    delimiter = isNaN(name) ? '\'' : '';
+    path+= '[' + delimiter + name + delimiter + ']';
+  }
+  $('#path').html('<code id="path">$cert' + path + '</code>:');
+};
+$(document).ready(function() {
+  $('.printr').treeview({
+     persist: "location",
+     collapsed: true,
+     unique: true
+   });
+   $('.name,.hitarea').click(showPath);
+   $('#path').html('<code id="path">$cert</code>');
+});
+</script>
+<h2><a class="anchor" aria-hidden="true" id="reading-certificates"></a><a href="#reading-certificates" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reading Certificates</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">X509</span>;
+
+$x509 = <span class="hljs-keyword">new</span> X509();
+$cert = $x509-&gt;loadX509(file_get_contents(<span class="hljs-string">'google.crt'</span>));
+
+var_dump($cert);
+</code></pre>
+<p><span style="font-size: 11px">(<a href="/x509/google.crt">download google.crt</a>)</span></p>
+<p>Running the above will produce an array that looks something like this:</p>
+<p><code id="path">$cert</code></p>
+<ul class="printr"><li><span class="name">tbsCertificate</span><ul><li><span class="name">version</span><ul><li>v3</li></ul></li><li><span class="name">serialNumber</span><ul><li>105827261859531100510423749949966875981</li></ul></li><li><span class="name">signature</span><ul><li><span class="name">algorithm</span><ul><li>sha1WithRSAEncryption</li></ul></li><li><span class="name">parameters</span><ul><li><span class="name">null</span><ul><li></li></ul></li></ul></li></ul></li><li><span class="name">issuer</span><ul><li><span class="name">rdnSequence</span><ul><li><span class="name">0</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-countryName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>ZA</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">1</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-organizationName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>Thawte Consulting (Pty) Ltd.</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">2</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-commonName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>Thawte SGC CA</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li><span class="name">validity</span><ul><li><span class="name">notBefore</span><ul><li><span class="name">utcTime</span><ul><li>Wed, 26 Oct 2011 00:00:00 +0000</li></ul></li></ul></li><li><span class="name">notAfter</span><ul><li><span class="name">utcTime</span><ul><li>Mon, 30 Sep 2013 23:59:59 +0000</li></ul></li></ul></li></ul></li><li><span class="name">subject</span><ul><li><span class="name">rdnSequence</span><ul><li><span class="name">0</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-countryName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>US</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">1</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-stateOrProvinceName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>California</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">2</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-localityName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>Mountain View</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">3</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-organizationName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>Google Inc</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">4</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-commonName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>www.google.com</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li><span class="name">subjectPublicKeyInfo</span><ul><li><span class="name">algorithm</span><ul><li><span class="name">algorithm</span><ul><li>rsaEncryption</li></ul></li><li><span class="name">parameters</span><ul><li><span class="name">null</span><ul><li></li></ul></li></ul></li></ul></li><li><span class="name">subjectPublicKey</span><ul><li>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDetyZDppmFzTinFQm5zw/Jw1WM
+iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
+<span class="hljs-number">2</span>XGMzM0nEx6dQl049qes7/pi8xiB1CRGfwF3fMYqiRSZu5g5HagZ+zkARH0blGp4
+LWmtwHos+tDaIBKY0wIDAQAB
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+</li></ul></li></ul></li><li><span class="name">extensions</span><ul><li><span class="name">0</span><ul><li><span class="name">extnId</span><ul><li>id-ce-basicConstraints</li></ul></li><li><span class="name">critical</span><ul><li>1</li></ul></li><li><span class="name">extnValue</span><ul><li><span class="name">cA</span><ul><li></li></ul></li></ul></li></ul></li><li><span class="name">1</span><ul><li><span class="name">extnId</span><ul><li>id-ce-cRLDistributionPoints</li></ul></li><li><span class="name">critical</span><ul><li></li></ul></li><li><span class="name">extnValue</span><ul><li><span class="name">0</span><ul><li><span class="name">distributionPoint</span><ul><li><span class="name">fullName</span><ul><li><span class="name">0</span><ul><li><span class="name">uniformResourceIdentifier</span><ul><li>http://crl.thawte.com/ThawteSGCCA.crl</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li><span class="name">2</span><ul><li><span class="name">extnId</span><ul><li>id-ce-extKeyUsage</li></ul></li><li><span class="name">critical</span><ul><li></li></ul></li><li><span class="name">extnValue</span><ul><li><span class="name">0</span><ul><li>id-kp-serverAuth</li></ul></li><li><span class="name">1</span><ul><li>id-kp-clientAuth</li></ul></li><li><span class="name">2</span><ul><li>2.16.840.1.113730.4.1</li></ul></li></ul></li></ul></li><li><span class="name">3</span><ul><li><span class="name">extnId</span><ul><li>id-pe-authorityInfoAccess</li></ul></li><li><span class="name">critical</span><ul><li></li></ul></li><li><span class="name">extnValue</span><ul><li><span class="name">0</span><ul><li><span class="name">accessMethod</span><ul><li>id-ad-ocsp</li></ul></li><li><span class="name">accessLocation</span><ul><li><span class="name">uniformResourceIdentifier</span><ul><li>http://ocsp.thawte.com</li></ul></li></ul></li></ul></li><li><span class="name">1</span><ul><li><span class="name">accessMethod</span><ul><li>id-ad-caIssuers</li></ul></li><li><span class="name">accessLocation</span><ul><li><span class="name">uniformResourceIdentifier</span><ul><li>http://www.thawte.com/repository/Thawte_SGC_CA.crt</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li><li><span class="name">signatureAlgorithm</span><ul><li><span class="name">algorithm</span><ul><li>sha1WithRSAEncryption</li></ul></li><li><span class="name">parameters</span><ul><li><span class="name">null</span><ul><li></li></ul></li></ul></li></ul></li><li><span class="name">signature</span><ul><li>...</li></ul></li></ul>
+<h3><a class="anchor" aria-hidden="true" id="getdnprop"></a><a href="#getdnprop" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getDNProp()</h3>
+<pre><code class="hljs css language-php">print_r($x509-&gt;getDNProp(<span class="hljs-string">'CN'</span>));
+</code></pre>
+<p>That will produce the following:</p>
+<ul class="printr"><li><span class="name">0</span><ul><li>www.google.com</li></ul></li></ul>
+<p>An array is returned because each distinguished name property can (in theory) have multiple values</p>
+<p>Valid property names are enumerated upon at <a href="/docs/dnsprops">Distinguished Property Names</a>.</p>
+<p><code>getIssuerDNProp()</code> returns the issuer distinguished name as opposed to the subject distinguished name.</p>
+<h3><a class="anchor" aria-hidden="true" id="getdn"></a><a href="#getdn" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getDN()</h3>
+<pre><code class="hljs css language-php">print_r($x509-&gt;getDN());
+</code></pre>
+<p><code>getDN()</code> / <code>getIssuerDN()</code> accept several different parameters:</p>
+<ul>
+<li><p><code>X509::DN_ARRAY</code> (the default value) returns an array who's keys are based on the ASN.1 syntax for X.509:</p>
+  <ul class="printr"><li><span class="name">rdnSequence</span><ul><li><span class="name">0</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-countryName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>US</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">1</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-stateOrProvinceName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">printableString</span><ul><li>California</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">2</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-localityName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>Mountain View</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">3</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-organizationName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>Google Inc</li></ul></li></ul></li></ul></li></ul></li><li><span class="name">4</span><ul><li><span class="name">0</span><ul><li><span class="name">type</span><ul><li>id-at-commonName</li></ul></li><li><span class="name">value</span><ul><li><span class="name">teletexString</span><ul><li>www.google.com</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul>
+</li>
+<li><p><code>X509::DN_STRING</code> returns an OpenSSL-style string:</p>
+<pre><code class="hljs"><span class="hljs-attribute">C</span>=US, <span class="hljs-attribute">ST</span>=California, <span class="hljs-attribute">L</span>=Mountain View, <span class="hljs-attribute">O</span>=Google Inc, <span class="hljs-attribute">CN</span>=www.google.com
+</code></pre></li>
+<li><p><code>X509::DN_OPENSSL</code> returns an OpenSSL-style array:</p>
+  <ul class="printr"><li><span class="name">C</span><ul><li>US</li></ul></li><li><span class="name">ST</span><ul><li>California</li></ul></li><li><span class="name">L</span><ul><li>Mountain View</li></ul></li><li><span class="name">O</span><ul><li>Google Inc</li></ul></li><li><span class="name">CN</span><ul><li>www.google.com</li></ul></li></ul>
+</li>
+<li><p><code>X509::DN_ASN1</code> returns a DER encoded binary string</p></li>
+<li><p><code>X509::DN_CANON</code> returns a &quot;canonicalized&quot; DER encoded binary string wherein SEQUENCE around RDNs and all string values normalized as trimmed lowercase UTF-8 with all spacing as one blank. Constructed RDNs are not canonicalized.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="getpublickey"></a><a href="#getpublickey" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>getPublicKey()</h3>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">echo</span> $x509-&gt;getPublicKey();
+</code></pre>
+<p>Returns a <code>\phpseclib3\Crypt\Common\PublicKey</code> object that, by default, gets cast to a PKCS8-encoded public key:</p>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDetyZDppmFzTinFQm5zw/Jw1WM
+iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
+<span class="hljs-number">2</span>XGMzM0nEx6dQl049qes7/pi8xiB1CRGfwF3fMYqiRSZu5g5HagZ+zkARH0blGp4
+LWmtwHos+tDaIBKY0wIDAQAB
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="validating-certificates"></a><a href="#validating-certificates" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Validating Certificates</h2>
+<h3><a class="anchor" aria-hidden="true" id="signatures"></a><a href="#signatures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Signatures</h3>
+<pre><code class="hljs css language-php">$x509 = <span class="hljs-keyword">new</span> X509();
+$x509-&gt;loadCA(<span class="hljs-string">'...'</span>);
+$cert = $x509-&gt;loadX509(<span class="hljs-string">'...'</span>);
+<span class="hljs-keyword">echo</span> $x509-&gt;validateSignature() ? <span class="hljs-string">'valid'</span> : <span class="hljs-string">'invalid'</span>;
+</code></pre>
+<p>Certificate authority certificates can be downloaded from <a href="https://curl.haxx.se/docs/caextract.html">curl - SSL CA Certificates</a>. Parsing that is left as an exercise to the reader.</p>
+<h3><a class="anchor" aria-hidden="true" id="self-signed-signatures"></a><a href="#self-signed-signatures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Self-signed Signatures</h3>
+<pre><code class="hljs css language-php">$x509 = <span class="hljs-keyword">new</span> X509();
+$cert = $x509-&gt;loadX509(<span class="hljs-string">'...'</span>);
+<span class="hljs-keyword">echo</span> $x509-&gt;validateSignature(<span class="hljs-keyword">false</span>) ?
+    <span class="hljs-string">'valid'</span> :
+    <span class="hljs-string">'invalid'</span>;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="urls"></a><a href="#urls" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>URLs</h3>
+<pre><code class="hljs css language-php">$x509 = <span class="hljs-keyword">new</span> File_X509();
+$cert = $x509-&gt;loadX509(<span class="hljs-string">'...'</span>);
+<span class="hljs-keyword">echo</span> $x509-&gt;validateURL(<span class="hljs-string">'https://www.domain.tld/path/to/whatever.ext'</span>) ?
+    <span class="hljs-string">'valid'</span> :
+    <span class="hljs-string">'invalid'</span>;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="dates"></a><a href="#dates" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Dates</h3>
+<pre><code class="hljs css language-php">$x509 = <span class="hljs-keyword">new</span> X509();
+$cert = $x509-&gt;loadX509(<span class="hljs-string">'...'</span>);
+<span class="hljs-keyword">echo</span> $x509-&gt;validateDate() ? <span class="hljs-string">'valid'</span> : <span class="hljs-string">'invalid'</span>;
+</code></pre>
+<p>By default <code>validateDate</code> checks to see if the <em>current</em> date is within the date range. If, however, you want to use a custom date you may do so by either passing a string (eg. <code>validateDate('January 1, 2001')</code>) or a DateTime object (eg. <code>validateDate(new DateTime('January 1, 2001'))</code>).</p>
+<h2><a class="anchor" aria-hidden="true" id="creating-certificates"></a><a href="#creating-certificates" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating Certificates</h2>
+<h3><a class="anchor" aria-hidden="true" id="the-general-idea"></a><a href="#the-general-idea" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The General Idea</h3>
+<p>In a nutshell...</p>
+<pre><code class="hljs css language-php">$result = $x509-&gt;sign($issuer, $subject); 
+$x509-&gt;saveX509($result);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="public--private-keys"></a><a href="#public--private-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public / Private Keys</h3>
+<p><code>$issuer</code> and <code>$subject</code> are, themselves, X509 objects. They need private and public keys, respectively. Here's an example of how to create them from scratch for a brand new self-signed cert:</p>
+<pre><code class="hljs css language-php">$privKey = RSA::createKey();
+$pubKey = $privKey-&gt;getPublicKey();
+
+$issuer-&gt;setPrivateKey($privKey); 
+$subject-&gt;setPublicKey($pubKey);
+</code></pre>
+<p>The public key can also be set by <code>$subject-&gt;loadCSR('...')</code> or <code>$subject-&gt;loadX509('...')</code>. If you're using <code>$subject-&gt;loadX509()</code> you'll effectively be re-signing <code>$subject</code>. The issuer DN of <code>$subject</code> will be updated as will some of the other &quot;transactional properties&quot; (see below), if appropriate, but all (well, most) of the extensions will be preserved.</p>
+<p>Note that whereas in the 1.0 and 2.0 branches, the signature algorithm was set by using an additional parameter in the <code>sign</code> method (or <code>signCSR</code>, <code>signCRL</code>, etc) in this case it's set based on the key. So if you want to create an rsaEncryption X509 cert you'd need to do <code>$publicKey = $publicKey-&gt;withHashing(RSA::SIGNATURE_PKCS1)</code> since, by default, RSA keys use <code>RSA::SIGNATURE_PSS</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="key-identifiers"></a><a href="#key-identifiers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Key Identifiers</h3>
+<p>Sometimes an <code>$issuer</code> or a <code>$subject</code> will have multiple private keys. To disambiguate between them key identifiers are used. Quoting <a href="http://tools.ietf.org/html/rfc5280#section-4.2.1.1">RFC5280 § 4.2.1.1</a>, &quot;<em>the value of the keyIdentifier field SHOULD be derived from the public key used to verify the certificate's signature or a method that generates unique values</em>&quot;. An example follows:</p>
+<pre><code class="hljs css language-php">$issuer-&gt;setKeyIdentifier($issuer-&gt;computeKeyIdentifier($pubKey));
+</code></pre>
+<p>Note that computeKeyIdentifier is already called by <code>saveX509()</code> unless you've specifically over-written the key identifier.</p>
+<h3><a class="anchor" aria-hidden="true" id="distinguished-names"></a><a href="#distinguished-names" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Distinguished Names</h3>
+<p><code>$issuer</code> and <code>$subject</code> also need to have their distinguished names set. That can be done in a number of ways. The following are all equivalent to one another:</p>
+<pre><code class="hljs css language-php">$subject-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib demo cert'</span>); 
+$subject-&gt;setDN( 
+    <span class="hljs-keyword">array</span>( 
+        <span class="hljs-string">'rdnSequence'</span> =&gt; <span class="hljs-keyword">array</span>( 
+            <span class="hljs-keyword">array</span>( 
+                <span class="hljs-keyword">array</span>( 
+                    <span class="hljs-string">'type'</span> =&gt; <span class="hljs-string">'id-at-organizationName'</span>, 
+                    <span class="hljs-string">'value'</span>=&gt; <span class="hljs-string">'phpseclib demo cert'</span> 
+                ) 
+            ) 
+        ) 
+    ) 
+); 
+$subject-&gt;setDN(<span class="hljs-keyword">array</span>( 
+    <span class="hljs-string">'O'</span> =&gt; <span class="hljs-string">'phpseclib demo cert'</span> 
+)); 
+$subject-&gt;setDN(<span class="hljs-string">'/O=phpseclib demo cert'</span>);
+</code></pre>
+<p>DN properties can also be removed thusly:</p>
+<pre><code class="hljs css language-php">$subject-&gt;removeDNProp(<span class="hljs-string">'id-at-organizationName'</span>);
+</code></pre>
+<p>DN properties can be set via <code>$subject-&gt;loadCSR('...')</code> and <code>$subject-&gt;loadX509('...')</code> as well.</p>
+<p>In the case of <code>$subject-&gt;setDN()</code>.. the value will be assumed to be utf8String unless you explicitely tell phpseclib to set it to another type by doing something like <code>'value'=&gt; array('ia5String' =&gt; 'phpseclib demo cert')</code>.</p>
+<p>See also: <a href="/docs/dnsprops">List of DN property names</a></p>
+<h3><a class="anchor" aria-hidden="true" id="domain-names"></a><a href="#domain-names" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Domain Names</h3>
+<p>If your X.509 certificate is supposed to be valid for a single domain name that domain name can be set by either setting the id-at-commonName or CN distinguished name property. If your X.509 certificate is supposed to be valid for multiple domain names an X.509 extension - id-ce-subjectAltName - is required. <code>setDomain()</code> takes care of all of this for you. Here's an example of how to make your certificate valid for two domains:</p>
+<pre><code class="hljs css language-php">$subject-&gt;setDomain(<span class="hljs-string">'www.google.com'</span>, <span class="hljs-string">'www.yahoo.com'</span>);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="transactional-properties"></a><a href="#transactional-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transactional Properties</h3>
+<p>Some properties belong neither to <code>$issuer</code> or <code>$subject</code>. Rather they belong to &quot;transaction&quot;. The functions to set those properties are as follows:</p>
+<pre><code class="hljs css language-php">$x509-&gt;setSerialNumber(...);
+$x509-&gt;makeCA();
+$x509-&gt;setStartDate(...); 
+$x509-&gt;setEndDate(...);
+</code></pre>
+<p><code>$subject-&gt;setDomain()</code> isn't considered a transactional property because, in theory, the issuing certificate could have at least one domain too since that's based on a particular distinguished name property.</p>
+<p>The start time is, by default, when the cert is created. The current time is converted to UTC time and the fact that it's UTC time is denoted in the cert. Other X.509 decoders (eg. browsers or email clients or whatever) should decode this to their timezone so there's no need to set it to do <code>$x509-&gt;setStartDate('-1 day')</code> or anything like that.</p>
+<p>The end date, by default, is one year from the current time.</p>
+<p><code>setStartDate()</code> / <code>setEndDate()</code> can accept strings or DateTime objects. If you want the cert to last forever pass <code>'lifetime'</code> to it.</p>
+<h3><a class="anchor" aria-hidden="true" id="function-list"></a><a href="#function-list" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Function List</h3>
+<p>Functions affecting properties common to both <code>$issuer</code> and <code>$subject</code> are as follows:</p>
+<ul>
+<li><code>setDNProp</code></li>
+<li><code>removeDNProp</code></li>
+<li><code>setDN</code></li>
+<li><code>loadCSR</code></li>
+<li><code>loadX509</code></li>
+<li><code>setKeyIdentifier / computeKeyIdentifier</code></li>
+</ul>
+<p>Functions affecting <code>$issuer</code> only properties:</p>
+<ul>
+<li><code>setPrivateKey</code></li>
+</ul>
+<p>Functions affecting <code>$subject</code> only properties:</p>
+<ul>
+<li><code>setPublicKey</code></li>
+<li><code>setDomain</code></li>
+</ul>
+<p>Functions affecting <code>$x509</code> properties:</p>
+<ul>
+<li><code>setSerialNumber</code></li>
+<li><code>makeCA</code></li>
+<li><code>setStartDate</code></li>
+<li><code>setEndDate</code></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="minimalistic-example"></a><a href="#minimalistic-example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Minimalistic Example</h3>
+<pre><code class="hljs css language-php">$subject = <span class="hljs-keyword">new</span> X509(); 
+$subject-&gt;setPublicKey($pubKey); <span class="hljs-comment">// $pubKey is a PublicKey objet</span>
+$subject-&gt;setDN(<span class="hljs-string">'/O=phpseclib demo cert'</span>); 
+
+$issuer = <span class="hljs-keyword">new</span> X509(); 
+$issuer-&gt;setPrivateKey($privKey); <span class="hljs-comment">// $privKey is a PrivateKey object</span>
+$issuer-&gt;setDN(<span class="hljs-string">'/O=phpseclib demo cert'</span>); 
+
+$x509 = <span class="hljs-keyword">new</span> X509(); 
+$result = $x509-&gt;sign($issuer, $subject); 
+<span class="hljs-keyword">echo</span> $x509-&gt;saveX509($result);
+</code></pre>
+<p>For self-signed certs the DN of the subject and issuer will match and the issuer's private key will correspond to the subject's public key.</p>
+<h3><a class="anchor" aria-hidden="true" id="example-self-signed-cert"></a><a href="#example-self-signed-cert" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example: Self-signed cert</h3>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">File</span>\<span class="hljs-title">X509</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
+
+<span class="hljs-comment">// create private key / x.509 cert for stunnel / website</span>
+$CAPrivKey = RSA::createKey();
+$CAPubKey = $CAPrivKey-&gt;getPublicKey();
+
+$CASubject = <span class="hljs-keyword">new</span> X509;
+$CASubject-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib CA cert'</span>);
+$CASubject-&gt;setPublicKey($CAPubKey);
+
+$CAIssuer = <span class="hljs-keyword">new</span> X509;
+$CAIssuer-&gt;setPrivateKey($CAPrivKey);
+$CAIssuer-&gt;setDN($CASubject-&gt;getDN());
+
+$x509 = <span class="hljs-keyword">new</span> X509;
+$x509-&gt;makeCA();
+$result = $x509-&gt;sign($CAIssuer, $CASubject);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"private key for CA cert (can be discarded):\r\n\r\n"</span>;
+<span class="hljs-keyword">echo</span> $CAPrivKey;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\n\r\nCA cert to be imported into browser:\r\n\r\n"</span>;
+<span class="hljs-keyword">echo</span> $x509-&gt;saveX509($result);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\n"</span>;
+</code></pre>
+<p>The cert that this script creates is a CA cert. If you don't want it to be a CA cert you can comment out the <code>$x509-&gt;makeCA()</code> line.</p>
+<h3><a class="anchor" aria-hidden="true" id="example-ca-signed-cert"></a><a href="#example-ca-signed-cert" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example: CA-signed cert</h3>
+<p>The following code requires the previous code to work and should follow the code in the previous section.</p>
+<pre><code class="hljs css language-php">$privKey = RSA::createKey();
+$pubKey = $privKey-&gt;getPublicKey();
+
+$subject = <span class="hljs-keyword">new</span> X509;
+$subject-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib demo cert'</span>);
+
+$subject-&gt;setPublicKey($pubKey);
+
+$issuer = <span class="hljs-keyword">new</span> X509;
+$issuer-&gt;setPrivateKey($CAPrivKey);
+$issuer-&gt;setDN($CASubject-&gt;getDN());
+
+$x509 = <span class="hljs-keyword">new</span> X509;
+$result = $x509-&gt;sign($issuer, $subject);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\nthe stunnel.pem contents are as follows:\r\n\r\n"</span>;
+<span class="hljs-keyword">echo</span> $privKey;
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\n"</span>;
+<span class="hljs-keyword">echo</span> $x509-&gt;saveX509($result);
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\n"</span>;
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="example-custom-extensions"></a><a href="#example-custom-extensions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example: Custom Extensions</h3>
+<p>phpseclib can be used to implement custom extensions but the current approach is rather clunky and inelegant.</p>
+<p>Building off of the previous example (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-php"><span class="hljs-comment">#</span>
+<span class="hljs-comment">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-comment">#</span>
+$result = $x509-&gt;sign($issuer, $subject);
+<span class="hljs-comment">#</span>
+<span class="hljs-comment">#-----[ BEFORE, ADD ]-----------------------------------</span>
+<span class="hljs-comment">#</span>
+$x509-&gt;loadX509($x509-&gt;saveX509($x509-&gt;sign($issuer, $subject)));
+$x509-&gt;setExtension(<span class="hljs-string">'id-pe-authorityInfoAccess'</span>, [
+    [
+        <span class="hljs-string">"accessMethod"</span> =&gt; <span class="hljs-string">"id-ad-ocsp"</span>,
+        <span class="hljs-string">"accessLocation"</span> =&gt; [
+            <span class="hljs-string">"uniformResourceIdentifier"</span> =&gt; <span class="hljs-string">'https://ocsp.test.ca/'</span>,
+        ]
+    ],
+    [
+        <span class="hljs-string">"accessMethod"</span> =&gt; <span class="hljs-string">"id-ad-caIssuers"</span>,
+        <span class="hljs-string">"accessLocation"</span> =&gt; [
+            <span class="hljs-string">"uniformResourceIdentifier"</span> =&gt; <span class="hljs-string">'https://crt.test.ca/test.crt'</span>,
+        ],
+    ],
+], <span class="hljs-keyword">true</span>, <span class="hljs-keyword">false</span>);
+$subject = $x509;
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/symmetric"><span class="arrow-prev">← </span><span>Overview</span></a><a class="docs-next button" href="/docs/csr"><span>CSR</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#reading-certificates">Reading Certificates</a><ul class="toc-headings"><li><a href="#getdnprop">getDNProp()</a></li><li><a href="#getdn">getDN()</a></li><li><a href="#getpublickey">getPublicKey()</a></li></ul></li><li><a href="#validating-certificates">Validating Certificates</a><ul class="toc-headings"><li><a href="#signatures">Signatures</a></li><li><a href="#self-signed-signatures">Self-signed Signatures</a></li><li><a href="#urls">URLs</a></li><li><a href="#dates">Dates</a></li></ul></li><li><a href="#creating-certificates">Creating Certificates</a><ul class="toc-headings"><li><a href="#the-general-idea">The General Idea</a></li><li><a href="#public--private-keys">Public / Private Keys</a></li><li><a href="#key-identifiers">Key Identifiers</a></li><li><a href="#distinguished-names">Distinguished Names</a></li><li><a href="#domain-names">Domain Names</a></li><li><a href="#transactional-properties">Transactional Properties</a></li><li><a href="#function-list">Function List</a></li><li><a href="#minimalistic-example">Minimalistic Example</a></li><li><a href="#example-self-signed-cert">Example: Self-signed cert</a></li><li><a href="#example-ca-signed-cert">Example: CA-signed cert</a></li><li><a href="#example-custom-extensions">Example: Custom Extensions</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Overview · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Best Practices"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Overview · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="## Best Practices"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Symmetric Keys</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Overview</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="best-practices"></a><a href="#best-practices" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Best Practices</h2>
+<p>ChaCha20-Poly1305 is the best practices algorithm to be using at the time of this writing. After that it would be AES-GCM. Both of these are <a href="https://en.wikipedia.org/wiki/Authenticated_encryption">authenticated encryption</a> algorithms.</p>
+<h2><a class="anchor" aria-hidden="true" id="design-criteria"></a><a href="#design-criteria" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Design Criteria</h2>
+<p>Cryptography is easy to get wrong. If you don't know what you're doing you might use a bad algorithm (eg. DES), you might use a bad mode (eg. ECB), you might use a short password as a key, etc.</p>
+<p>phpseclib2 was pretty tolerant about this. A key that wasn't long enough would be null padded. An IV that wasn't provided would be assumed to be all null bytes. It was very forgiving and in so doing it almost enabled bad cryptography. phpseclib3, in contrast, has a much less forgiving API. If you leave a step out or don't provide enough data an Exception will be thrown.</p>
+<p>Sure, phpseclib3 could be made to only include &quot;good&quot; algorithms and modes, but they might still be needed for interoperability purposes.</p>
+<h2><a class="anchor" aria-hidden="true" id="streamcipher-vs-blockcipher"></a><a href="#streamcipher-vs-blockcipher" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>StreamCipher vs BlockCipher</h2>
+<p>All symmetric key classes extend <code>\phpseclib3\Crypt\Common\SymmetricKey</code> (as opposed to <code>\phpseclib3\Crypt\Common\AsymmetricKey</code>).</p>
+<p>Symmetric key classes extend either <code>\phpseclib3\Crypt\Common\StreamCipher</code> or <code>\phpseclib3\Crypt\Common\BlockCipher</code>, depending on whether or not they're a stream or block cipher, respectively.</p>
+<p>The chief difference between the two is that stream ciphers only support one mode of operation whereas block ciphers support multiple modes of operation.</p>
+<p>Stream ciphers also never make use of an IV (although they may make use of a nonce).</p>
+<p>phpseclib provides implementations for three different stream ciphers:</p>
+<ul>
+<li>RC4</li>
+<li>Salsa20</li>
+<li>ChaCha20</li>
+</ul>
+<p>phpseclib provides implementations for the following block ciphers:</p>
+<ul>
+<li>AES</li>
+<li>Rijndael (AES with support for variable block sizes)</li>
+<li>DES</li>
+<li>TripleDES</li>
+<li>RC2</li>
+<li>Blowfish</li>
+<li>Twofish</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="high-level-example-using-aes"></a><a href="#high-level-example-using-aes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>High Level Example (using AES)</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Random</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'ctr'</span>);
+$cipher-&gt;setIV(Random::string(<span class="hljs-number">16</span>));
+$cipher-&gt;setKey(Random::string(<span class="hljs-number">16</span>));
+
+$ciphertext = $cipher-&gt;encrypt(<span class="hljs-string">'...'</span>);
+<span class="hljs-keyword">echo</span> $cipher-&gt;decrypt($ciphertext);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="the-constructor"></a><a href="#the-constructor" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The Constructor</h3>
+<p>In this example <code>'ctr'</code> is a block cipher mode of operation. This parameter does not need to be provided for stream ciphers.</p>
+<p>Supported block cipher modes of operation are as follows:</p>
+<ul>
+<li>ctr</li>
+<li>ecb</li>
+<li>cbc</li>
+<li>cfb8</li>
+<li>ofb</li>
+<li>gcm</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="setiv-vs-setnonce"></a><a href="#setiv-vs-setnonce" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>setIV() vs setNonce()</h3>
+<p><code>usesIV()</code> tells you whether the cipher object requires an IV. If an IV is required it can be set with <code>setIV()</code>.</p>
+<p><code>usesNonce()</code> tells you whether or not a cipher object uses a nonce. If a nonce is required it can be set with <code>setNonce()</code>.</p>
+<p>Nonce's and IV's are very closely related but, in the context of phpseclib, a nonce is only used with GCM. Whereas the IV length is equal to the block size the nonce length is normally 96 bits (whereas the block size is 128 bits; GCM only works on ciphers with block length of 128 bits).</p>
+<h3><a class="anchor" aria-hidden="true" id="setkey-vs-setpassword"></a><a href="#setkey-vs-setpassword" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>setKey() vs setPassword()</h3>
+<p>Whereas <strong>keys</strong> need to be an exact length and, in theory, should be randomly generated (not that phpseclib has a way to verify whether or not they were randomly generated), <strong>passwords</strong> have no such requirements.</p>
+<p>Passwords should still follow good password guidelines. A number, an upper case / lower case character, a symbol, at least eight characters, whatever. But they don't need to be 16 or 32 characters including non-printable characters like keys ought to be.</p>
+<p><code>setPassword</code>'s derives passwords using one of three different techniques:</p>
+<ul>
+<li><a href="https://tools.ietf.org/html/rfc2898#section-5.1">PBKDF1</a></li>
+<li><a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7292#appendix-B.2">PKCS12</a> (used by some PKCS8 keys)</li>
+</ul>
+<p>The current best practices method for generating keys from passwords is actually <a href="https://en.wikipedia.org/wiki/Argon2">Argon2</a>, which is not implemented by phpseclib. The reason phpseclib doesn't support this is two fold</p>
+<ol>
+<li>Speed considerations. It's too slow for <a href="https://github.com/paragonie/sodium_compat">sodium_compat</a> to implement and it's too slow for phpseclib to implement. Maybe <a href="https://wiki.php.net/rfc/jit">PHP8's JIT</a> will change this.</li>
+<li><a href="/docs/publickeys#common-key-formats">PKCS8</a> support. The key derivation functions that phpseclib does implement are all used, in one form or another, for PKCS8 public keys.</li>
+</ol>
+<p>The parameters <code>setPassword</code> takes are as follows:</p>
+<pre><code class="hljs css language-php">$cipher-&gt;setPassword(
+    $password,
+    $method = <span class="hljs-string">'pbkdf2'</span>,
+    $hash = <span class="hljs-string">'sha1'</span>,
+    $salt = <span class="hljs-string">'phpseclib/salt'</span>,
+    $iterationCount = <span class="hljs-number">1000</span>,
+    $derivedKeyLength = $cipher-&gt;getKeyLength() &gt;&gt; <span class="hljs-number">3</span>
+); 
+</code></pre>
+<p>PBKDF1 and PKCS12 set the IV, as well - PBKDF2 does not.</p>
+<h2><a class="anchor" aria-hidden="true" id="padding"></a><a href="#padding" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Padding</h2>
+<p><a href="https://en.wikipedia.org/wiki/Padding_(cryptography)#PKCS%235_and_PKCS%237">PKCS#5 / PKCS#7 padding</a> can be enabled by doing <code>$cipher-&gt;enablePadding()</code>.</p>
+<p>Padding can be disabled by doing <code>$cipher-&gt;disablePadding()</code>.</p>
+<p>Padding is enabled by default.</p>
+<h2><a class="anchor" aria-hidden="true" id="continuous-buffer"></a><a href="#continuous-buffer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Continuous Buffer</h2>
+<p>Normally <code>$cipher-&gt;encrypt('...') === $cipher-&gt;encrypt('...')</code> but, if you do <code>$cipher-&gt;enableContinuousBuffer()</code> then that will no longer be the case. Consider the following example:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">Random</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'ctr'</span>);
+$cipher-&gt;setIV(Random::string(<span class="hljs-number">16</span>));
+$cipher-&gt;setKey(Random::string(<span class="hljs-number">16</span>));
+
+$ciphertext1 = $cipher-&gt;encrypt(<span class="hljs-string">'......'</span>);
+$cipher-&gt;enableContinuousBuffer();
+$ciphertext2 = $cipher-&gt;encrypt(<span class="hljs-string">'...'</span>) . $cipher-&gt;encrypt(<span class="hljs-string">'...'</span>);
+
+<span class="hljs-keyword">echo</span> $ciphertext1 === $ciphertext2 ? <span class="hljs-string">'same'</span> : <span class="hljs-string">'different'</span>;
+</code></pre>
+<p>With the continuous buffer enabled <code>same</code> will be output. Without the continuous buffer <code>different</code> will be output.</p>
+<p>The continuous buffer can be disabled by calling <code>$cipher-&gt;disableContinuousBuffer()</code>.</p>
+<p>This is the same idea as <a href="https://www.php.net/manual/en/function.hash-init.php">incremental hashing contexts</a> in PHP.</p>
+<h2><a class="anchor" aria-hidden="true" id="cipher-attributes"></a><a href="#cipher-attributes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Cipher Attributes</h2>
+<p>Various cipher attributes can be obtained by calling <code>$cipher-&gt;getKeyLength()</code>, <code>$cipher-&gt;getBlockLength()</code> or <code>$cipher-&gt;getBlockLengthInBytes()</code>.</p>
+<p><code>$cipher-&gt;getKeyLength()</code> returns the key length in bits (if it were to return the key length in bytes it'd be named <code>$cipher-&gt;getKeyLengthInBytes()</code>).</p>
+<p>The block length for stream ciphers is 0.</p>
+<h2><a class="anchor" aria-hidden="true" id="aad-modes"></a><a href="#aad-modes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AAD modes</h2>
+<p>GCM mode can be enabled by doing <code>$cipher = new AES('gcm')</code>. It can only be used on ciphers with a 128-bit block size. GCM, uniquely, requires a nonce (instead of an IV) by set by calling <code>$cipher-&gt;setNonce()</code>. See <a href="#setiv-vs-setnonce">setIV() vs setNonce()</a> for more information.</p>
+<p>Poly1305 support can be enabled by doing <code>$cipher-&gt;enablePoly1305()</code>. Poly1305 keys can be set (when necessary) by doing <code>$cipher-&gt;setPoly1305Key('...')</code> (keys must be 256-bits). For Salsa20 / ChaCha20, Poly1305 keys are automatically generated using the technique described in <a href="https://tools.ietf.org/html/rfc8439#section-2.6.1">RFC8439 § 2.6.1. Poly1305 Key Generation in Pseudocode</a> (altho it may still be desirable to manually set the key [eg. SSH2 uses a different key construction than that RFC describes]).</p>
+<p>For both GCM and Poly1305 you may optionally set the &quot;additional authenticated data&quot; with <code>$cipher-&gt;setAAD()</code> (by default it's the empty string).</p>
+<p>The tag can be set with <code>$cipher-&gt;setTag(...)</code> and retreived with <code>$cipher-&gt;getTag()</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/dh"><span class="arrow-prev">← </span><span>(EC)DH</span></a><a class="docs-next button" href="/docs/x509"><span>X.509</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#best-practices">Best Practices</a></li><li><a href="#design-criteria">Design Criteria</a></li><li><a href="#streamcipher-vs-blockcipher">StreamCipher vs BlockCipher</a></li><li><a href="#high-level-example-using-aes">High Level Example (using AES)</a><ul class="toc-headings"><li><a href="#the-constructor">The Constructor</a></li><li><a href="#setiv-vs-setnonce">setIV() vs setNonce()</a></li><li><a href="#setkey-vs-setpassword">setKey() vs setPassword()</a></li></ul></li><li><a href="#padding">Padding</a></li><li><a href="#continuous-buffer">Continuous Buffer</a></li><li><a href="#cipher-attributes">Cipher Attributes</a></li><li><a href="#aad-modes">AAD modes</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

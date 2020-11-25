@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Connecting · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Basic Example with Signature Verification"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Connecting · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="## Basic Example with Signature Verification"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>SSH2</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Connecting</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="basic-example-with-signature-verification"></a><a href="#basic-example-with-signature-verification" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Basic Example with Signature Verification</h2>
+<p>As the &quot;secure&quot; part of Secure Shell (SSH) implies, SSH is designed to work over hostile networks. SSH encrypts your data so that eavesdroppers cannot read the data being sent back and forth and it provides a method that can be used to verify that the server you're connecting to hasn't been replaced with a hostile server. To facilitate the latter SSH servers have a host public key. Data that's unique to the SSH session is signed by the server and should be verified by the client with the host public key. Of course, simply verifying the signature is insufficient - you need to verify that the host public key is correct. X.509 / SSL / TLS does this with <a href="https://en.wikipedia.org/wiki/Certificate_authority">certificate authorities</a> but in SSH, in theory, you'd get the host public key through some <a href="https://en.wikipedia.org/wiki/Out-of-band_agreement">out-of-band method</a>. In practice, however, people usually just cache the key the first time they connect to a server and assume all subsequent connections should be using that same key. How the expected host key is saved is up to the application designer (OpenSSH saves them in <code>~/.ssh/known_hosts</code>) but here is an example of how the host key would be retrieved from the SSH server (prior to authentication) and checked against the expected value (<code>$expected</code>):</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SSH2</span>;
+
+$ssh = <span class="hljs-keyword">new</span> SSH2(<span class="hljs-string">'localhost'</span>, <span class="hljs-number">22</span>);
+<span class="hljs-keyword">if</span> ($expected != $ssh-&gt;getServerPublicHostKey()) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Host key verification failed'</span>);
+}
+</code></pre>
+<p>All subsequent code samples omit this part for brevity but if you're concerned about eavesdroppers (which isn't always a legit concern; eg. if you're connecting to localhost) it should not be skipped.</p>
+<p>The port number, incidentally, is optional. If not specified it will be assumed to be 22.</p>
+<h2><a class="anchor" aria-hidden="true" id="using-an-http-proxy"></a><a href="#using-an-http-proxy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using an HTTP Proxy</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SSH2</span>;
+
+$fsock = fsockopen(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">80</span>, $errno, $errstr, <span class="hljs-number">1</span>);
+<span class="hljs-keyword">if</span> (!$fsock) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>($errstr);
+}
+fputs($fsock, <span class="hljs-string">"CONNECT localhost:22 HTTP/1.0\r\n"</span>);
+<span class="hljs-comment">//fputs($fsock, "Proxy-Authorization: Basic " . base64_encode('user:pass') . "\r\n");</span>
+fputs($fsock, <span class="hljs-string">"\r\n"</span>);
+<span class="hljs-keyword">while</span> ($line = fgets($fsock, <span class="hljs-number">1024</span>)) {
+    <span class="hljs-keyword">if</span> ($line == <span class="hljs-string">"\r\n"</span>) {
+        <span class="hljs-keyword">break</span>;
+    }
+    <span class="hljs-comment">//echo $line;</span>
+}
+
+$ssh = <span class="hljs-keyword">new</span> SSH2($fsock);
+$ssh-&gt;login(<span class="hljs-string">'username'</span>, <span class="hljs-string">'password'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'ls -latr'</span>);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="using-a-socks5-proxy"></a><a href="#using-a-socks5-proxy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using a SOCKS5 Proxy</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SSH2</span>;
+
+<span class="hljs-comment">// SSH connection info</span>
+$port = <span class="hljs-number">22</span>;
+$address = <span class="hljs-string">'localhost'</span>;
+
+<span class="hljs-comment">// SOCKS5 connection info</span>
+$fsock = fsockopen(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">1080</span>, $errno, $errstr, <span class="hljs-number">1</span>);
+<span class="hljs-keyword">if</span> (!$fsock) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>($errstr);
+}
+
+$port = pack(<span class="hljs-string">'n'</span>, $port);
+$address = chr(strlen($address)) . $address;
+
+$request = <span class="hljs-string">"\5\1\0"</span>;
+<span class="hljs-keyword">if</span> (fwrite($fsock, $request) != strlen($request)) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Premature termination'</span>);
+}
+
+$response = fread($fsock, <span class="hljs-number">2</span>);
+<span class="hljs-keyword">if</span> ($response != <span class="hljs-string">"\5\0"</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Unsupported protocol or unsupported method'</span>);
+}
+
+$request = <span class="hljs-string">"\5\1\0\3$address$port"</span>;
+<span class="hljs-keyword">if</span> (fwrite($fsock, $request) != strlen($request)) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">'Premature termination'</span>);
+}
+
+$response = fread($fsock, strlen($address) + <span class="hljs-number">6</span>);
+<span class="hljs-keyword">if</span> (substr($response, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>) != <span class="hljs-string">"\5\0"</span>) {
+<span class="hljs-keyword">echo</span> bin2hex($response) . <span class="hljs-string">"\n"</span>;
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> \<span class="hljs-keyword">Exception</span>(<span class="hljs-string">"Unsupported protocol or connection refused"</span>);
+}
+
+$ssh = <span class="hljs-keyword">new</span> SSH2($fsock);
+$ssh-&gt;login(<span class="hljs-string">'username'</span>, <span class="hljs-string">'password'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'ls -latr'</span>);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="binding-to-a-specific-ip-address"></a><a href="#binding-to-a-specific-ip-address" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Binding to a Specific IP Address</h2>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Net</span>\<span class="hljs-title">SSH2</span>;
+
+<span class="hljs-comment">// http://php.net/manual/en/context.socket.php</span>
+$opts = <span class="hljs-keyword">array</span>(
+    <span class="hljs-string">'socket'</span> =&gt; <span class="hljs-keyword">array</span>(
+        <span class="hljs-string">'bindto'</span> =&gt; <span class="hljs-string">'127.255.255.255:0'</span>,
+    ),
+);
+$context = stream_context_create($opts);
+$socket = stream_socket_client(<span class="hljs-string">'tcp://localhost:22'</span>, $errno, $errstr, ini_get(<span class="hljs-string">'default_socket_timeout'</span>), STREAM_CLIENT_CONNECT, $context);
+
+$ssh = <span class="hljs-keyword">new</span> SSH2($socket);
+$ssh-&gt;login(<span class="hljs-string">'username'</span>, <span class="hljs-string">'password'</span>);
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'ls -latr'</span>);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="using-a-custom-cipher-suite"></a><a href="#using-a-custom-cipher-suite" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using a Custom Cipher Suite</h2>
+<p>You can tell phpseclib which algorithms you'd like to use by doing <code>$ssh-&gt;setPreferredAlgorithms($methods)</code>. <code>$methods</code> should be an associative array with any or all of the following parameters (inspired by <a href="https://www.php.net/ssh2-connect">ssh2_connect</a>):</p>
+<table>
+<thead>
+<tr><th>Index</th><th>Meaning</th><th>Supported Values</th></tr>
+</thead>
+<tbody>
+<tr><td>kex</td><td>List of key exchange methods to advertise, comma separated in order of preference.</td><td><em>curve25519-sha256</em>, <em>curve25519-sha256<a href=""></a>@libssh.org</em>, <em>ecdh-sha2-nistp256</em>, <em>ecdh-sha2-nistp384</em>, <em>ecdh-sha2-nistp521</em>, <em>diffie-hellman-group-exchange-sha256</em>, <em>diffie-hellman-group-exchange-sha1</em>, <em>diffie-hellman-group14-sha256</em>, <em>diffie-hellman-group14-sha1</em>, <em>diffie-hellman-group15-sha512</em>, <em>diffie-hellman-group16-sha512</em>, <em>diffie-hellman_group17-sha512</em>, <em>diffie-hellman-group18-sha512</em>, <em>diffie-hellman-group1-sha1</em>. Pretty much anything returned by <code>$ssh-&gt;getSupportedKEXAlgorithms()</code></td></tr>
+<tr><td>hostkey</td><td>List of hostkey methods to advertise, comma separated in order of preference.</td><td><em>ssh-ed25519</em>, <em>ecdsa-sha2-nistp256</em>, <em>ecdsa-sha2-nistp384</em>, <em>ecdsa-sha2-nistp521</em>, <em>rsa-sha2-256</em>, <em>rsa-sha2-512</em>, <em>ssh-rsa</em>, <em>ssh-dss</em>. Pretty much anything returned by <code>$ssh-&gt;getSupportedHostKeyAlgorithms()</code></td></tr>
+<tr><td>client_to_server</td><td>Associative array containing crypt, compression, and message authentication code (MAC) method preferences for messages sent from client to server.</td><td></td></tr>
+<tr><td>server_to_client</td><td>Associative array containing crypt, compression, and message authentication code (MAC) method preferences for messages sent from server to client.</td><td></td></tr>
+</tbody>
+</table>
+<p><code>client_to_server</code> and <code>server_to_client</code> should be an associative array with any or all of the following parameters.</p>
+<table>
+<thead>
+<tr><th>Index</th><th>Meaning</th><th>Supported Values</th></tr>
+</thead>
+<tbody>
+<tr><td>crypt</td><td>List of crypto methods to advertise, comma separated in order of preference.</td><td><em>aes128-gcm<a href=""></a>@openssh.com</em>, <em>aes256-gcm<a href=""></a>@openssh.com</em>, <em>arcfour256</em>, <em>arcfour128</em>, <em>aes128-ctr</em>, <em>aes192-ctr</em>, <em>aes256-ctr</em>, <em>chacha20-poly1305<a href=""></a>@openssh.com</em>, <em>twofish128-ctr</em>, <em>twofish192-ctr</em>, <em>twofish256-ctr</em>, <em>aes128-cbc</em>, <em>aes192-cbc</em>, <em>aes256-cbc</em>, <em>twofish128-cbc</em>, <em>twofish192-cbc</em>, <em>twofish256-cbc</em>, <em>twofish-cbc</em>, <em>blowfish-ctr</em>, <em>blowfish-cbc</em>, <em>3des-ctr</em>, <em>3des-cbc</em>. Pretty much anything returned by <code>$ssh-&gt;getSupportedEncryptionAlgorithms()</code></td></tr>
+<tr><td>comp</td><td>List of compression methods to advertise, comma separated in order of preference.</td><td><em>none</em>. Pretty much anything returned by <code>$ssh-&gt;getSupportedCompressionAlgorithms()</code></td></tr>
+<tr><td>mac</td><td>List of MAC methods to advertise, comma separated in order of preference.</td><td><em>hmac-sha2-256-etm<a href=""></a>@openssh.com</em>, <em>hmac-sha2-512-etm<a href=""></a>@openssh.com</em>, <em>umac-64-etm<a href=""></a>@openssh.com</em>, <em>umac-128-etm<a href=""></a>@openssh.com</em>, <em>hmac-sha1-etm<a href=""></a>@openssh.com</em>, <em>hmac-sha2-256</em>, <em>hmac-sha2-512</em>, <em>umac-64<a href=""></a>@openssh.com</em>, <em>umac-128<a href=""></a>@openssh.com</em>, <em>hmac-sha1-96</em>, <em>hmac-sha1</em>, <em>hmac-md5-96</em>, <em>hmac-md5</em>. Pretty much anything returned by <code>$ssh-&gt;getSupportedMACAlgorithms()</code></td></tr>
+</tbody>
+</table>
+<p>Note that a given algorithm will only be used if it's supported by both phpseclib and the server. The algorithms that the server supports can be determined by doing <code>$ssh-&gt;getServerAlgorithms()</code>. The algorithms that ultimately wind up being used can be determined by doing <code>$ssh-&gt;getAlgorithmsNegotiated()</code>.</p>
+<p>Using a custom cipher suite is not recommended. phpseclib's prioritization of algorithms is intended to maximize speed and security. For example, if OpenSSL is installed and you're using PHP &gt;= 7.1.0 then <em>aes128-gcm<a href=""></a>@openssh.com</em> will be the preferred algorithm. If (1) OpenSSL is not installed or you're using PHP &lt; 7.1.0 BUT (2) libsodium is installed, then <em>aes256-gcm<a href=""></a>@openssh.com</em> will be the preferred algorithm. You can make either of those the preferred algorithms even if neither OpenSSL or libsodium are installed but your connection will be slowed down because the pure-PHP implemenation of both of those is not nearly as fast as OpenSSL / libsodium.</p>
+<p><em>chacha20-poly1305<a href=""></a>@openssh.com</em> is the latest hotness in the cryptographic community but it is not prioritized higher because (1) while OpenSSL supports ChaCha20, it doens't support Poly1305 and (2) libsodium doesn't use Poly1305 in the same way that SSH uses it. Despite that, <em>chacha20-poly1305<a href=""></a>@openssh.com</em> is still pretty fast but not as fast as some of the other available algorithms.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/interop"><span class="arrow-prev">← </span><span>Interoperability</span></a><a class="docs-next button" href="/docs/auth"><span>Authenticating</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#basic-example-with-signature-verification">Basic Example with Signature Verification</a></li><li><a href="#using-an-http-proxy">Using an HTTP Proxy</a></li><li><a href="#using-a-socks5-proxy">Using a SOCKS5 Proxy</a></li><li><a href="#binding-to-a-specific-ip-address">Binding to a Specific IP Address</a></li><li><a href="#using-a-custom-cipher-suite">Using a Custom Cipher Suite</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

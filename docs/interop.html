@@ -1,0 +1,741 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Interoperability · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Python"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Interoperability · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="## Python"/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Interoperability</h1></header><article><div><span><h2><a class="anchor" aria-hidden="true" id="python"></a><a href="#python" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Python</h2>
+<p>All Python code samples use <a href="https://www.pycryptodome.org/en/latest/src/introduction.html">PyCryptodome</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="aes-128-cbc-decryption"></a><a href="#aes-128-cbc-decryption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AES-128-CBC Decryption</h3>
+<p>Encrypting a string using AES-128-CBC with phpseclib:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'cbc'</span>);
+$cipher-&gt;setKey(str_repeat(<span class="hljs-string">'a'</span>, <span class="hljs-number">16</span>));
+$cipher-&gt;setIV(str_repeat(<span class="hljs-string">'b'</span>, <span class="hljs-number">16</span>));
+
+<span class="hljs-keyword">echo</span> bin2hex($cipher-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decrypting that same string with Python:</p>
+<pre><code class="hljs css language-python"><span class="hljs-keyword">from</span> Crypto.Cipher <span class="hljs-keyword">import</span> AES
+<span class="hljs-keyword">from</span> Crypto.Util.Padding <span class="hljs-keyword">import</span> unpad
+
+key = <span class="hljs-string">"aaaaaaaaaaaaaaaa"</span>.encode(<span class="hljs-string">"utf8"</span>)
+iv = <span class="hljs-string">"bbbbbbbbbbbbbbbb"</span>.encode(<span class="hljs-string">"utf8"</span>)
+ciphertext = bytearray.fromhex(<span class="hljs-string">"10f42fd95857ed2775cfbc4b471bc213"</span>)
+
+cipher = AES.new(key, AES.MODE_CBC, iv)
+plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+
+print(plaintext)
+</code></pre>
+<p>Keep in mind that phpseclib, by default, pads it's ciphertext's. To disable this behavior do <code>$cipher-&gt;disablePadding()</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption"></a><a href="#rsa-decryption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with Python:</p>
+<pre><code class="hljs css language-python"><span class="hljs-keyword">from</span> Crypto.PublicKey <span class="hljs-keyword">import</span> RSA
+<span class="hljs-keyword">from</span> Crypto.Cipher <span class="hljs-keyword">import</span> PKCS1_v1_5
+<span class="hljs-keyword">from</span> Crypto <span class="hljs-keyword">import</span> Random
+<span class="hljs-keyword">import</span> base64
+
+key = RSA.import_key(<span class="hljs-string">"""-----BEGIN PRIVATE KEY-----
+MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t
+gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ
+jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw
+Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj
+hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb
+NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH
+/bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh
+BVl433tgTTQ=
+-----END PRIVATE KEY-----"""</span>)
+
+ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>
+
+ciphertextBytes = base64.decodebytes(ciphertext.encode(<span class="hljs-string">'ascii'</span>))
+
+cipher = PKCS1_v1_5.new(key)
+sentinel = Random.new().read(key.size_in_bytes())
+plaintext = cipher.decrypt(ciphertextBytes, sentinel)
+
+print(plaintext)
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="java"></a><a href="#java" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Java</h2>
+<h3><a class="anchor" aria-hidden="true" id="aes-128-cbc-decryption-1"></a><a href="#aes-128-cbc-decryption-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AES-128-CBC Decryption</h3>
+<p>Encrypting a string using AES-128-CBC with phpseclib:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'cbc'</span>);
+$cipher-&gt;setKey(str_repeat(<span class="hljs-string">'a'</span>, <span class="hljs-number">16</span>));
+$cipher-&gt;setIV(str_repeat(<span class="hljs-string">'b'</span>, <span class="hljs-number">16</span>));
+
+<span class="hljs-keyword">echo</span> bin2hex($cipher-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decrypting that same string with Java:</p>
+<pre><code class="hljs css language-java"><span class="hljs-keyword">import</span> javax.xml.bind.DatatypeConverter;
+<span class="hljs-keyword">import</span> javax.crypto.spec.SecretKeySpec;
+<span class="hljs-keyword">import</span> javax.crypto.spec.IvParameterSpec;
+<span class="hljs-keyword">import</span> javax.crypto.Cipher;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+</span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception
+    </span>{
+        String key = <span class="hljs-string">"aaaaaaaaaaaaaaaa"</span>;
+        String iv = <span class="hljs-string">"bbbbbbbbbbbbbbbb"</span>;
+        String ciphertext = <span class="hljs-string">"10f42fd95857ed2775cfbc4b471bc213"</span>;
+
+        <span class="hljs-keyword">byte</span>[] ciphertextBytes = DatatypeConverter.parseHexBinary(ciphertext);
+
+        <span class="hljs-comment">// perform the actual decryption</span>
+        Cipher cipher = Cipher.getInstance(<span class="hljs-string">"AES/CBC/PKCS5Padding"</span>);
+        SecretKeySpec keySpec = <span class="hljs-keyword">new</span> SecretKeySpec(key.getBytes(), <span class="hljs-string">"AES"</span>);
+        IvParameterSpec ivSpec = <span class="hljs-keyword">new</span> IvParameterSpec(iv.getBytes());
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+        <span class="hljs-keyword">byte</span>[] plaintextBytes = cipher.doFinal(ciphertextBytes);
+        String plaintext = <span class="hljs-keyword">new</span> String(plaintextBytes);
+
+        System.out.println(plaintext);
+    }
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-1"></a><a href="#rsa-decryption-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with Java:</p>
+<pre><code class="hljs css language-java"><span class="hljs-keyword">import</span> org.bouncycastle.openssl.PEMParser;
+<span class="hljs-keyword">import</span> org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+<span class="hljs-keyword">import</span> org.bouncycastle.openssl.PEMKeyPair;
+<span class="hljs-keyword">import</span> java.security.KeyPair;
+<span class="hljs-keyword">import</span> java.io.StringReader;
+<span class="hljs-keyword">import</span> javax.crypto.Cipher;
+<span class="hljs-keyword">import</span> java.util.Base64;
+<span class="hljs-keyword">import</span> java.security.interfaces.RSAPrivateKey;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+</span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception
+    </span>{
+        String ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+        String key = <span class="hljs-string">"-----BEGIN RSA PRIVATE KEY-----\n"</span> +
+<span class="hljs-string">"MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\n"</span> +
+<span class="hljs-string">"KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\n"</span> +
+<span class="hljs-string">"o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\n"</span> +
+<span class="hljs-string">"TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\n"</span> +
+<span class="hljs-string">"9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\n"</span> +
+<span class="hljs-string">"v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\n"</span> +
+<span class="hljs-string">"/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00\n"</span> +
+<span class="hljs-string">"-----END RSA PRIVATE KEY-----\n"</span>;
+
+        <span class="hljs-comment">// load the private key</span>
+        PEMParser pemParser = <span class="hljs-keyword">new</span> PEMParser(<span class="hljs-keyword">new</span> StringReader(key));
+        JcaPEMKeyConverter converter = <span class="hljs-keyword">new</span> JcaPEMKeyConverter();
+        KeyPair keyPair = converter.getKeyPair((PEMKeyPair) pemParser.readObject());
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+
+        <span class="hljs-comment">// load the ciphertext</span>
+        <span class="hljs-keyword">byte</span>[] cipherBytes = Base64.getDecoder().decode(ciphertext);
+
+        <span class="hljs-comment">// perform the actual decryption</span>
+        Cipher cipher = Cipher.getInstance(<span class="hljs-string">"RSA/ECB/PKCS1Padding"</span>);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        <span class="hljs-keyword">byte</span>[] plaintextBytes = cipher.doFinal(cipherBytes);
+        String plaintext = <span class="hljs-keyword">new</span> String(plaintextBytes);
+
+        System.out.println(plaintext);
+    }
+}
+</code></pre>
+<p>The above code only works with PKCS1 keys. If you want to load a PKCS8 key you'll need to make the following changes (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-java">#
+#-----[ FIND ]------------------------------------------
+#
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.PEMKeyPair;
+import java.security.KeyPair;
+import java.io.StringReader;
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.KeyFactory;
+#
+#-----[ FIND ]------------------------------------------
+#
+        String key = "-----BEGIN RSA PRIVATE KEY-----\n" +
+"MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\n" +
+"KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\n" +
+"o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\n" +
+"TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\n" +
+"9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\n" +
+"v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\n" +
+"/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00\n" +
+"-----END RSA PRIVATE KEY-----\n";
+
+        // load the private key
+        PEMParser pemParser = new PEMParser(new StringReader(key));
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        KeyPair keyPair = converter.getKeyPair((PEMKeyPair) pemParser.readObject());
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        String key = "-----BEGIN PRIVATE KEY-----\n" +
+"MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t\n" +
+"gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ\n" +
+"jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw\n" +
+"Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj\n" +
+"hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb\n" +
+"NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH\n" +
+"/bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh\n" +
+"BVl433tgTTQ=\n" +
+"-----END PRIVATE KEY-----";
+
+        // extract BER from PEM
+        key = key
+                  .replaceAll("-+[^-]+-+", "")
+                  .replace("\n", "")
+                  .replace("\r", "");
+        byte[] keyBytes = Base64.getDecoder().decode(key);
+
+        // load decoded private key
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPrivateKey privateKey = (RSAPrivateKey) kf.generatePrivate(spec);
+</code></pre>
+<p>In the PKCS1 example BouncyCastle is being used to read the key and the actual decryption is being performed by the com.sun.crypto.provider.SunJCE provider.</p>
+<p>Normally, com.sun.crypto.provider.SunJCE and org.bouncycastle.jce.provider.BouncyCastleProvider will yield the same result but that is not always the case. Consider OAEP.</p>
+<p>Here's the phpseclib code to encrypt something with OAEP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key
+    -&gt;withPadding(RSA::ENCRYPTION_OAEP)
+    -&gt;withHash(<span class="hljs-string">'md5'</span>)
+    -&gt;withMGFHash(<span class="hljs-string">'sha1'</span>);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p><sup><em>(md5 is being used because the key is a 512-bit key from <a href="/docs/rsa-keys">Sample RSA Keys</a>; 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a>; sha1 would work but for the purposes of this demonstration it can't be sha1)</em></sup></p>
+<p>Now let's modify the Java code again:</p>
+<pre><code class="hljs css language-java">#
+#-----[ FIND ]------------------------------------------
+#
+        String ciphertext = "L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ==";
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        String ciphertext = "h3j3zLT2jXCaZuwF7cgUE/Zmc/5IsIfKbaTiBhpCJo86AiyuoA3Yvni+Lrm5wu2OGv2h5R7Zu3voFcHugiystw==";
+#
+#-----[ FIND ]------------------------------------------
+#
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithMD5AndMGF1Padding");
+</code></pre>
+<p>That works just fine. BUT what if use <code>Cipher.getInstance(&quot;RSA/ECB/OAEPWithMD5AndMGF1Padding&quot;, &quot;BC&quot;)</code> instead? eg. what if we force org.bouncycastle.jce.provider.BouncyCastleProvider to be the crypto provider instead of com.sun.crypto.provider.SunJCE? Then it doesn't work.</p>
+<p>org.bouncycastle.jce.provider.BouncyCastleProvider assumes the MGFHash and the Hash are using the same algorithm whereas com.sun.crypto.provider.SunJCE has the MGFHash hard-coded as sha1.</p>
+<p>More information can be found at <a href="https://stackoverflow.com/a/32166210/569976">Breaking down RSA/ECB/OAEPWithSHA-256AndMGF1Padding</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="javascript"></a><a href="#javascript" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>JavaScript</h2>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-with-web-crypto-api"></a><a href="#rsa-decryption-with-web-crypto-api" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption with Web Crypto API</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key
+    <span class="hljs-comment">// OAEP is used by default so explicitly setting the padding to OAEP is not necessary</span>
+    <span class="hljs-comment">//-&gt;withPadding(RSA::ENCRYPTION_OAEP)</span>
+    -&gt;withHash(<span class="hljs-string">'sha1'</span>)
+    -&gt;withMGFHash(<span class="hljs-string">'sha1'</span>);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with JavaScript using <a href="https://en.wikipedia.org/wiki/Web_Cryptography_API">Web Cryptography API</a>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> keyData = <span class="hljs-string">`-----BEGIN PRIVATE KEY-----
+MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t
+gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ
+jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw
+Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj
+hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb
+NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH
+/bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh
+BVl433tgTTQ=
+-----END PRIVATE KEY-----`</span>;
+
+<span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">'kTOOqeGDRMRil40J8SRRSgXqisUhF27wLwTcNH00rk7Xl94dY9aPjCTSIefTWutbWLvKwFGO7Z7QoZjIIIPEwA=='</span>;
+
+<span class="hljs-comment">// from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey#PKCS_8_import</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">str2ab</span>(<span class="hljs-params">str</span>) </span>{
+    <span class="hljs-keyword">const</span> buf = <span class="hljs-keyword">new</span> <span class="hljs-built_in">ArrayBuffer</span>(str.length);
+    <span class="hljs-keyword">const</span> bufView = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(buf);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>, strLen = str.length; i &lt; strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    <span class="hljs-keyword">return</span> buf;
+}
+
+keyData = keyData
+    .replace(<span class="hljs-regexp">/-+[^-]+-+/g</span>, <span class="hljs-string">''</span>)
+    .replace(<span class="hljs-string">"\n"</span>, <span class="hljs-string">''</span>)
+    .replace(<span class="hljs-string">"\r"</span>, <span class="hljs-string">''</span>);
+keyData = str2ab(<span class="hljs-built_in">window</span>.atob(keyData));
+
+ciphertext = str2ab(<span class="hljs-built_in">window</span>.atob(ciphertext));
+
+<span class="hljs-built_in">window</span>.crypto.subtle.importKey(
+    <span class="hljs-string">'pkcs8'</span>,
+    keyData,
+    {
+        <span class="hljs-attr">name</span>: <span class="hljs-string">'RSA-OAEP'</span>,
+        <span class="hljs-attr">hash</span>: <span class="hljs-string">"SHA-1"</span>
+    },
+    <span class="hljs-literal">true</span>,
+    [<span class="hljs-string">'decrypt'</span>]             
+).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">privateKey</span>) </span>{
+    <span class="hljs-built_in">window</span>.crypto.subtle.decrypt(
+        {
+            <span class="hljs-attr">name</span>: <span class="hljs-string">"RSA-OAEP"</span>
+        },
+        privateKey,
+        ciphertext
+    ).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">plaintext</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">new</span> TextDecoder().decode(plaintext));
+    })
+});
+</code></pre>
+<p><sup><em>(sha1 is being used because the key is a 512-bit key from <a href="/docs/rsa-keys">Sample RSA Keys</a>; 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a>)</em></sup></p>
+<p>PKCS1 keys are not supported and neither is PKCS1 padding for encryption (PKCS1 signature padding, however, is supported).</p>
+<p>See it in action at <a href="https://jsfiddle.net/u7ad10fn/">https://jsfiddle.net/u7ad10fn/</a></p>
+<h2><a class="anchor" aria-hidden="true" id="nodejs"></a><a href="#nodejs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Node.js</h2>
+<h3><a class="anchor" aria-hidden="true" id="aes-128-cbc-decryption-with-cryptojs"></a><a href="#aes-128-cbc-decryption-with-cryptojs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AES-128-CBC Decryption with CryptoJS</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'cbc'</span>);
+$cipher-&gt;setKey(str_repeat(<span class="hljs-string">'a'</span>, <span class="hljs-number">16</span>));
+$cipher-&gt;setIV(str_repeat(<span class="hljs-string">'b'</span>, <span class="hljs-number">16</span>));
+
+<span class="hljs-keyword">echo</span> bin2hex($cipher-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with Node.js / <a href="https://github.com/brix/crypto-js">CryptoJS</a>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> CryptoJS = <span class="hljs-built_in">require</span>(<span class="hljs-string">'crypto-js'</span>);
+
+<span class="hljs-keyword">var</span> key = CryptoJS.enc.Utf8.parse(<span class="hljs-string">'aaaaaaaaaaaaaaaa'</span>);
+<span class="hljs-keyword">var</span> iv = CryptoJS.enc.Utf8.parse(<span class="hljs-string">'bbbbbbbbbbbbbbbb'</span>);
+<span class="hljs-keyword">var</span> ciphertext = CryptoJS.enc.Hex.parse(<span class="hljs-string">'10f42fd95857ed2775cfbc4b471bc213'</span>);
+ciphertext = {<span class="hljs-attr">ciphertext</span>: ciphertext};
+
+<span class="hljs-keyword">var</span> plaintext = CryptoJS.AES.decrypt(ciphertext, key, {
+    <span class="hljs-attr">iv</span>: iv,
+    <span class="hljs-attr">mode</span>: CryptoJS.mode.CBC
+});
+
+<span class="hljs-built_in">console</span>.log(plaintext.toString(CryptoJS.enc.Utf8));
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-2"></a><a href="#rsa-decryption-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with Node.js:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">'crypto'</span>);
+
+<span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+ciphertext = Buffer.from(ciphertext, <span class="hljs-string">'base64'</span>);
+
+<span class="hljs-keyword">var</span> key = <span class="hljs-string">`-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----`</span>;
+
+key = crypto.createPrivateKey(key);
+
+<span class="hljs-keyword">var</span> plaintext = crypto.privateDecrypt(
+    {
+        <span class="hljs-attr">key</span>: key,
+        <span class="hljs-attr">padding</span>: crypto.constants.RSA_PKCS1_PADDING
+    },
+    ciphertext
+);
+
+<span class="hljs-built_in">console</span>.log(plaintext.toString(<span class="hljs-string">'ascii'</span>));
+</code></pre>
+<p>PKCS8 keys are supported as well as OAEP padding.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-with-nodersa"></a><a href="#rsa-decryption-with-nodersa" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption with NodeRSA</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with Node.js / <a href="https://github.com/rzcoder/node-rsa">NodeRSA</a>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> NodeRSA = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node-rsa'</span>);
+
+<span class="hljs-keyword">var</span> key = <span class="hljs-keyword">new</span> NodeRSA(<span class="hljs-string">`-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----`</span>);
+key.setOptions({<span class="hljs-attr">encryptionScheme</span>: <span class="hljs-string">'pkcs1'</span>});
+
+<span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">'L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=='</span>;
+
+<span class="hljs-keyword">var</span> plaintext = key.decrypt(ciphertext, <span class="hljs-string">'base64'</span>);
+plaintext = Buffer.from(plaintext, <span class="hljs-string">'base64'</span>);
+<span class="hljs-built_in">console</span>.log(plaintext.toString());
+</code></pre>
+<p>PKCS8 keys are supported as is OAEP padding.</p>
+<h2><a class="anchor" aria-hidden="true" id="c"></a><a href="#c" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>C#</h2>
+<h3><a class="anchor" aria-hidden="true" id="aes-128-cbc-decryption-2"></a><a href="#aes-128-cbc-decryption-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AES-128-CBC Decryption</h3>
+<p>Encrypting a string using AES-128-CBC with phpseclib:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">AES</span>;
+
+$cipher = <span class="hljs-keyword">new</span> AES(<span class="hljs-string">'cbc'</span>);
+$cipher-&gt;setKey(str_repeat(<span class="hljs-string">'a'</span>, <span class="hljs-number">16</span>));
+$cipher-&gt;setIV(str_repeat(<span class="hljs-string">'b'</span>, <span class="hljs-number">16</span>));
+
+<span class="hljs-keyword">echo</span> bin2hex($cipher-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with C#:</p>
+<pre><code class="hljs css language-c#"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Security.Cryptography;
+<span class="hljs-keyword">using</span> System.Text;
+<span class="hljs-keyword">using</span> System.IO;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+{
+    <span class="hljs-comment">// from https://stackoverflow.com/a/311179/569976</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] <span class="hljs-title">StringToByteArray</span>(<span class="hljs-params">String hex</span>)</span>
+    {
+        <span class="hljs-keyword">int</span> NumberChars = hex.Length;
+        <span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[NumberChars / <span class="hljs-number">2</span>];
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; NumberChars; i += <span class="hljs-number">2</span>)
+            bytes[i / <span class="hljs-number">2</span>] = Convert.ToByte(hex.Substring(i, <span class="hljs-number">2</span>), <span class="hljs-number">16</span>);
+          <span class="hljs-keyword">return</span> bytes;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">var</span> ciphertext = StringToByteArray(<span class="hljs-string">"10f42fd95857ed2775cfbc4b471bc213"</span>);
+
+        <span class="hljs-keyword">var</span> aes = <span class="hljs-keyword">new</span> AesManaged();
+        <span class="hljs-comment">//aes.Mode = CipherMode.CBC;</span>
+        <span class="hljs-keyword">var</span> key = Encoding.ASCII.GetBytes(<span class="hljs-string">"aaaaaaaaaaaaaaaa"</span>);
+        <span class="hljs-keyword">var</span> iv = Encoding.ASCII.GetBytes(<span class="hljs-string">"bbbbbbbbbbbbbbbb"</span>);
+
+        ICryptoTransform decryptor = aes.CreateDecryptor(key, iv);
+        MemoryStream msDecrypt = <span class="hljs-keyword">new</span> MemoryStream(ciphertext);
+        CryptoStream csDecrypt = <span class="hljs-keyword">new</span> CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
+        StreamReader srDecrypt = <span class="hljs-keyword">new</span> StreamReader(csDecrypt);
+        String plaintext = srDecrypt.ReadToEnd();
+
+        Console.WriteLine(plaintext);
+    }
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-3"></a><a href="#rsa-decryption-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with C#</p>
+<!-- csc test.cs && mono test.exe -->
+<pre><code class="hljs css language-c#"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Security.Cryptography;
+<span class="hljs-keyword">using</span> System.Text;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">var</span> key = <span class="hljs-string">@"&lt;RSAKeyPair&gt;
+  &lt;Modulus&gt;qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==&lt;/Modulus&gt;
+  &lt;Exponent&gt;AQAB&lt;/Exponent&gt;
+  &lt;P&gt;oxK/MgGeeLui385KJ7ZOYktjhLBNAB69fKwTZFsUNh0=&lt;/P&gt;
+  &lt;Q&gt;AQlBGkUJzJ26e/ZsQ1w3+gFNHDf0TwY2/akhw3FmRxs1&lt;/Q&gt;
+  &lt;DP&gt;bYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgk=&lt;/DP&gt;
+  &lt;DQ&gt;yS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3ok=&lt;/DQ&gt;
+  &lt;InverseQ&gt;E6z/k6I+ChN1LLttwX0galITxmAYrOBhBVl433tgTTQ=&lt;/InverseQ&gt;
+  &lt;D&gt;IJLixBy2qpFoS4DSmoEmo3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2kTQ==&lt;/D&gt;
+&lt;/RSAKeyPair&gt;"</span>;
+
+        <span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+        <span class="hljs-keyword">var</span> ciphertextBytes = Convert.FromBase64String(ciphertext);
+
+        <span class="hljs-keyword">var</span> rsa = RSA.Create();
+        rsa.FromXmlString(key);
+
+        <span class="hljs-keyword">var</span> plaintextBytes = rsa.Decrypt(ciphertextBytes, RSAEncryptionPadding.Pkcs1);
+
+        <span class="hljs-keyword">var</span> plaintext = Encoding.Default.GetString(plaintextBytes);
+
+        Console.WriteLine(plaintext);
+    }
+}
+</code></pre>
+<p>Note that <code>rsa.FromXmlString(key)</code> only supports XML formatted keys (as the name implies lol).</p>
+<p>If you're using .NET Core 3.0+ / are <em>not</em> using <a href="https://en.wikipedia.org/wiki/Mono_(software)">Mono</a>, <a href="https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsa.importrsaprivatekey?view=netcore-3.0">ImportRSAPrivateKey</a> can be used to load PKCS1 formatted keys, using the following (untested) changes to the above (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-c#"><span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-meta">#</span>
+<span class="hljs-keyword">using</span> System.Text;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ AFTER, ADD ]------------------------------------</span>
+<span class="hljs-meta">#</span>
+<span class="hljs-keyword">using</span> System.Text.RegularExpressions;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> key = <span class="hljs-string">@"&lt;RSAKeyPair&gt;
+  &lt;Modulus&gt;qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==&lt;/Modulus&gt;
+  &lt;Exponent&gt;AQAB&lt;/Exponent&gt;
+  &lt;P&gt;oxK/MgGeeLui385KJ7ZOYktjhLBNAB69fKwTZFsUNh0=&lt;/P&gt;
+  &lt;Q&gt;AQlBGkUJzJ26e/ZsQ1w3+gFNHDf0TwY2/akhw3FmRxs1&lt;/Q&gt;
+  &lt;DP&gt;bYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgk=&lt;/DP&gt;
+  &lt;DQ&gt;yS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3ok=&lt;/DQ&gt;
+  &lt;InverseQ&gt;E6z/k6I+ChN1LLttwX0galITxmAYrOBhBVl433tgTTQ=&lt;/InverseQ&gt;
+  &lt;D&gt;IJLixBy2qpFoS4DSmoEmo3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2kTQ==&lt;/D&gt;
+&lt;/RSAKeyPair&gt;"</span>;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ REPLACE WITH ]----------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> key = <span class="hljs-string">@"-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----"</span>;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-meta">#</span>
+        rsa.FromXmlString(key);
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ REPLACE WITH ]----------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> rx = <span class="hljs-keyword">new</span> Regex(<span class="hljs-string">"-+[^-]+-+"</span>);
+        key = rx.Replace(key, <span class="hljs-string">""</span>)
+                .Replace(<span class="hljs-string">"\r"</span>, <span class="hljs-string">""</span>)
+                .Replace(<span class="hljs-string">"\n"</span>, <span class="hljs-string">""</span>);
+        <span class="hljs-keyword">var</span> keyBytes = Convert.FromBase64String(key);
+
+        rsa.ImportRSAPrivateKey(keyBytes, <span class="hljs-keyword">out</span> _);
+</code></pre>
+<p>OAEP encryption is also supported.</p>
+<p>To load PKCS8 formatted keys <a href="https://www.bouncycastle.org/csharp/index.html">BouncyCastle</a> can be used.</p>
+<h2><a class="anchor" aria-hidden="true" id="c-1"></a><a href="#c-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>C</h2>
+<p>All C code samples use <a href="https://en.wikipedia.org/wiki/OpenSSL">OpenSSL</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-4"></a><a href="#rsa-decryption-4" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with C:</p>
+<!-- gcc -x c test.c -lcrypto && ./a.out -->
+<pre><code class="hljs css language-c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/evp.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/pem.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span> <span class="hljs-params">(<span class="hljs-keyword">void</span>)</span>
+</span>{
+    <span class="hljs-keyword">char</span> privateKey[] = <span class="hljs-string">"-----BEGIN RSA PRIVATE KEY-----\n"</span>\
+<span class="hljs-string">"MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\n"</span>\
+<span class="hljs-string">"KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\n"</span>\
+<span class="hljs-string">"o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\n"</span>\
+<span class="hljs-string">"TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\n"</span>\
+<span class="hljs-string">"9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\n"</span>\
+<span class="hljs-string">"v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\n"</span>\
+<span class="hljs-string">"/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00\n"</span>\
+<span class="hljs-string">"-----END RSA PRIVATE KEY-----\n"</span>;
+    <span class="hljs-keyword">char</span> ciphertext[] = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+    <span class="hljs-comment">// base64 decode ciphertext</span>
+    EVP_DecodeBlock(ciphertext, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+
+    BIO* bo = BIO_new(BIO_s_mem());
+    BIO_write(bo, privateKey, <span class="hljs-built_in">strlen</span>(privateKey));
+    EVP_PKEY* pkey = <span class="hljs-number">0</span>;
+    PEM_read_bio_PrivateKey(bo, &amp;pkey, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+    BIO_free(bo);
+
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(pkey, <span class="hljs-literal">NULL</span>);
+    EVP_PKEY_decrypt_init(ctx);
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_padding_mode"</span>, <span class="hljs-string">"pkcs1"</span>);
+
+    <span class="hljs-keyword">size_t</span> plaintext_len;
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span>* plaintext;
+
+    <span class="hljs-comment">// determine output size</span>
+    EVP_PKEY_decrypt(ctx, <span class="hljs-literal">NULL</span>, &amp;plaintext_len, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+
+    <span class="hljs-comment">// allocate memory (+1 for terminating null-character)</span>
+    plaintext = OPENSSL_malloc(plaintext_len + <span class="hljs-number">1</span>);
+    EVP_PKEY_decrypt(ctx, plaintext, &amp;plaintext_len, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+    plaintext[plaintext_len] = <span class="hljs-string">'\0'</span>; <span class="hljs-comment">// required for %s</span>
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s\n"</span>, plaintext);
+}
+</code></pre>
+<p>PKCS8 private keys can be loaded using this technique as well. OAEP is also supported.</p>
+<h2><a class="anchor" aria-hidden="true" id="php"></a><a href="#php" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PHP</h2>
+<p>Despite the fact that PHP has built-in support for some cryptographic operations via OpenSSL there are still reasons to use phpseclib. See <a href="/docs/why#phpseclib-vs-openssl">phpseclib vs OpenSSL</a></p>
+<h3><a class="anchor" aria-hidden="true" id="rsa-decryption-5"></a><a href="#rsa-decryption-5" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
+<p>Encryption with PHP / phpseclib:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with PHP / OpenSSL:</p>
+<pre><code class="hljs css language-php">$private = <span class="hljs-string">'-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----'</span>;
+
+$ciphertext = <span class="hljs-string">'L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=='</span>;
+
+$private = openssl_get_privatekey($private);
+
+openssl_private_decrypt(base64_decode($ciphertext), $plaintext, $private, OPENSSL_PKCS1_PADDING);
+
+<span class="hljs-keyword">echo</span> $plaintext;
+</code></pre>
+<p>OAEP padding is supported but <a href="https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466">only with sha1 as the hash / MGF hash</a> (no doubt because php-src is using OpenSSL's <a href="https://www.openssl.org/docs/man1.0.2/man3/RSA_private_decrypt.html">RSA_private_decrypt</a> is being used as opposed to OpenSSL's newer <a href="https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_decrypt.html">EVP_PKEY_decrypt</a>)</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/benchmarks"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/docs/connect"><span>Connecting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#python">Python</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption">RSA Decryption</a></li></ul></li><li><a href="#java">Java</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-1">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-1">RSA Decryption</a></li></ul></li><li><a href="#javascript">JavaScript</a><ul class="toc-headings"><li><a href="#rsa-decryption-with-web-crypto-api">RSA Decryption with Web Crypto API</a></li></ul></li><li><a href="#nodejs">Node.js</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-with-cryptojs">AES-128-CBC Decryption with CryptoJS</a></li><li><a href="#rsa-decryption-2">RSA Decryption</a></li><li><a href="#rsa-decryption-with-nodersa">RSA Decryption with NodeRSA</a></li></ul></li><li><a href="#c">C#</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-2">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-3">RSA Decryption</a></li></ul></li><li><a href="#c-1">C</a><ul class="toc-headings"><li><a href="#rsa-decryption-4">RSA Decryption</a></li></ul></li><li><a href="#php">PHP</a><ul class="toc-headings"><li><a href="#rsa-decryption-5">RSA Decryption</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>DSA · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Loading and saving keys is discussed in [Public Keys: Overview](/docs/publickeys)."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="DSA · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="Loading and saving keys is discussed in [Public Keys: Overview](/docs/publickeys)."/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Public Keys</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">DSA</h1></header><article><div><span><p>Loading and saving keys is discussed in <a href="/docs/publickeys">Public Keys: Overview</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="supported-formats"></a><a href="#supported-formats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Supported Formats</h2>
+<ul>
+<li><strong>PKCS1</strong>
+<ul>
+<li>Keys start with <code>-----BEGIN DSA PRIVATE KEY-----</code> or <code>-----BEGIN DSA PUBLIC KEY-----</code> or <code>-----BEGIN DSA PARAMETERS-----</code></li>
+</ul></li>
+<li><strong>PKCS8</strong>
+<ul>
+<li>Keys start with <code>-----BEGIN PRIVATE KEY-----</code> or <code>-----BEGIN ENCRYPTED PRIVATE KEY-----</code> or <code>-----BEGIN PUBLIC KEY-----</code></li>
+</ul></li>
+<li><strong>PuTTY</strong> <sup style="color: red"><strong>[1]</strong></sup>
+<ul>
+<li>Public keys start off with <code>---- BEGIN SSH2 PUBLIC KEY ----</code></li>
+</ul></li>
+<li><strong>OpenSSH</strong> <sup style="color: red"><strong>[1]</strong></sup>
+<ul>
+<li>Private keys start with <code>-----BEGIN OPENSSH PRIVATE KEY-----</code></li>
+</ul></li>
+<li><strong>XML</strong></li>
+</ul>
+<p>A more in-depth discussion of the common formats can be found in <a href="/docs/publickeys#common-key-formats">Common Key Formats</a>. See <a href="/docs/dsa-keys">Sample DSA Keys</a> for actual samples.</p>
+<div style="font-size: 11px">
+<p><sup style="color: red"><strong>[1]</strong></sup> The only keys supported by this format are those with an N (length of group order Q) of 160 because <a href="https://tools.ietf.org/html/rfc4253#page-15">that's all SSH2 supports</a>.</p>
+</div>
+<h3><a class="anchor" aria-hidden="true" id="parameters"></a><a href="#parameters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Parameters</h3>
+<p>Parameters consist of P (prime), Q (group order) and G (group generator). Public and private keys also include Y (public key value) and private keys additionally include X (secret exponent).</p>
+<p>PKCS1 is the only format that supports Parameters. They can be extracted from a private or public key by doing <code>$key-&gt;getParameters()</code>.</p>
+<p>Whereas public and private keys are instances of <code>\phpseclib3\Crypt\Common\PublicKey</code> and <code>\phpseclib3\Crypt\Common\PrivateKey</code>, respectively, parameters are an instance of <code>phpseclib3\Crypt\DSA\Parameters</code> (which is what <code>$key-&gt;getParameters()</code> returns).</p>
+<h2><a class="anchor" aria-hidden="true" id="creating-keys"></a><a href="#creating-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating Keys</h2>
+<p>There are three different ways to create a DSA public / private keypair.</p>
+<h3><a class="anchor" aria-hidden="true" id="with-l-and-n"></a><a href="#with-l-and-n" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>With L and N</h3>
+<p>Before a private key can be computed DSA needs to know what to use for P (prime), Q (group order) and G (group generator).</p>
+<p>Most typically the group generator G is 2 so that's hard-coded.</p>
+<p>By providing <strong>N</strong> (length of group order Q) and <strong>L</strong> (length of prime P), the remaining requisite values can be generated dynamically.</p>
+<p>An example follows:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">DSA</span>;
+
+$L = <span class="hljs-number">2048</span>;
+$N = <span class="hljs-number">224</span>;
+$private = DSA::createKey($L, $N);
+$public = $private-&gt;getPublicKey();
+</code></pre>
+<p>Note that if you're trying to create a key for use with SSH2 that <strong>N</strong> will need to be 160 since, as noted in the footnotes for <a href="#supported-formats">Supported Formats</a>, that that's all SSH2 supports.</p>
+<h3><a class="anchor" aria-hidden="true" id="with-a-parameters-object"></a><a href="#with-a-parameters-object" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>With a Parameters object</h3>
+<p>With this approach P (prime), Q (group order) and G (group generator) are pre-computed. Either they've been loaded from a <code>-----BEGIN DSA PARAMETERS-----</code> file (or string) or else they've been generated with <code>DSA::createParameters()</code>.</p>
+<p>Here's an example of doing it using with <code>createParameters</code>:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">DSA</span>;
+
+$private = DSA::createKey(DSA::createParameters(<span class="hljs-number">2048</span>, <span class="hljs-number">224</span>));
+$public = $private-&gt;getPublicKey();
+</code></pre>
+<p>This is basically the same thing as doing <code>DSA::createKey(2048, 224)</code>.</p>
+<p>Here's an example of creating a key by loading an existant parameters file:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">DSA</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$private = DSA::createKey(PublicKeyLoader::load(file_get_contents(<span class="hljs-string">'...'</span>)));
+$public = $private-&gt;getPublicKey();
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="without-any-parameters"></a><a href="#without-any-parameters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Without any parameters</h3>
+<p>If no parameters are provided then the default paramters for <code>DSA::createParameters()</code> will be used - <strong>L</strong> will be 2048 and <strong>N</strong> will be 224.</p>
+<p>An example follows:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">DSA</span>;
+
+$private = DSA::createKey();
+$public = $private-&gt;getPublicKey();
+</code></pre>
+<p>This is the same thing as doing <code>DSA::createKey(DSA::createParameters())</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="creating--verifying-signatures"></a><a href="#creating--verifying-signatures" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating / Verifying Signatures</h2>
+<p>Signatures can be created / verified thusly:</p>
+<pre><code class="hljs css language-php"><span class="hljs-comment">//$private = $private-&gt;withSignatureFormat('ASN1');</span>
+$signature = $private-&gt;sign($message);
+<span class="hljs-keyword">echo</span> $private-&gt;getPublicKey()-&gt;verify($message, $signature) ?
+    <span class="hljs-string">'valid signature'</span> :
+    <span class="hljs-string">'invalid signature'</span>;
+</code></pre>
+<p>The signatures generated are <em>not</em> deterministic, as discussed in <a href="https://tools.ietf.org/html/rfc6979">RFC6979</a>. Such determinism is chiefly of benefit when a <a href="https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator">CSPRNG</a> is <em>not</em> available and with PHP there is one that's available.</p>
+<p>Signatures have two components - <strong>r</strong> and <strong>s</strong>. How these two components are combined to a single string depends on the signature format being employed.</p>
+<h3><a class="anchor" aria-hidden="true" id="asn1"></a><a href="#asn1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ASN1</h3>
+<p><span style="color: green">This is the default format</span>. ASN1-formatted signatures employee the format discussed in <a href="https://tools.ietf.org/html/rfc3279#section-2.2.2">RFC3279</a>. This is the format used by X.509 certificates.</p>
+<h3><a class="anchor" aria-hidden="true" id="ssh2"></a><a href="#ssh2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SSH2</h3>
+<p>SSH2-formatted signatures employee the format discussed in <a href="https://tools.ietf.org/html/rfc4253#page-15">RFC4253</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="raw"></a><a href="#raw" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Raw</h3>
+<p>Returns an array with <strong>r</strong> and <strong>s</strong> as keys.</p>
+<h2><a class="anchor" aria-hidden="true" id="key-attributes"></a><a href="#key-attributes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Key Attributes</h2>
+<p><code>$key-&gt;getLength()</code> returns an array with <strong>L</strong> (length of prime P) and <strong>N</strong> (length of group order Q).</p>
+<p>All the <code>with</code> methods have corresponding <code>get</code> methods as follows:</p>
+<table>
+<thead>
+<tr><th>Setter</th><th>Getter</th></tr>
+</thead>
+<tbody>
+<tr><td><code>withHash</code></td><td><code>getHash</code></td></tr>
+<tr><td><code>withSignatureFormat</code></td><td><code>getSignatureFormat</code></td></tr>
+</tbody>
+</table>
+<p>While <code>withHash</code> accepts strings, <code>getHash</code> returns a Hash object (that can be cast to a string via <a href="https://www.php.net/manual/en/language.oop5.magic.php#object.tostring">__toString</a>).</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/rsa"><span class="arrow-prev">← </span><span>RSA</span></a><a class="docs-next button" href="/docs/ec"><span>Elliptic Curves</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#supported-formats">Supported Formats</a><ul class="toc-headings"><li><a href="#parameters">Parameters</a></li></ul></li><li><a href="#creating-keys">Creating Keys</a><ul class="toc-headings"><li><a href="#with-l-and-n">With L and N</a></li><li><a href="#with-a-parameters-object">With a Parameters object</a></li><li><a href="#without-any-parameters">Without any parameters</a></li></ul></li><li><a href="#creating--verifying-signatures">Creating / Verifying Signatures</a><ul class="toc-headings"><li><a href="#asn1">ASN1</a></li><li><a href="#ssh2">SSH2</a></li><li><a href="#raw">Raw</a></li></ul></li><li><a href="#key-attributes">Key Attributes</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

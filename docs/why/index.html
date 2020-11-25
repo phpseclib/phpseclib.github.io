@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Why phpseclib? · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="phpseclib provides pure-PHP implementations of SSH2, SFTP, RSA, DSA, Elliptic Curves, AES, ChaCha20, X.509, CSR, CRL, SPKAC, etc."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Why phpseclib? · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="phpseclib provides pure-PHP implementations of SSH2, SFTP, RSA, DSA, Elliptic Curves, AES, ChaCha20, X.509, CSR, CRL, SPKAC, etc."/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive siteNavItemActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/docs/why">Why phpseclib?</a></li><li class="navListItem"><a class="navItem" href="/docs/interop">Interoperability</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Why phpseclib?</h1></header><article><div><span><p>phpseclib provides pure-PHP implementations of SSH2, SFTP, RSA, DSA, Elliptic Curves, AES, ChaCha20, X.509, CSR, CRL, SPKAC, etc.</p>
+<h2><a class="anchor" aria-hidden="true" id="portability"></a><a href="#portability" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Portability</h2>
+<p>The only requirement that phpseclib 3.0 has is that you must be using PHP 5.6+.</p>
+<p>Extensions like bcmath, gmp, libsodium and openssl, if they're available, for speed, but they're not required.</p>
+<h2><a class="anchor" aria-hidden="true" id="phpseclib-3-vs-phspeclib-1--2"></a><a href="#phpseclib-3-vs-phspeclib-1--2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>phpseclib 3 vs phspeclib 1 / 2</h2>
+<p>phpseclib 3.0.x offers a completely redesigned public key interface featuring immutability, among other things. And whereas 1.0 / 2.0 only supported RSA keys 3.0 supports DSA, ECDSA and EdDSA keys.</p>
+<p>More modern symmetric key algorithms have been added as well, including ChaCha20-Poly1305 and GCM modes.</p>
+<p>SSH2, SFTP and X.509 are largely unchanged.</p>
+<p>phpseclib 1.0 / 2.0 documentation lives at <a href="http://phpseclib.sourceforge.net/">http://phpseclib.sourceforge.net/</a></p>
+<h2><a class="anchor" aria-hidden="true" id="phpseclib-vs-libsodium"></a><a href="#phpseclib-vs-libsodium" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>phpseclib vs libsodium</h2>
+<p>libsodium is the latest hotness in PHP cryptography but there's a lot of things phpseclib does that libsodium doesn't even pretend to do. phpseclib provides an SSH2 implementation, an SFTP implementation, an X.509 implementation, CSR, CRL, BigInteger, etc. libsodium doesnt aim to provide any of these things.</p>
+<p>In so far as cryptographic applications are concerned...  libsodium trades flexibility for security. If you need to use AES-128-CBC or RSA or any other algorithm that <a href="https://wiki.php.net/rfc/libsodium">isn't explicitly supported by libsodium</a> you're out of luck.</p>
+<p>That said, if you want ease of use and want to rely on the defaults of whatever library you're using, libsodium is definitely recommended. phpseclib 3.0 is much less error tolerant than 1.0 / 2.0 anyway now. Symmetric keys / IVs are no longer padded to the default length, the mode must <em>explicitly</em> be specified now for symmetric key algorithms, etc. The goal is to make it less &quot;friendly&quot; to use cryptographic primitives so that only those who truly know what they're doing will do so henceforth.</p>
+<h2><a class="anchor" aria-hidden="true" id="phpseclib-vs-openssl"></a><a href="#phpseclib-vs-openssl" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>phpseclib vs OpenSSL</h2>
+<p>As with libsodium, there are a lot of things phpseclib provides that OpenSSL doesn't even aim to provide. SSH, SFTP, BigInteger, etc.</p>
+<p>In so far as cryptographic applications are concerned, phpseclib still provides some advantages to OpenSSL. PHP's bindings to OpenSSL don't let you specify the hashes for RSA OAEP, for example. Both the hash and the MGF hash are hard-coded as sha1. You also can't use RSA PSS with PHP's OpenSSL bindings. You can do all this and more with phpseclib.</p>
+<p>Further, OpenSSL doesn't have native support for &quot;progressive encryption&quot; / &quot;continuous mode&quot; for symmetric key algorithms whereas phpseclib does. Certainly that mode can be simulated (which is what phpseclib does if OpenSSL is installed) but that adds a whole extra layer of complexity that phpseclib eliminates.</p>
+<p>The OpenSSL extension also doesn't provide support for <a href="https://stackoverflow.com/q/56222220/569976">ECDH</a> or <a href="https://stackoverflow.com/q/56222067/569976">Ed25519</a>.</p>
+<p>phpseclib also supports public and private keys in a myriad of more formats than OpenSSL.</p>
+<h2><a class="anchor" aria-hidden="true" id="phpseclib-vs-libssh2"></a><a href="#phpseclib-vs-libssh2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>phpseclib vs libssh2</h2>
+<p>Whether or not the API is better than <a href="http://php.net/ssh2">libssh2</a> is debatable. Here, we consider more objective criteria.</p>
+<h3><a class="anchor" aria-hidden="true" id="portability-1"></a><a href="#portability-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Portability</h3>
+<p>libssh2 exists as a PECL extension that most hosts are not going to have installed.</p>
+<p>If you're a library author then any extra dependenicies that you have (that can't be installed through Composer) are going to be additional pain points for your end users.</p>
+<p>If you're writing a website then, if you're not using Docker or Ansible or whatever, then you're going to need to somehow document that that extension was installed so that the production (or dev) servers can be updated with it as well and so that the extension can be reinstalled if either of the servers need to be rebuilt.</p>
+<h3><a class="anchor" aria-hidden="true" id="algorithm-support"></a><a href="#algorithm-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Algorithm Support</h3>
+<p>phpseclib 3.0 supports best practices algorithms that libssh2 <a href="https://www.php.net/manual/en/function.ssh2-connect.php">does not support</a>. Algorithms like curve25519-sha256, ecdh-sha2-nistp256, ssh-ed25519, ecdsa-sha2-nistp256, aes128-gcm, chacha20-poly1305, etc.</p>
+<h3><a class="anchor" aria-hidden="true" id="speed"></a><a href="#speed" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Speed</h3>
+<p>The following table shows how long, in seconds, it took to transfer a 10mb file via phpseclib and libssh2 to localhost.</p>
+<table border="1">
+  <tbody>
+    <tr>
+      <td style="background: tan" rowspan="2">Upload</td>
+      <td><strong>libssh2</strong></td>
+      <td>0.6125</td>
+    </tr>
+    <tr>
+      <td><strong>phpseclib</strong></td>
+      <td style="background: lightgreen">0.1680</td>
+    </tr>
+    <tr>
+      <td style="background: tan" rowspan="2">Download</td>
+      <td><strong>libssh2</strong></td>
+      <td>1.5422</td>
+    </tr>
+    <tr>
+      <td><strong>phpseclib</strong></td>
+      <td style="background: lightgreen">0.2389</td>
+    </tr>
+  </tbody>
+</table>
+<p>So phpseclib uploads files <strong>3.5x</strong> faster than libssh2 and downloads files <strong>6.5x</strong> faster than libssh2.</p>
+<p>Note that these numbers are <em>with</em> the <a href="http://php.net/openssl">openssl</a>, <a href="https://www.php.net/sodium">sodium</a> and <a href="https://www.php.net/gmp">gmp</a> extensions installed. Removal of openssl and sodium, in particular, will <em>significantly</em> slow phpseclib down. Uploads and downloads will still happen, but at significantely reduced speed (unless the network is a more significant bottleneck).</p>
+<p>These numbers were obtained <a href="https://travis-ci.org/github/phpseclib/benchmarks/builds/706532232">on Travis CI</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="public-key-support"></a><a href="#public-key-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Key Support</h3>
+<p>Here's how you do it with libssh2:</p>
+<pre><code class="hljs css language-php">$ssh = ssh2_connect(<span class="hljs-string">'domain.tld'</span>);
+ssh2_auth_pubkey_file($ssh, <span class="hljs-string">'username'</span>, <span class="hljs-string">'/home/ubuntu/pubkey'</span>, <span class="hljs-string">'/home/ubuntu/privkey'</span><span class="hljs-comment">/*, 'password'*/</span>);
+
+$stream = ssh2_exec($ssh, <span class="hljs-string">'ls -la'</span>);
+<span class="hljs-keyword">echo</span> stream_get_contents($stream);
+</code></pre>
+<p>Here's how you do it with phpseclib:</p>
+<pre><code class="hljs css language-php">$ssh = <span class="hljs-keyword">new</span> SSH2(<span class="hljs-string">'domain.tld'</span>);
+$ssh-&gt;login(<span class="hljs-string">'username'</span>, PublicKeyLoader::load(file_get_contents(<span class="hljs-string">'/home/ubuntu/privkey'</span>)<span class="hljs-comment">/*, 'password'*/</span>);
+
+<span class="hljs-keyword">echo</span> $ssh-&gt;exec(<span class="hljs-string">'ls -la'</span>);
+</code></pre>
+<p>Ignoring the API for the time being there are a few clear ways phpseclib comes out on top here:</p>
+<ul>
+<li>phpseclib takes in strings - not file paths. If you want to do a file you can do file_get_contents.</li>
+<li>phpseclib doesn't require a public key. Private keys have the public key embedded within them so phpseclib just extracts it.</li>
+<li>phpseclib can take in pretty much any standardized format, from PKCS#1 formatted keys, to PuTTY keys, to XML Signature keys.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="diagnosing-problems"></a><a href="#diagnosing-problems" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Diagnosing Problems</h3>
+<p>Why didn't top or sudo work? With phpseclib you can get logs. They look like this:</p>
+<p><a href="/logs/complex.txt">complex.txt</a></p>
+<p>You can also do <code>print_r($ssh-&gt;getErrors())</code> or echo <code>$ssh-&gt;getLastError()</code>.</p>
+<p>See <a href="/docs/diagnosis">SSH2: Diagnosing Issues</a> for more information.</p>
+<h3><a class="anchor" aria-hidden="true" id="changing-directories"></a><a href="#changing-directories" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Changing Directories</h3>
+<p>I don't see any cd or chdir functions at <a href="http://php.net/ssh2">http://php.net/ssh2</a>. phpseclib, however, has it - <code>SFTP::chdir(...)</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="interactive-shell"></a><a href="#interactive-shell" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Interactive Shell</h3>
+<p>Let's try to do sudo on the remote system.</p>
+<p>With phpseclib: <a href="/docs/commands#read-with-regular-expressions-sudo">read() with regular expressions: sudo</a></p>
+<p>With libssh2? I have no clue. My best guess (doesn't work):</p>
+<pre><code class="hljs css language-php">$ssh = ssh2_connect(<span class="hljs-string">'domain.tld'</span>); 
+ssh2_auth_password($ssh, <span class="hljs-string">'username'</span>, <span class="hljs-string">'password'</span>);
+
+$shell = ssh2_shell($ssh);
+<span class="hljs-keyword">echo</span> fread($shell, <span class="hljs-number">1024</span>*<span class="hljs-number">1024</span>);
+fwrite($shell, <span class="hljs-string">"sudo ls -la\n"</span>);
+$output = fread($shell, <span class="hljs-number">1024</span>*<span class="hljs-number">1024</span>);
+<span class="hljs-keyword">echo</span> $output;
+<span class="hljs-keyword">if</span> (preg_match(<span class="hljs-string">'#[pP]assword[^:]*:#'</span>, $output)) {
+    fwrite($shell, <span class="hljs-string">"password\n"</span>);
+}
+<span class="hljs-keyword">echo</span> fread($shell, <span class="hljs-number">1024</span>*<span class="hljs-number">1024</span>);
+</code></pre>
+<p>It is additionally unclear how to get top working with libssh2 but it works perfectly fine with phpseclib: <a href="/docs/commands#top">exec() with and without a PTY vs Interactive Shells: top</a></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-next button" href="/docs/install"><span>Next</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#portability">Portability</a></li><li><a href="#phpseclib-3-vs-phspeclib-1--2">phpseclib 3 vs phspeclib 1 / 2</a></li><li><a href="#phpseclib-vs-libsodium">phpseclib vs libsodium</a></li><li><a href="#phpseclib-vs-openssl">phpseclib vs OpenSSL</a></li><li><a href="#phpseclib-vs-libssh2">phpseclib vs libssh2</a><ul class="toc-headings"><li><a href="#portability-1">Portability</a></li><li><a href="#algorithm-support">Algorithm Support</a></li><li><a href="#speed">Speed</a></li><li><a href="#public-key-support">Public Key Support</a></li><li><a href="#diagnosing-problems">Diagnosing Problems</a></li><li><a href="#changing-directories">Changing Directories</a></li><li><a href="#interactive-shell">Interactive Shell</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>

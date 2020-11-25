@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Supported Elliptic Curve (EC) Key Formats · phpseclib</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="All keys are the same key ([nistp256 / secp256r1](https://www.secg.org/sec2-v2.pdf#page=13)) encoded differently. Encrypted keys use `demo` as the key."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Supported Elliptic Curve (EC) Key Formats · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.github.io/"/><meta property="og:description" content="All keys are the same key ([nistp256 / secp256r1](https://www.secg.org/sec2-v2.pdf#page=13)) encoded differently. Encrypted keys use `demo` as the key."/><meta property="og:image" content="https://phpseclib.github.io/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.github.io/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Supported Elliptic Curve (EC) Key Formats</h1></header><article><div><span><p>All keys are the same key (<a href="https://www.secg.org/sec2-v2.pdf#page=13">nistp256 / secp256r1</a>) encoded differently. Encrypted keys use <code>demo</code> as the key.</p>
+<p>See <a href="/docs/ec#supported-formats">EC: Supported Formats</a> for a more in depth discussion of the various formats (the features they support, the standards to which they conform, etc).</p>
+<h2><a class="anchor" aria-hidden="true" id="pkcs1"></a><a href="#pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PKCS1</h2>
+<h3><a class="anchor" aria-hidden="true" id="private-keys"></a><a href="#private-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Private Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve"></a><a href="#named-curve" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs">-----BEGIN EC <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+MHcCAQEEIEqT+eRC3V7MI/SUWQD0cLU30uAjUaqSiLPtvKzR4jwKoAoGCCqGSM49
+AwEHoUQDQgAErPJyxEu2/oKCrJaaTVTrq39DKJ2XcN6W+k8UvGf+Y/lDWNbFitQo
+cabsDUvSN0edHH3UKP5QPTz4cOlyIPMrXQ==
+-----<span class="hljs-keyword">END</span> EC <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve"></a><a href="#specified-curve" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS1::useSpecifiedCurve()</code> and then <code>$key-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs">-----BEGIN EC PRIVATE KEY-----
+MIIBTgIBAQQgSpP55ELdXswj9JRZAPRwtTfS4CNRqpKIs+<span class="hljs-number">28r</span>NHiPAqggeAwgd0C
+AQEwLAYHKoZIzj0BAQIhAP<span class="hljs-regexp">////</span><span class="hljs-number">8</span>AAAABAAAAAAAAAAAAAAAA<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span>
+MEQEIP<span class="hljs-regexp">////</span><span class="hljs-number">8</span>AAAABAAAAAAAAAAAAAAAA<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">///8BCBaxjXYqjqT57Pr
+vVV2mIa8ZR0GsMxTsPY7zjw+J9JgSwRBBGsX0fLhLEJH+Lzm5WOkQPJ3A32BLesz
+oPShOUXYmMKWT+NC4v4af5uO5+tKfA+eFivOM1drMV7Oy7ZAaDe/UfUCIQD//</span><span class="hljs-regexp">///
+AAAAAP//</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span>vOb6racXnoTzucrC/GMlUaFEA0IABKzycsRLtv6CgqyWmk1U
+<span class="hljs-number">66t</span>/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08+HDpciDz
+K10=
+-----END EC PRIVATE KEY-----
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="encrypted-private-keys"></a><a href="#encrypted-private-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Encrypted Private Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve-1"></a><a href="#named-curve-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;withPassword('demo')-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs"><span class="hljs-comment">-----BEGIN EC PRIVATE KEY-----</span>
+Proc-<span class="hljs-keyword">Type</span>: <span class="hljs-number">4</span>,<span class="hljs-keyword">ENCRYPTED</span>
+DEK-<span class="hljs-keyword">Info</span>: AES<span class="hljs-number">-128</span>-CBC,<span class="hljs-number">0</span>D74A1F3DB0F51121E9DA1B28A0AB2BD
+
+NZfHlU+Ln86s5DlbTdTb/P6JXAAOEsONC3ruujq2ZEU7v47I578aQGmjV6lOvyYN
+y4GMK+Mn8tAuap2TZYk09Ucr32fFG3H8CaXILjYHivorUuRhOk8g/l1JHnf7M0YH
+uuOcI+Fk3RN2CPktcdHp59OtgZwny2IySqNiw/F/<span class="hljs-number">5</span>Y4=
+<span class="hljs-comment">-----END EC PRIVATE KEY-----</span>
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve-1"></a><a href="#specified-curve-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS1::useSpecifiedCurve()</code> and then <code>$key-&gt;withPassword('demo')-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs"><span class="hljs-comment">-----BEGIN EC PRIVATE KEY-----</span>
+Proc-<span class="hljs-keyword">Type</span>: <span class="hljs-number">4</span>,<span class="hljs-keyword">ENCRYPTED</span>
+DEK-<span class="hljs-keyword">Info</span>: AES<span class="hljs-number">-128</span>-CBC,<span class="hljs-number">952</span>C100E8CC7DC068297848512B6598F
+
+cgkqw+xfC5RUAyiU9tlt3du6HH+c+RZYaLSGUcfRlmSoW9ohMr8dadCs66npqXtf
+kbgEotqL8IwaIA2q9qGpsCa19mvRS0Ys5JyQEmopHGIrm571NYiXWT06iwxHTyJb
+XRR70iPVluG7wPK+C8BhEXWzE6GU5yIbe46GFxLE/SipDyjvs2HAZCM8PHsqoJa6
+fx11e45kcL+FGdLQbjzP9DZF0K1825A/yWB6jyLgdhMrghFFRd47G+UDdJ+Ph58l
+EM8Q1VL/azCgSvh15ACQ7e4SCk3XCqG5mWJRVO0+JTR14hFlH7cZKtXZ/dZOtZgz
+<span class="hljs-number">8</span>MvutZikiTDWWgG/Zt+czt2lEPy8B7BLNsR1qhcD8k8QdNLPHcCa+<span class="hljs-number">5</span>eD4WsHy/W2
+u2DZ/<span class="hljs-number">2</span>vUGB1v2SOnbNboRut6PQE+by3d3xdTVFugZ1ABRNBUR/CdGxMRp82USiC3
+OmX98QrbsaxIO5K6Um+/YA==
+<span class="hljs-comment">-----END EC PRIVATE KEY-----</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="parameters"></a><a href="#parameters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Parameters</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve-2"></a><a href="#named-curve-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;getParameters()-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs">--<span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">BEGIN</span> <span class="hljs-comment">EC</span> <span class="hljs-comment">PARAMETERS</span>--<span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span>
+<span class="hljs-comment">BggqhkjOPQMBBw==</span>
+--<span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">END</span> <span class="hljs-comment">EC</span> <span class="hljs-comment">PARAMETERS</span>--<span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span>
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve-2"></a><a href="#specified-curve-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS1::useSpecifiedCurve()</code> and then <code>$key-&gt;getParameters()-&gt;toString('PKCS1')</code>.</p>
+<pre><code class="hljs">-----BEGIN EC PARAMETERS-----
+MIHdAgEBMCwGByqGSM49AQECIQD<span class="hljs-regexp">////</span><span class="hljs-regexp">/AAAAAQAAAAAAAAAAAAAAAP/</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span>/
+<span class="hljs-regexp">////</span><span class="hljs-regexp">/zBEBCD/</span><span class="hljs-regexp">////</span>AAAAAQAAAAAAAAAAAAAAAP<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">///AQgWsY12Ko6
+k+ez671VdpiGvGUdBrDMU7D2O848PifSYEsEQQRrF9Hy4SxCR/i85uVjpEDydwN9
+gS3rM6D0oTlF2JjClk/jQuL+Gn+bjufrSnwPnhYrzjNXazFezsu2QGg3v1H1AiEA
+//</span><span class="hljs-regexp">///wAAAAD//</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-number">7zm</span>+q2nF56E87nKwvxjJVE=
+-----END EC PARAMETERS-----
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="pkcs8"></a><a href="#pkcs8" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PKCS8</h2>
+<h3><a class="anchor" aria-hidden="true" id="private-keys-1"></a><a href="#private-keys-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Private Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve-3"></a><a href="#named-curve-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgSpP55ELdXswj9JRZ
+APRwtTfS4CNRqpKIs+<span class="hljs-number">28</span>rNHiPAqhRANCAASs8nLES7b+goKslppNVOurf0MonZdw
+<span class="hljs-number">3</span>pb6TxS8Z/<span class="hljs-number">5</span>j+UNY1sWK1ChxpuwNS9I3R50cfdQo/lA9PPhw6XIg8ytd
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve-3"></a><a href="#specified-curve-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS8::useSpecifiedCurve()</code> and then <code>$key-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN PRIVATE KEY-----
+MIIBXgIBADCB6QYHKoZIzj0CATCB3QIBATAsBgcqhkjOPQEBAiEA<span class="hljs-regexp">////</span>/wAAAAEA
+AAAAAAAAAAAAAAD<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">///8wRAQg//</span><span class="hljs-regexp">///wAAAAEAAAAAAAAAAAAAAAD/
+//</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span>wEIFrGNdiqOpPns+u9VXaYhrxlHQawzFOw9jvOPD4n0mBLBEEE
+axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54W
+K84zV2sxXs7LtkBoN79R9QIhAP<span class="hljs-regexp">////</span><span class="hljs-number">8</span>AAAAA<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">//+85vqtpxeehPO5ysL8
+YyVRBG0wawIBAQQgSpP55ELdXswj9JRZAPRwtTfS4CNRqpKIs+28rNHiPAqhRANC
+AASs8nLES7b+goKslppNVOurf0MonZdw3pb6TxS8Z/5j+UNY1sWK1ChxpuwNS9I3
+R50cfdQo/lA9PPhw6XIg8ytd
+-----END PRIVATE KEY-----
+</span></code></pre>
+<h3><a class="anchor" aria-hidden="true" id="encrypted-private-keys-1"></a><a href="#encrypted-private-keys-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Encrypted Private Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve-4"></a><a href="#named-curve-4" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;withPassword('demo')-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN ENCRYPTED <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+MIHsMFcGCSqGSIb3DQEFDTBKMCkGCSqGSIb3DQEFDDAcBAgSAksBQ9sCqQICCAAw
+DAYIKoZIhvcNAgkFADAdBglghkgBZQMEAQIEEBVJUSnfBOUCx7FnWtt+pzoEgZCQ
+f5gKEy9lnPcM7SgrNBOXNk9mPHSTO1D4UIlPdPtxbPPYM2ULWrxrQoQ0iSmXUp1n
+<span class="hljs-number">0</span>jHfDbnBlgDTS/<span class="hljs-number">8</span>ezcnaRDuusZojGNUZg1DfJ3fDxKl6v/zxj1aqNtoyco7uDWuc
+YQEdJEzPsVKYMa37gdGp5+<span class="hljs-number">2</span>nv/<span class="hljs-keyword">Of</span>/sVss+t8+<span class="hljs-number">6</span>IHs445JC15ZF5XirVqx5qUjxQ=
+-----<span class="hljs-keyword">END</span> ENCRYPTED <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve-4"></a><a href="#specified-curve-4" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS8::useSpecifiedCurve()</code> and then <code>$key-&gt;withPassword('demo')-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN ENCRYPTED <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+MIIBzTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQIvXl/jJoRTfICAggA
+MAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAECBBCOWt/n7mCGfhpheWWfezOfBIIB
+cGmNkXw1hYneO8XKQvKHSauJ8aUWrh9fc+nTNXq171vJtdZpQN/NcJ5TYA4yEKa1
+mquL8Jeoauy9HGXo2g1nE6vkRlyTPIzAGXhdzNUfeFjl4DpClELkfzgLDoSUKP7R
+<span class="hljs-number">4</span>pziC0fqxmZDTJVaNludMrB3JV8ET+abg9MRAr/XqxflTq+kvLl/nvO6UBuEVbPB
+<span class="hljs-number">0</span>/l79vZAIJFFBB3L6DcVB8yesGHbbJCeIqG3AoxRgUIK7JBCDWpO+e19L13q9NpZ
+MBB+dPfx9T3PYFPQ1YBjHDlVKuPDImL3F6pLQglyBj4ImoT2VAOABiSKamos4jxW
+u21rdiy8soQrgUpnY1uUngE29hggSz5kfP5jQW59i/dkXPkRte4v9z38ijsQs1uA
+<span class="hljs-number">6</span>jAqk/SHUCdgWbOTFhXt7xjKLCpO26GrQ7a+mQcBjkVa8aZQwdVVpatIGfEdQfnl
+xje33obeN/yjl+x/eFAfd+fUDN907fRZO8Sko956uQRy
+-----<span class="hljs-keyword">END</span> ENCRYPTED <span class="hljs-keyword">PRIVATE</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="public-keys"></a><a href="#public-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="named-curve-5"></a><a href="#named-curve-5" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Named Curve</h4>
+<p>Generated with <code>$key-&gt;getPublicKey()-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErPJyxEu2/oKCrJaaTVTrq39DKJ2X
+cN6W+k8UvGf+Y/lDWNbFitQocabsDUvSN0edHH3UKP5QPTz4cOlyIPMrXQ==
+-----<span class="hljs-keyword">END</span> <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span>-----
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="specified-curve-5"></a><a href="#specified-curve-5" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Specified Curve</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\PKCS8::useSpecifiedCurve()</code> and then <code>$key-&gt;getPublicKey()-&gt;toString('PKCS8')</code>.</p>
+<pre><code class="hljs">-----BEGIN PUBLIC KEY-----
+MIIBMDCB6QYHKoZIzj0CATCB3QIBATAsBgcqhkjOPQEBAiEA<span class="hljs-regexp">////</span>/wAAAAEAAAAA
+AAAAAAAAAAD<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">///8wRAQg//</span><span class="hljs-regexp">///wAAAAEAAAAAAAAAAAAAAAD//</span><span class="hljs-regexp">///
+//</span><span class="hljs-regexp">////</span><span class="hljs-regexp">////</span>wEIFrGNdiqOpPns+u9VXaYhrxlHQawzFOw9jvOPD4n0mBLBEEEaxfR
+<span class="hljs-number">8u</span>EsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84z
+V2sxXs7LtkBoN79R9QIhAP<span class="hljs-regexp">////</span><span class="hljs-number">8</span>AAAAA<span class="hljs-regexp">////</span><span class="hljs-regexp">////</span><span class="hljs-regexp">//+85vqtpxeehPO5ysL8YyVR
+A0IABKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L
+0jdHnRx91Cj+UD08+HDpciDzK10=
+-----END PUBLIC KEY-----
+</span></code></pre>
+<h2><a class="anchor" aria-hidden="true" id="putty"></a><a href="#putty" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>PuTTY</h2>
+<h3><a class="anchor" aria-hidden="true" id="private-keys-2"></a><a href="#private-keys-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Private Keys</h3>
+<p>Generated with <code>$key-&gt;toString('PuTTY')</code>.</p>
+<pre><code class="hljs">PuTTY-User-Key-File-2: ecdsa-sha2-nistp256
+Encryption: none
+<span class="hljs-keyword">Comment</span>: phpseclib-<span class="hljs-keyword">generated</span>-<span class="hljs-keyword">key</span>
+<span class="hljs-keyword">Public</span>-<span class="hljs-keyword">Lines</span>: <span class="hljs-number">3</span>
+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6C
+gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
++HDpciDzK10=
+<span class="hljs-keyword">Private</span>-<span class="hljs-keyword">Lines</span>: <span class="hljs-number">1</span>
+AAAAIQBKk/nkQt1ezCP0lFkA9HC1N9LgI1Gqkoiz7bys0eI8Cg==
+<span class="hljs-keyword">Private</span>-MAC: <span class="hljs-number">9239</span>cacc5e71079d25f63d03941c5a35b5304f6c
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="encrypted-private-keys-2"></a><a href="#encrypted-private-keys-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Encrypted Private Keys</h3>
+<p>Generated with <code>$key-&gt;withPassword('demo')-&gt;toString('PuTTY')</code>.</p>
+<pre><code class="hljs">PuTTY-User-Key-File-2: ecdsa-sha2-nistp256
+Encryption: aes256-cbc
+<span class="hljs-keyword">Comment</span>: phpseclib-<span class="hljs-keyword">generated</span>-<span class="hljs-keyword">key</span>
+<span class="hljs-keyword">Public</span>-<span class="hljs-keyword">Lines</span>: <span class="hljs-number">3</span>
+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6C
+gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
++HDpciDzK10=
+<span class="hljs-keyword">Private</span>-<span class="hljs-keyword">Lines</span>: <span class="hljs-number">1</span>
+U43Vy/gRjjfRA8Nbsy4Mremrnz3n49fTCwDdB2t1Nr9di16WaoBb582T489sn5ff
+<span class="hljs-keyword">Private</span>-MAC: <span class="hljs-number">1</span>a89ef91b9a3fcc4d3ad9033a06bf5cbd36395d9
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="public-keys-1"></a><a href="#public-keys-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Keys</h3>
+<p>Generated with <code>$key-&gt;getPublicKey()-&gt;toString('PuTTY')</code>.</p>
+<pre><code class="hljs">---- BEGIN SSH2 <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span> ----
+Comment: <span class="hljs-string">"phpseclib-generated-key"</span>
+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6C
+gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
++HDpciDzK10=
+---- <span class="hljs-keyword">END</span> SSH2 <span class="hljs-keyword">PUBLIC</span> <span class="hljs-keyword">KEY</span> ----
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="openssh"></a><a href="#openssh" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>OpenSSH</h2>
+<h3><a class="anchor" aria-hidden="true" id="private-keys-3"></a><a href="#private-keys-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Private Keys</h3>
+<p>Generated with <code>$key-&gt;toString('OpenSSH')</code>.</p>
+<pre><code class="hljs">-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAaAAAABNlY2RzYS
+<span class="hljs-number">1</span>zaGEyLW5pc3RwMjU2AAAACG5pc3RwMjU2AAAAQQSs8nLES7b+goKslppNVOurf0MonZdw
+<span class="hljs-number">3</span>pb6TxS8Z/<span class="hljs-number">5</span>j+UNY1sWK1ChxpuwNS9I3R50cfdQo/lA9PPhw6XIg8ytdAAAAsJreM3qa3j
+N6AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6CgqyW
+mk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08+HDpciDzK1
+<span class="hljs-number">0</span>AAAAgSpP55ELdXswj9JRZAPRwtTfS4CNRqpKIs+<span class="hljs-number">28</span>rNHiPAoAAAAXcGhwc2VjbGliLWdl
+bmVyYXRlZC1rZXkB
+-----END OPENSSH PRIVATE KEY-----
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="public-keys-2"></a><a href="#public-keys-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Keys</h3>
+<p>Generated with <code>$key-&gt;getPublicKey()-&gt;toString('OpenSSH')</code>.</p>
+<pre><code class="hljs">ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08+HDpciDzK10= phpseclib-generated-key
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="xml"></a><a href="#xml" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>XML</h2>
+<h3><a class="anchor" aria-hidden="true" id="public-keys-3"></a><a href="#public-keys-3" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Public Keys</h3>
+<h4><a class="anchor" aria-hidden="true" id="regular-ecdsakeyvalues"></a><a href="#regular-ecdsakeyvalues" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Regular ECDSAKeyValues</h4>
+<p>Generated with <code>$key-&gt;getPublicKey()-&gt;toString('XML')</code>.</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">ECDSAKeyValue</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2009/xmldsig11#"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">NamedCurve</span> <span class="hljs-attr">URI</span>=<span class="hljs-string">"urn:oid:1.2.840.10045.3.1.7"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">PublicKey</span>&gt;</span>BKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08+HDpciDzK10=<span class="hljs-tag">&lt;/<span class="hljs-name">PublicKey</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ECDSAKeyValue</span>&gt;</span>
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="rfc4050-formatted-ecdsakeyvalues"></a><a href="#rfc4050-formatted-ecdsakeyvalues" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RFC4050 formatted ECDSAKeyValues</h4>
+<p>Generated by doing <code>\phpseclib3\Crypt\EC\Formats\Keys\XML::enableRFC4050Syntax()</code> and then <code>$key-&gt;getPublicKey()-&gt;toString('XML')</code>.</p>
+<pre><code class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">ECDSAKeyValue</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2001/04/xmldsig-more#"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">DomainParameters</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">NamedCurve</span> <span class="hljs-attr">URN</span>=<span class="hljs-string">"urn:oid:1.2.840.10045.3.1.7"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">DomainParameters</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">PublicKey</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">X</span> <span class="hljs-attr">Value</span>=<span class="hljs-string">"78226179037204970007758573525096590005539509111629919618136274592348755616761"</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">Y</span> <span class="hljs-attr">Value</span>=<span class="hljs-string">"30461925696227425434068699083275029164946463271650913121991290383387057138525"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">PublicKey</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ECDSAKeyValue</span>&gt;</span>
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#pkcs1">PKCS1</a><ul class="toc-headings"><li><a href="#private-keys">Private Keys</a></li><li><a href="#encrypted-private-keys">Encrypted Private Keys</a></li><li><a href="#parameters">Parameters</a></li></ul></li><li><a href="#pkcs8">PKCS8</a><ul class="toc-headings"><li><a href="#private-keys-1">Private Keys</a></li><li><a href="#encrypted-private-keys-1">Encrypted Private Keys</a></li><li><a href="#public-keys">Public Keys</a></li></ul></li><li><a href="#putty">PuTTY</a><ul class="toc-headings"><li><a href="#private-keys-2">Private Keys</a></li><li><a href="#encrypted-private-keys-2">Encrypted Private Keys</a></li><li><a href="#public-keys-1">Public Keys</a></li></ul></li><li><a href="#openssh">OpenSSH</a><ul class="toc-headings"><li><a href="#private-keys-3">Private Keys</a></li><li><a href="#public-keys-2">Public Keys</a></li></ul></li><li><a href="#xml">XML</a><ul class="toc-headings"><li><a href="#public-keys-3">Public Keys</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '22ad7fe108506790086c025b80c5e65d',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>
