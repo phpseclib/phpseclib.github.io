@@ -55,6 +55,7 @@ class Footer extends React.Component {
           </div>
           <div>
             <h5>Support</h5>
+            <a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a>
             <a
               href="https://stackoverflow.com/questions/tagged/phpseclib"
               target="_blank"

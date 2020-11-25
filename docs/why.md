@@ -11,6 +11,16 @@ The only requirement that phpseclib 3.0 has is that you must be using PHP 5.6+.
 
 Extensions like bcmath, gmp, libsodium and openssl, if they're available, for speed, but they're not required.
 
+## phpseclib 3 vs phspeclib 1 / 2
+
+phpseclib 3.0.x offers a completely redesigned public key interface featuring immutability, among other things. And whereas 1.0 / 2.0 only supported RSA keys 3.0 supports DSA, ECDSA and EdDSA keys.
+
+More modern symmetric key algorithms have been added as well, including ChaCha20-Poly1305 and GCM modes.
+
+SSH2, SFTP and X.509 are largely unchanged.
+
+phpseclib 1.0 / 2.0 documentation lives at http://phpseclib.sourceforge.net/
+
 ## phpseclib vs libsodium
 
 libsodium is the latest hotness in PHP cryptography but there's a lot of things phpseclib does that libsodium doesn't even pretend to do. phpseclib provides an SSH2 implementation, an SFTP implementation, an X.509 implementation, CSR, CRL, BigInteger, etc. libsodium doesnt aim to provide any of these things.
