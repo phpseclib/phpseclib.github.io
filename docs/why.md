@@ -11,7 +11,7 @@ The only requirement that phpseclib 3.0 has is that you must be using PHP 5.6+.
 
 Extensions like bcmath, gmp, libsodium and openssl, if they're available, for speed, but they're not required.
 
-## phpseclib 3 vs phspeclib 1 / 2
+## phpseclib 3.0 vs phspeclib 1.0 / 2.0
 
 phpseclib 3.0.x offers a completely redesigned public key interface featuring immutability, among other things. And whereas 1.0 / 2.0 only supported RSA keys 3.0 supports DSA, ECDSA and EdDSA keys.
 
