@@ -78,6 +78,14 @@ function get($remote_file, $local_file = false, $offset = 0, $length = -1, $prog
 
 Returns a string containing the contents of `$remote_file` if `$local_file` is left undefined or a boolean false if the operation was unsuccessful. If `$local_file` is defined, returns true or false depending on the success of the operation.
 
+If `$local_file` is an anonymous function you can stream the download real time or whatever. eg.
+
+```php
+$sftp->get('filename.remote', function ($output) {
+    echo $output;
+});
+```
+
 ## Preserving the Date
 
 If you want the uploaded or downloaded file to have the same last modified / accessed time as the original file by doing `$sftp->enableDatePreservation()`. `$sftp->disableDatePreservation()` will turn this behavior off. The default status is "off".
