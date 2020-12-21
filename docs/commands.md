@@ -122,7 +122,13 @@ After each `$ssh->read()` the timeout resets to what you set it to last. By defa
 
 `$ssh->setTimeout()` works with `$ssh->read()` and `$ssh->exec()`.
 
-Unfortunately, commands like `$ssh->exec('sleep 10')` don't work well with `$ssh->setTimeout()` as discussed in [issue # 1440](https://github.com/phpseclib/phpseclib/issues/1440). This can somewhat be worked around by doing `$ssh->exec('nohup sleep 10 > /dev/null 2>&1 &')` or `$ssh->exec('timeout 5 sleep 10')`, depending on what you're trying to do.
+Unfortunately, commands like `$ssh->exec('sleep 10')` don't work well with `$ssh->setTimeout()` as discussed in [issue # 1440](https://github.com/phpseclib/phpseclib/issues/1440). eg. if you have a timeout of 5s and are doing `$ssh->exec('sleep 10')` it may not, in fact, return after 5s, but rather, after 10s. This can somewhat be worked around by doing `$ssh->exec('nohup sleep 10 > /dev/null 2>&1 &')` or `$ssh->exec('timeout 5 sleep 10')`, depending on what you're trying to do.
+
+## setKeepAlive()
+
+In some cases it may be necessary to send a "[keepalive](https://en.wikipedia.org/wiki/Keepalive)" to the server every x seconds to prevent the SSH connection from being closed during long running commands. eg. if, in the target servers sshd_config, ClientAliveCountMax is 0 and ClientAliveInterval is 3, then `echo $ssh->exec('sleep 10; ls -latr')` will timeout and you'll get a "Connection closed prematurely" ConnectionClosedException. `setKeepAlive(...)` is the answer to this problem.
+
+Note that `setKeepAlive()` will not keep a connection alive if you're doing a time consuming operation _outside_ of the SSH instance. eg. doing `sleep(10); echo $ssh->exec('ls -latr');` on a server with the aforementioned sshd_config will still result in a "Connection closed prematurely" ConnectionClosedException because, at the end of the day, PHP is still a synchronous language and unless phpseclib has control then the "keepalive" packets won't be sent out.
 
 ## Determining what to read(): passwd
 
