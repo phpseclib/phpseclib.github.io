@@ -46,7 +46,7 @@ const siteConfig = {
   ],
 
   algolia: {
-    apiKey: '22ad7fe108506790086c025b80c5e65d',
+    apiKey: '981175a1328b86301b68efbff3a39ce8',
     indexName: 'phpseclib',
     algoliaOptions: {} // Optional, if provided by Algolia
   },
