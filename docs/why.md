@@ -19,7 +19,30 @@ More modern symmetric key algorithms have been added as well, including ChaCha20
 
 SSH2, SFTP and X.509 are largely unchanged.
 
+The name space has also been changed from `\phpseclib` to `\phpsecib3`.
+
 phpseclib 1.0 / 2.0 documentation lives at http://phpseclib.sourceforge.net/
+
+## phpseclib2_compat
+
+Due to the namespace change, phpseclib 3.0 can be used to emulate phpseclib 2.0. [phpseclib2_compat](https://github.com/phpseclib/phpseclib2_compat) does just that. So let's say you want to use phpseclib 3 but some of your dependencies are still using phpseclib 2. In this scenario you can require phpseclib/phpseclib:~3.0 and phpseclib/phpseclib2_compat:~1.0 and you're dependencies will then start using phpseclib 3 even if they don't know it.
+
+Using phpseclib2_compat will actually bring a few enhancements to your dependency. While phpseclib 2.0 only supports RSA keys phpseclib2_compat sports support for ECDSA / DSA / Ed25519 / Ed449 keys.
+
+Consider this code sample:
+
+```php
+use phpseclib\Crypt\RSA;
+
+$rsa = new RSA;
+$rsa->loadKey('ecdsa private key');
+
+$ssh = new SSH2('website.com');
+$ssh->login('username', $rsa);
+```
+That'll work with phpseclib2_compat, even with an ECDSA private key, whereas in phpseclib 2.0 it would not work.
+
+SSH1 and SCP are not supported but those were likely never frequently used anyway.
 
 ## phpseclib vs libsodium
 
