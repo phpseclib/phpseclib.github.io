@@ -17,6 +17,25 @@ phpseclib 3.0.x offers a completely redesigned public key interface featuring im
 
 More modern symmetric key algorithms have been added as well, including ChaCha20-Poly1305 and GCM modes.
 
+The default hash algorithm has also been changed from sha1 to sha256 and public keys are now immutable. So let's say you had created an RSA encrypted ciphertext with phpseclib 2.0 using the default encryption mode and default hashes. Here's how you'd decrypt it with phpseclib 2:
+
+```php
+use phpseclib\Crypt\RSA;
+
+$rsa = new RSA;
+$rsa->loadKey(...);
+echo $rsa->decrypt(...);
+```
+
+Here's how you'd decrypt it with phpeclib 3:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load(...)->withHash('sha1')->withMGFHash('sha1');
+echo $key->decrypt(...);
+```
+
 SSH2, SFTP and X.509 are largely unchanged.
 
 The name space has also been changed from `\phpseclib` to `\phpsecib3`.
