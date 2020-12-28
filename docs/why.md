@@ -67,7 +67,7 @@ SSH1 and SCP are not supported but those were likely never frequently used anywa
 
 libsodium is the latest hotness in PHP cryptography but there's a lot of things phpseclib does that libsodium doesn't even pretend to do. phpseclib provides an SSH2 implementation, an SFTP implementation, an X.509 implementation, CSR, CRL, BigInteger, etc. libsodium doesnt aim to provide any of these things.
 
-In so far as cryptographic applications are concerned...  libsodium trades flexibility for security. If you need to use AES-128-CBC or RSA or any other algorithm that [isn't explicitly supported by libsodium](https://wiki.php.net/rfc/libsodium) you're out of luck.
+In so far as cryptographic applications are concerned...  libsodium trades flexibility for security. If you need to use AES-128-CBC, RSA or ECDSA / ECDH with nistp256 or secp256k1 (aka the bitcoin curve) or any other algorithm that [isn't explicitly supported by libsodium](https://wiki.php.net/rfc/libsodium) you're out of luck.
 
 That said, if you want ease of use and want to rely on the defaults of whatever library you're using, libsodium is definitely recommended. phpseclib 3.0 is much less error tolerant than 1.0 / 2.0 anyway now. Symmetric keys / IVs are no longer padded to the default length, the mode must _explicitly_ be specified now for symmetric key algorithms, etc. The goal is to make it less "friendly" to use cryptographic primitives so that only those who truly know what they're doing will do so henceforth.
 
