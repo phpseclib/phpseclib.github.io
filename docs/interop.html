@@ -281,7 +281,7 @@ MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
 S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
 -----END RSA PUBLIC KEY-----'</span>);
 $key = $key
-    -&gt;withPadding(RSA::ENCRYPTION_OAEP)
+    <span class="hljs-comment">//-&gt;withPadding(RSA::ENCRYPTION_OAEP)</span>
     -&gt;withHash(<span class="hljs-string">'md5'</span>)
     -&gt;withMGFHash(<span class="hljs-string">'sha1'</span>);
 <span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
@@ -306,8 +306,165 @@ $key = $key
         Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithMD5AndMGF1Padding");
 </code></pre>
 <p>That works just fine. BUT what if use <code>Cipher.getInstance(&quot;RSA/ECB/OAEPWithMD5AndMGF1Padding&quot;, &quot;BC&quot;)</code> instead? eg. what if we force org.bouncycastle.jce.provider.BouncyCastleProvider to be the crypto provider instead of com.sun.crypto.provider.SunJCE? Then it doesn't work.</p>
-<p>org.bouncycastle.jce.provider.BouncyCastleProvider assumes the MGFHash and the Hash are using the same algorithm whereas com.sun.crypto.provider.SunJCE has the MGFHash hard-coded as sha1.</p>
-<p>More information can be found at <a href="https://stackoverflow.com/a/32166210/569976">Breaking down RSA/ECB/OAEPWithSHA-256AndMGF1Padding</a>.</p>
+<p>org.bouncycastle.jce.provider.BouncyCastleProvider assumes the MGFHash and the Hash are using the same algorithm whereas com.sun.crypto.provider.SunJCE has the MGFHash hard-coded as sha1. To work around this we can do the following:</p>
+<pre><code class="hljs css language-java">#
+#-----[ FIND ]------------------------------------------
+#
+import java.security.interfaces.RSAPrivateKey;
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+import javax.crypto.spec.OAEPParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import javax.crypto.spec.PSource.PSpecified;
+#
+#-----[ FIND ]------------------------------------------
+#
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        OAEPParameterSpec oaepParams = new OAEPParameterSpec(
+            "MD5",
+            "MGF1",
+            new MGF1ParameterSpec("SHA-1"),
+            PSpecified.DEFAULT
+        );
+        cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParams);
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="rsa-signature-verification"></a><a href="#rsa-signature-verification" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Signature Verification</h3>
+<p>Signature creation with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----'</span>)
+    <span class="hljs-comment">//-&gt;withHash('sha256')</span>
+    -&gt;withPadding(RSA::SIGNATURE_PKCS1);
+
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;sign(<span class="hljs-string">'zzz'</span>));
+</code></pre>
+<p>Signature verification with Java:</p>
+<pre><code class="hljs css language-java"><span class="hljs-keyword">import</span> org.bouncycastle.openssl.PEMParser;
+<span class="hljs-keyword">import</span> org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+<span class="hljs-keyword">import</span> org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+<span class="hljs-keyword">import</span> java.io.StringReader;
+<span class="hljs-keyword">import</span> java.util.Base64;
+<span class="hljs-keyword">import</span> java.security.interfaces.RSAPublicKey;
+<span class="hljs-keyword">import</span> java.security.Signature;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+</span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception
+    </span>{
+        String plaintext = <span class="hljs-string">"zzz"</span>;
+        String signature = <span class="hljs-string">"MUE536c4UJSAmycs7V6qFaLMATrKMQA8TYj5xX1+fwHINz3/BafgaRt0ycoD5IxTxaclLWavrGSza4xSBHraEw=="</span>;
+
+        String key = <span class="hljs-string">"-----BEGIN RSA PUBLIC KEY-----\n"</span> +
+<span class="hljs-string">"MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx\n"</span> +
+<span class="hljs-string">"S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=\n"</span> +
+<span class="hljs-string">"-----END RSA PUBLIC KEY-----\n"</span>;
+
+        <span class="hljs-comment">// load the public key</span>
+        PEMParser pemParser = <span class="hljs-keyword">new</span> PEMParser(<span class="hljs-keyword">new</span> StringReader(key));
+        JcaPEMKeyConverter converter = <span class="hljs-keyword">new</span> JcaPEMKeyConverter();
+        SubjectPublicKeyInfo pub = SubjectPublicKeyInfo.getInstance(pemParser.readObject());
+        RSAPublicKey publicKey = (RSAPublicKey) converter.getPublicKey(pub);
+
+        <span class="hljs-comment">// load the plaintext</span>
+        <span class="hljs-keyword">byte</span>[] signatureBytes = Base64.getDecoder().decode(signature);
+
+        <span class="hljs-comment">// perform the actual signature verification</span>
+        Signature sig = Signature.getInstance(<span class="hljs-string">"SHA256withRSA"</span>);
+        sig.initVerify(publicKey);
+        sig.update(plaintext.getBytes());
+        System.out.println(sig.verify(signatureBytes) ? <span class="hljs-string">"good"</span> : <span class="hljs-string">"bad"</span>);
+    }
+}
+</code></pre>
+<p>The above code only works with PKCS1 keys. If you want to load a PKCS8 key you'll need to make the following changes (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-java">#
+#-----[ FIND ]------------------------------------------
+#
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import java.io.StringReader;
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+import java.security.spec.X509EncodedKeySpec;
+import java.security.KeyFactory;
+#
+#-----[ FIND ]------------------------------------------
+#
+        String key = "-----BEGIN RSA PUBLIC KEY-----\n" +
+"MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx\n" +
+"S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=\n" +
+"-----END RSA PUBLIC KEY-----\n";
+
+        // load the public key
+        PEMParser pemParser = new PEMParser(new StringReader(key));
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        SubjectPublicKeyInfo pub = SubjectPublicKeyInfo.getInstance(pemParser.readObject());
+        RSAPublicKey publicKey = (RSAPublicKey) converter.getPublicKey(pub);
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        String key = "-----BEGIN PUBLIC KEY-----\n" +
+"MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf\n" +
+"9Cnzj4p4WGeKLs1Pt8QuKUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQ==\n" +
+"-----END PUBLIC KEY-----";
+
+        // extract BER from PEM
+        key = key
+                  .replaceAll("-+[^-]+-+", "")
+                  .replace("\n", "")
+                  .replace("\r", "");
+        byte[] keyBytes = Base64.getDecoder().decode(key);
+
+        // load decoded public key
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        RSAPublicKey publicKey = (RSAPublicKey) kf.generatePublic(spec);
+</code></pre>
+<p>If you want to do PSS signature verification and you have org.bouncycastle.jce.provider.BouncyCastleProvider as an available crypto provider (as of Java 8, sun.security.rsa.SunRsaSign does not support PSS), you can do <code>Signature.getInstance(&quot;SHA1withRSA/PSS&quot;)</code> instead of <code>Signature.getInstance(&quot;SHA1withRSA&quot;)</code>. If you do <code>SHA256withRSA/PSS</code> (which you're not going to be able to do with 512-bit RSA keys) you'll need to keep in mind that the MGFHash is assumed to be the same as the regular Hash. If that's not the case (or if you're using a salt length other than the length of the Hash) then you'll need to do something like this:</p>
+<pre><code class="hljs css language-java">#
+#-----[ FIND ]------------------------------------------
+#
+import java.security.Signature;
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+import java.security.spec.PSSParameterSpec;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.MessageDigest;
+#
+#-----[ FIND ]------------------------------------------
+#
+        Signature sig = Signature.getInstance("SHA256withRSA");
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        Signature sig = Signature.getInstance("RSASSA-PSS");
+        PSSParameterSpec pssParams = new PSSParameterSpec(
+            "SHA-256",
+            "MGF1",
+            new MGF1ParameterSpec("SHA-1"),
+            MessageDigest.getInstance("SHA-256").getDigestLength(),
+            PSSParameterSpec.TRAILER_FIELD_BC
+        );
+        sig.setParameter(pssParams);
+</code></pre>
+<p>In this example SHA-256 is the Hash, SHA-1 is the MGFHash and the salt length is equal to the length of the hash in bytes <em>(this example requires a minimum 528-bit RSA private key instead of the 512-bit RSA private keys we've been using so a complete working example is not provided)</em></p>
 <h2><a class="anchor" aria-hidden="true" id="javascript"></a><a href="#javascript" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>JavaScript</h2>
 <h3><a class="anchor" aria-hidden="true" id="rsa-decryption-with-web-crypto-api"></a><a href="#rsa-decryption-with-web-crypto-api" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption with Web Crypto API</h3>
 <p>Encryption with PHP:</p>
@@ -719,7 +876,7 @@ openssl_private_decrypt(base64_decode($ciphertext), $plaintext, $private, OPENSS
 <span class="hljs-keyword">echo</span> $plaintext;
 </code></pre>
 <p>OAEP padding is supported but <a href="https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466">only with sha1 as the hash / MGF hash</a> (no doubt because php-src is using OpenSSL's <a href="https://www.openssl.org/docs/man1.0.2/man3/RSA_private_decrypt.html">RSA_private_decrypt</a> is being used as opposed to OpenSSL's newer <a href="https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_decrypt.html">EVP_PKEY_decrypt</a>)</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/benchmarks"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/docs/connect"><span>Connecting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#python">Python</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption">RSA Decryption</a></li></ul></li><li><a href="#java">Java</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-1">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-1">RSA Decryption</a></li></ul></li><li><a href="#javascript">JavaScript</a><ul class="toc-headings"><li><a href="#rsa-decryption-with-web-crypto-api">RSA Decryption with Web Crypto API</a></li></ul></li><li><a href="#nodejs">Node.js</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-with-cryptojs">AES-128-CBC Decryption with CryptoJS</a></li><li><a href="#rsa-decryption-2">RSA Decryption</a></li><li><a href="#rsa-decryption-with-nodersa">RSA Decryption with NodeRSA</a></li></ul></li><li><a href="#c">C#</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-2">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-3">RSA Decryption</a></li></ul></li><li><a href="#c-1">C</a><ul class="toc-headings"><li><a href="#rsa-decryption-4">RSA Decryption</a></li></ul></li><li><a href="#php">PHP</a><ul class="toc-headings"><li><a href="#rsa-decryption-5">RSA Decryption</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><section class="copyright">Copyright © 2020 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/benchmarks"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/docs/connect"><span>Connecting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#python">Python</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption">RSA Decryption</a></li></ul></li><li><a href="#java">Java</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-1">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-1">RSA Decryption</a></li><li><a href="#rsa-signature-verification">RSA Signature Verification</a></li></ul></li><li><a href="#javascript">JavaScript</a><ul class="toc-headings"><li><a href="#rsa-decryption-with-web-crypto-api">RSA Decryption with Web Crypto API</a></li></ul></li><li><a href="#nodejs">Node.js</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-with-cryptojs">AES-128-CBC Decryption with CryptoJS</a></li><li><a href="#rsa-decryption-2">RSA Decryption</a></li><li><a href="#rsa-decryption-with-nodersa">RSA Decryption with NodeRSA</a></li></ul></li><li><a href="#c">C#</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-2">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-3">RSA Decryption</a></li></ul></li><li><a href="#c-1">C</a><ul class="toc-headings"><li><a href="#rsa-decryption-4">RSA Decryption</a></li></ul></li><li><a href="#php">PHP</a><ul class="toc-headings"><li><a href="#rsa-decryption-5">RSA Decryption</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><section class="copyright">Copyright © 2021 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
