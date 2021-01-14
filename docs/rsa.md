@@ -83,7 +83,7 @@ The following methods can be used to configure this method:
 
 - `withHash` (defaults to sha256)
 - `withMGFHash` (defaults to sha256)
-- `withSaltLength` (defaults to 0)
+- `withSaltLength` (defaults to the length of the hash in bytes)
 
 The minimum key length (`$key->getLength()`) is `8 * ($key->getHash()->getLengthInBytes() + $key->getSaltLength() + 2)`.
 
