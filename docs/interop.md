@@ -83,6 +83,59 @@ plaintext = cipher.decrypt(ciphertextBytes, sentinel)
 print(plaintext)
 ```
 
+PKCS1 keys are loaded in the same way as PKCS8 keys.
+
+OAEP encryption is supported as well. Here's the phpseclib code to encrypt something with OAEP:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----');
+$key = $key
+    //->withPadding(RSA::ENCRYPTION_OAEP)
+    ->withHash('md5')
+    ->withMGFHash('sha1');
+echo base64_encode($key->encrypt('test'));
+```
+<sup>_(md5 is being used because the key is a 512-bit key from [Sample RSA Keys](/docs/rsa-keys); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](/docs/rsa#rsaencryption_oaep); sha1 would work but for the purposes of this demonstration it's useful to have them be different)_</sup>
+
+The PKCS1 Python code will then need to be changed thusly:
+
+```python
+#
+#-----[ FIND ]------------------------------------------
+#
+from Crypto.Cipher import PKCS1_v1_5
+from Crypto import Random
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto import Hash
+#
+#-----[ FIND ]------------------------------------------
+#
+ciphertext = "L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+ciphertext = "h3j3zLT2jXCaZuwF7cgUE/Zmc/5IsIfKbaTiBhpCJo86AiyuoA3Yvni+Lrm5wu2OGv2h5R7Zu3voFcHugiystw=="
+#
+#-----[ FIND ]------------------------------------------
+#
+cipher = PKCS1_v1_5.new(key)
+sentinel = Random.new().read(key.size_in_bytes())
+plaintext = cipher.decrypt(ciphertextBytes, sentinel)
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+cipher = PKCS1_OAEP.new(key, Hash.MD5, mgfunc = lambda x,y: PKCS1_OAEP.MGF1(x, y, Hash.SHA1))
+plaintext = cipher.decrypt(ciphertextBytes)
+```
+
 ## Java
 
 ### AES-128-CBC Decryption
@@ -470,7 +523,7 @@ import java.security.MessageDigest;
         );
         sig.setParameter(pssParams);
 ```
-In this example SHA-256 is the Hash, SHA-1 is the MGFHash and the salt length is equal to the length of the hash in bytes _(this example requires a minimum 528-bit RSA private key instead of the 512-bit RSA private keys we've been using so a complete working example is not provided)_
+In this example SHA-256 is the Hash, SHA-1 is the MGFHash and the salt length is equal to the length of the hash in bytes _(this example requires a minimum 528-bit RSA private key instead of the 512-bit RSA private keys we've been using so a complete working example is not provided; in theory we could use MD5 as the Hash as we did with the OAEP example but Java doesn't support MD5 for PSS)_
 
 ## JavaScript
 
