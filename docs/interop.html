@@ -133,36 +133,31 @@ $key = $key
 <span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
 </code></pre>
 <p><sup><em>(md5 is being used because the key is a 512-bit key from <a href="/docs/rsa-keys">Sample RSA Keys</a>; 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a>; sha1 would work but for the purposes of this demonstration it's useful to have them be different)</em></sup></p>
-<p>The PKCS1 Python code will then need to be changed thusly:</p>
-<pre><code class="hljs css language-python"><span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ FIND ]------------------------------------------</span>
-<span class="hljs-comment">#</span>
-<span class="hljs-keyword">from</span> Crypto.Cipher <span class="hljs-keyword">import</span> PKCS1_v1_5
-<span class="hljs-keyword">from</span> Crypto <span class="hljs-keyword">import</span> Random
-<span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ REPLACE WITH ]----------------------------------</span>
-<span class="hljs-comment">#</span>
+<p>The Python code to decrypt is as follows:</p>
+<pre><code class="hljs css language-python"><span class="hljs-keyword">from</span> Crypto.PublicKey <span class="hljs-keyword">import</span> RSA
 <span class="hljs-keyword">from</span> Crypto.Cipher <span class="hljs-keyword">import</span> PKCS1_OAEP
 <span class="hljs-keyword">from</span> Crypto <span class="hljs-keyword">import</span> Hash
-<span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ FIND ]------------------------------------------</span>
-<span class="hljs-comment">#</span>
-ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>
-<span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ REPLACE WITH ]----------------------------------</span>
-<span class="hljs-comment">#</span>
+<span class="hljs-keyword">import</span> base64
+
+key = RSA.import_key(<span class="hljs-string">"""-----BEGIN PRIVATE KEY-----
+MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqPfgaTEWEP3S9w0t
+gsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZ
+jO9DAQIDAQABAkAgkuLEHLaqkWhLgNKagSajeobLS3rPT0Agm0f7k55FXVt743hw
+Ngkp98bMNrzy9AQ1mJGbQZGrpr4c8ZAx3aRNAiEAoxK/MgGeeLui385KJ7ZOYktj
+hLBNAB69fKwTZFsUNh0CIQEJQRpFCcydunv2bENcN/oBTRw39E8GNv2pIcNxZkcb
+NQIgbYSzn3Py6AasNj6nEtCfB+i1p3F35TK/87DlPSrmAgkCIQDJLhFoj1gbwRbH
+/bDRPrtlRUDDx44wHoEhSDRdy77eiQIgE6z/k6I+ChN1LLttwX0galITxmAYrOBh
+BVl433tgTTQ=
+-----END PRIVATE KEY-----"""</span>)
+
 ciphertext = <span class="hljs-string">"h3j3zLT2jXCaZuwF7cgUE/Zmc/5IsIfKbaTiBhpCJo86AiyuoA3Yvni+Lrm5wu2OGv2h5R7Zu3voFcHugiystw=="</span>
-<span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ FIND ]------------------------------------------</span>
-<span class="hljs-comment">#</span>
-cipher = PKCS1_v1_5.new(key)
-sentinel = Random.new().read(key.size_in_bytes())
-plaintext = cipher.decrypt(ciphertextBytes, sentinel)
-<span class="hljs-comment">#</span>
-<span class="hljs-comment">#-----[ REPLACE WITH ]----------------------------------</span>
-<span class="hljs-comment">#</span>
+
+ciphertextBytes = base64.decodebytes(ciphertext.encode(<span class="hljs-string">'ascii'</span>))
+
 cipher = PKCS1_OAEP.new(key, Hash.MD5, mgfunc = <span class="hljs-keyword">lambda</span> x,y: PKCS1_OAEP.MGF1(x, y, Hash.SHA1))
 plaintext = cipher.decrypt(ciphertextBytes)
+
+print(plaintext)
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="java"></a><a href="#java" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Java</h2>
 <h3><a class="anchor" aria-hidden="true" id="aes-128-cbc-decryption-1"></a><a href="#aes-128-cbc-decryption-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>AES-128-CBC Decryption</h3>
