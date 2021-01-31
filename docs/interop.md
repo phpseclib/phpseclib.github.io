@@ -177,6 +177,46 @@ if verifier.verify(hash, signatureBytes):
 else:
     print("bad")
 ```
+PSS signatures are supported as well. Here's the phpseclib code to sign something with PSS:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load('...')
+    //->withPadding(RSA::SIGNATURE_PSS)
+    //->withHash('sha256')
+    ->withMGFHash('sha1');
+
+echo base64_encode($key->sign('zzz'));
+```
+<sup>_(the actual key is omitted because, for this example, a larger key than the 512-bit key we've been using, is needed)_</sup>
+
+PSS signature verification with Python:
+
+```python
+from Crypto.PublicKey import RSA
+from Crypto.Signature import pss
+from Crypto import Hash
+import base64
+
+key = RSA.import_key("""-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBAM5iHBWEep6wz0o6PrD0MdmjuO2SJivi0Ik01eFZn3GuyEpUvMI1eLtH
+77wFORzI2eQTc2sGYWctEZk4k/Im91TFW0ahYyeB2m1XQ/cSY8RO9nyrWiGPJjzI
+FuePuh8dqWHT2hGDfD9CmMmz7Zb+fltmSZ3siF9XbWyUTnemQpOtAgMBAAE=
+-----END RSA PUBLIC KEY-----""")
+
+message = "zzz"
+signature = "JwqW/Xhh1hFxP5pGJAKkdVM+6WZ5FtQuPdwlmDq+pmJXknIybW4f31w7lJiBvc2VL8fNXg1DllwuwyCnErKRSygDGwdzkHJ/chvrjUequhiqoPhgKe3vQCFvJdlbeUEkF2Ho2qK5xU0VI3ViS1htDuQXJvCHm30wO+zgW9kshCE=";
+signatureBytes = base64.decodebytes(signature.encode("ascii"))
+
+hash = Hash.SHA256.new(message.encode("ascii"))
+verifier = pss.new(key, mask_func=lambda x, y: pss.MGF1(x, y, Hash.SHA1), salt_bytes=Hash.SHA256.digest_size)
+try:
+    verifier.verify(hash, signatureBytes)
+    print("good")
+except (ValueError):
+    print("bad")
+```
 
 ## Java
 
