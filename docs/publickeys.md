@@ -334,3 +334,8 @@ The exact parameters and return values depend on the algorithm being used. Check
 Due to the SSH2 tie-in a public key algorithm with parameters not supported by SSH2 will not generate a fingerprint.
 
 See [RFC4716](https://tools.ietf.org/html/rfc4716#section-4) for more information.
+
+## Comments
+Only PuTTY and OpenSSH formatted keys support comments. See [Saving Keys](publickeys.md#saving-keys) for information on saving keys.
+
+To read keys doing `$key->getComment()` is sufficient. If the loaded key is in a format that does not support keys then `NULL` will be returned.
