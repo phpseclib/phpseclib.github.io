@@ -155,20 +155,22 @@ $signature = $private-&gt;sign($message);
 <h3><a class="anchor" aria-hidden="true" id="rsasignature_relaxed_pkcs1"></a><a href="#rsasignature_relaxed_pkcs1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA::SIGNATURE_RELAXED_PKCS1</h3>
 <p>This is basically the same as PKCS1 with the caveat that the &quot;DigestInfo&quot; no longer has a fixed length.</p>
 <p><a href="https://tools.ietf.org/html/rfc8017#page-46">PKCS#1 § 9.2. EMSA-PKCS1-v1_5</a> says the following:</p>
-<pre><code class="hljs">  2.  Encode the algorithm ID for the hash function and the hash
-      value into an ASN.1 value of type DigestInfo (see
-      Appendix A.2.4) with the DER, where the type DigestInfo has
-      the syntax
-
-           DigestInfo ::= SEQUENCE {
-               digestAlgorithm AlgorithmIdentifier,
-               digest OCTET STRING
-           }
-
-      The first field identifies the hash function and the second
-      contains the hash value.  Let T be the DER encoding of the
-      DigestInfo value (see the notes below), and let tLen be the
-      length in octets of T.
+<pre><code class="hljs">   In version 1.5 of this document, T was defined as the BER
+   encoding, rather than the DER encoding, of the DigestInfo value.
+   In particular, it is possible -- at least in theory -- that the
+   verification operation defined in this document (as well as in
+   version 2.0) rejects a signature that is valid with respect to
+   the specification given in PKCS #1 v1.5.  This occurs if other
+   rules than DER are applied to DigestInfo (e.g., an indefinite
+   length encoding of the underlying SEQUENCE type).  While this is
+   unlikely to be a concern in practice, a cautious implementor may
+   choose to employ a verification operation based on a BER decoding
+   operation as specified in PKCS #1 v1.5.  In this manner,
+   compatibility with any valid implementation based on PKCS #1 v1.5
+   is obtained.  Such a verification operation should indicate
+   whether the underlying BER encoding is a DER encoding and hence
+   whether the signature is valid with respect to the specification
+   given in this document.
 </code></pre>
 <p>DER in this case refers to the <a href="https://en.wikipedia.org/wiki/X.690#DER_encoding">Distinguished Encoding Rules</a>, a subset of the <a href="https://en.wikipedia.org/wiki/X.690#BER_encoding">Basic Encoding Rules</a> (BER). Anything encoding using DER is valid BER but not everything encoded in BER is valid DER. Signatures phpseclib creates are valid DER regardless of whether or not PKCS1 or RELAXED_PKCS1 modes are used but when it comes to signature verification RELAXED_PKCS1 actually decodes the BER instead of just matching strings of fixed length.</p>
 <h2><a class="anchor" aria-hidden="true" id="encryption--decryption"></a><a href="#encryption--decryption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Encryption / Decryption</h2>
