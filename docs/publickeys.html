@@ -65,6 +65,7 @@ $key = PublicKeyLoader::load(file_get_contents(<span class="hljs-string">'/path/
 <p>The password is optional.</p>
 <p>So let's say you have a key that looks like <code>-----BEGIN PRIVATE KEY-----</code>. Is that an RSA key, a DSA key, an EC key, or what? With this approach you don't need to know what type the key is - it'll be automatically determined for you. Even passing in an X.509 certificate will work - you'll get back the public key portion of that certificate <sup style="color: red"><strong>[1]</strong></sup></p>
 <p>If a key can't be load a <code>phpseclib3\Exception\NoKeyLoadedException</code> exception will be thrown.</p>
+<p>If you know whether or not a key is a public or private but just don't know the type (eg. RSA, DSA, EC, etc) you can do <code>PublicKeyLoader::loadPublicKey()</code> or <code>PublicKeyLoader::loadPrivateKey()</code>.</p>
 <p>If you have a key that you believe should have been loadable but wasn't you can get more detailed information on why it didn't load if you know the key type (RSA, DSA, EC, etc) and the format. eg.</p>
 <pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">RSA</span>;
 
