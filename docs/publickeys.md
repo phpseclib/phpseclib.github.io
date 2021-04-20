@@ -22,6 +22,8 @@ So let's say you have a key that looks like `-----BEGIN PRIVATE KEY-----`. Is th
 
 If a key can't be load a `phpseclib3\Exception\NoKeyLoadedException` exception will be thrown.
 
+If you know whether or not a key is a public or private but just don't know the type (eg. RSA, DSA, EC, etc) you can do `PublicKeyLoader::loadPublicKey()` or `PublicKeyLoader::loadPrivateKey()`.
+
 If you have a key that you believe should have been loadable but wasn't you can get more detailed information on why it didn't load if you know the key type (RSA, DSA, EC, etc) and the format. eg.
 
 ```php
