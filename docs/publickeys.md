@@ -119,6 +119,8 @@ Private keys can be encrypted (in formats that support encryption) by doing `$ke
 
 Note that loading a key and then saving it may not yield the exact same sequence of bytes. In the case of encrypted keys, even though the password is preserved, the encryption parameters are not. So a PKCS8 key using pbeWithSHAAnd3-KeyTripleDES-CBC will be saved using id-PBES2 / aes128-CBC-PAD, unless you changed it. And even if you did load a id-PBES2 / aes128-CBC-PAD key the salt is randomly generated. OpenSSH keys have two random "checkint"'s that are supposed to match, ASN.1 encoded keys may have optional defaults that can either be explicitly or implicitly encoded, etc.
 
+If you want to save an encrypted private key _without_ encryption then you'll need to do `$key->withPassword()`.
+
 ### PKCS1
 
 By default, PKCS1 private keys uses AES-128-CBC as the encryption algorithm / mode. This can be configured thusly:
