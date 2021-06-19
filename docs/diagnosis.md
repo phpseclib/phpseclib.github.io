@@ -3,6 +3,19 @@ id: diagnosis
 title: Diagnosing Issues
 ---
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/js/jquery.treeview.js"></script>
+<link rel="stylesheet" href="/css/jquery.treeview.css">
+<script>
+$(document).ready(function() {
+  $('.printr').treeview({
+     persist: "location",
+     collapsed: true,
+     unique: true
+   });
+})
+</script>
+
 ## Exceptions
 
 Exceptions are thrown whenever a `bool(true)` or a `bool(false)` is insufficient to capture the error.
@@ -95,3 +108,20 @@ define('NET_SFTP_LOGGING', SFTP::LOG_COMPLEX);
 ```
 
 The logging options are largely the same as they are for SSH2, with the caveat that there is no analog to `SSH2::LOG_REALTIME_FILE`.
+
+## getSupportedVersions()
+
+There are seven different versions of SFTP that are defined (v0 through v6). OpenSSH only supports one version (v3) but some SFTP servers (eg. Syncplify.me Server!<sup style="color: red"><strong>[1]</strong></sup>) can be configured to support all versions.
+
+SFTP servers that support multiple versions will have a default version (usually v3) and will specifiy what other SFTP versions they support through the use of an extension.
+
+When muliple verisons of SFTP are supported here's what the output of this method will look like:
+
+<ul class="printr" style="margin-bottom: 15px"><li><span class="name">version</span><ul><li>3</li></ul></li><li><span class="name">extensions</span><ul><li>3,4,5,6</li></ul></li></ul>
+
+If only one version of SFTP is supported then the extensions key will most likely not be present.
+
+<div style="font-size: 11px">
+
+<sup style="color: red"><strong>[1]</strong></sup> If Syncplify, Inc. or any other organization that makes an SFTP server that supports multiple versions of SFTP wants me to actually include a hyperlink to them I'd be willing to do so for $5.00 / month [via Patreon](https://www.patreon.com/phpseclib).
+</div>
