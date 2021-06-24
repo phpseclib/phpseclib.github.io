@@ -300,7 +300,6 @@ $pubKey = $privKey-&gt;getPublicKey();
 
 $subject = <span class="hljs-keyword">new</span> X509;
 $subject-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib demo cert'</span>);
-
 $subject-&gt;setPublicKey($pubKey);
 
 $issuer = <span class="hljs-keyword">new</span> X509;
