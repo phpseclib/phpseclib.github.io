@@ -254,6 +254,7 @@ See [Permissions](#permissions) for more information on `mode` or `fileperms()`.
 $sftp->delete('filename.remote'); // deletes directories recursively
 // non-recursive delete
 $sftp->delete('dirname.remote', false);
+// rename() return false if newname.remote already exists
 $sftp->rename('filename.remote', 'newname.remote');
 ```
 
