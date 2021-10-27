@@ -123,7 +123,7 @@ You can tell phpseclib which algorithms you'd like to use by doing `$ssh->setPre
 | Index | Meaning | Supported Values |
 |---|---|---|
 | crypt | List of crypto methods to advertise, comma separated in order of preference. | _aes128-gcm[]()@openssh.com_, _aes256-gcm[]()@openssh.com_, _arcfour256_, _arcfour128_, _aes128-ctr_, _aes192-ctr_, _aes256-ctr_, _chacha20-poly1305[]()@openssh.com_, _twofish128-ctr_, _twofish192-ctr_, _twofish256-ctr_, _aes128-cbc_, _aes192-cbc_, _aes256-cbc_, _twofish128-cbc_, _twofish192-cbc_, _twofish256-cbc_, _twofish-cbc_, _blowfish-ctr_, _blowfish-cbc_, _3des-ctr_, _3des-cbc_. Pretty much anything returned by `$ssh->getSupportedEncryptionAlgorithms()` |
-| comp | List of compression methods to advertise, comma separated in order of preference. | _none_. Pretty much anything returned by `$ssh->getSupportedCompressionAlgorithms()` |
+| comp | List of compression methods to advertise, comma separated in order of preference. | _none_, _zlib[]()@openssh.com_, _zlib_ <sup style="color: red"><strong>[1]</strong></sup>. Pretty much anything returned by `$ssh->getSupportedCompressionAlgorithms()` |
 | mac | List of MAC methods to advertise, comma separated in order of preference. | _hmac-sha2-256-etm[]()@openssh.com_, _hmac-sha2-512-etm[]()@openssh.com_, _umac-64-etm[]()@openssh.com_, _umac-128-etm[]()@openssh.com_, _hmac-sha1-etm[]()@openssh.com_, _hmac-sha2-256_, _hmac-sha2-512_, _umac-64[]()@openssh.com_, _umac-128[]()@openssh.com_, _hmac-sha1-96_, _hmac-sha1_, _hmac-md5-96_, _hmac-md5_. Pretty much anything returned by `$ssh->getSupportedMACAlgorithms()` |
 
 Note that a given algorithm will only be used if it's supported by both phpseclib and the server. The algorithms that the server supports can be determined by doing `$ssh->getServerAlgorithms()`. The algorithms that ultimately wind up being used can be determined by doing `$ssh->getAlgorithmsNegotiated()`.
@@ -131,3 +131,8 @@ Note that a given algorithm will only be used if it's supported by both phpsecli
 Using a custom cipher suite is not recommended. phpseclib's prioritization of algorithms is intended to maximize speed and security. For example, if OpenSSL is installed and you're using PHP >= 7.1.0 then _aes128-gcm[]()@openssh.com_ will be the preferred algorithm. If (1) OpenSSL is not installed or you're using PHP < 7.1.0 BUT (2) libsodium is installed, then _aes256-gcm[]()@openssh.com_ will be the preferred algorithm. You can make either of those the preferred algorithms even if neither OpenSSL or libsodium are installed but your connection will be slowed down because the pure-PHP implemenation of both of those is not nearly as fast as OpenSSL / libsodium.
 
 _chacha20-poly1305[]()@openssh.com_ is the latest hotness in the cryptographic community but it is not prioritized higher because (1) while OpenSSL supports ChaCha20, it doens't support Poly1305 and (2) libsodium doesn't use Poly1305 in the same way that SSH uses it. Despite that, _chacha20-poly1305[]()@openssh.com_ is still pretty fast but not as fast as some of the other available algorithms.
+
+<div style="font-size: 11px">
+
+<sup style="color: red"><strong>[1]</strong></sup> _zlib[]()@openssh.com_ and _zlib_ support were introduced in phpseclib v3.0.11 and require PHP 7.0 and that the [zlib extension be installed](https://www.php.net/manual/en/zlib.installation.php) (until such time that a shim can be written).
+</div>
