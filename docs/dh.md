@@ -74,8 +74,8 @@ The following named primes are supported:
 
 | Name | Ref |
 |---|---|
-| diffie-hellman-group1-sha1 | [RFC2409](http://tools.ietf.org/html/rfc2409#section-6.2) |
-| diffie-hellman-group14-sha1 | [RFC3526](http://tools.ietf.org/html/rfc3526#section-3) |
+| diffie-hellman-group1-sha1 | [RFC2409](https://tools.ietf.org/html/rfc2409#section-6.2) |
+| diffie-hellman-group14-sha1 | [RFC3526](https://tools.ietf.org/html/rfc3526#section-3) |
 | diffie-hellman-group14-sha256 | [RFC3526](https://tools.ietf.org/html/rfc3526#section-3) |
 | diffie-hellman-group15-sha512 | [RFC3526](https://tools.ietf.org/html/rfc3526#section-4) |
 | diffie-hellman-group16-sha512 | [RFC3526](https://tools.ietf.org/html/rfc3526#section-5) |
