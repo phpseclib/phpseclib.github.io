@@ -4,8 +4,7 @@
       "why",
       "install",
       "compat",
-      "benchmarks",
-      "interop"
+      "benchmarks"
     ],
     "SSH2": [
       "connect",
@@ -29,6 +28,16 @@
       "csr",
       "spkac",
       "crl"
+    ],
+    "Interoperability": [
+      "interop",
+      "python",
+      "java",
+      "javascript",
+      "nodejs",
+      "csharp",
+      "c",
+      "php"
     ]
   }
 }
