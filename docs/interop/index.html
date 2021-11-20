@@ -897,8 +897,89 @@ v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
 
         rsa.ImportRSAPrivateKey(keyBytes, <span class="hljs-keyword">out</span> _);
 </code></pre>
-<p>OAEP encryption is also supported.</p>
-<p>To load PKCS8 formatted keys <a href="https://www.bouncycastle.org/csharp/index.html">BouncyCastle</a> can be used.</p>
+<p><a href="https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsa.importpkcs8privatekey">ImportPkcs8PrivateKey</a> can be used to load PKCS8 formatted keys.</p>
+<p>Now let us consider OAEP decryption. Here's the phpseclib to generate OAEP encrypted strings:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key
+    <span class="hljs-comment">//-&gt;withPadding(RSA::ENCRYPTION_OAEP)</span>
+    -&gt;withHash(<span class="hljs-string">'sha1'</span>)
+    -&gt;withMGFHash(<span class="hljs-string">'sha1'</span>);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p><sup><em>(sha1 is being used because the key is a 512-bit key from <a href="/docs/rsa-keys">Sample RSA Keys</a>; 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a>)</em></sup></p>
+<p>Here are the modifications we need to do to the above C# program to perform OAEP decryption:</p>
+<pre><code class="hljs css language-c#"><span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ REPLACE WITH ]----------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> ciphertext = <span class="hljs-string">"XZ/zwGTyLwm3S1A2N7vg87qlpqtqB4sLo5t6BlayLIfW3kICEiol46ryz/oSsOypAH6GKxcn5TvQF/gJvMOFBg=="</span>;
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ FIND ]------------------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> plaintextBytes = rsa.Decrypt(ciphertextBytes, RSAEncryptionPadding.Pkcs1);
+<span class="hljs-meta">#</span>
+<span class="hljs-meta">#-----[ REPLACE WITH ]----------------------------------</span>
+<span class="hljs-meta">#</span>
+        <span class="hljs-keyword">var</span> plaintextBytes = rsa.Decrypt(ciphertextBytes, RSAEncryptionPadding.OaepSHA1);
+</code></pre>
+<p>If you want or need to use non-matching MGFHash and Hash algorithms in OAEP then you'll need to use <a href="https://www.bouncycastle.org/csharp/index.html">BouncyCastle</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="rsa-signature-verification-2"></a><a href="#rsa-signature-verification-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Signature Verification</h3>
+<p>Signature creation with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----'</span>)
+    <span class="hljs-comment">//-&gt;withHash('sha256')</span>
+    -&gt;withPadding(RSA::SIGNATURE_PKCS1);
+
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;sign(<span class="hljs-string">'zzz'</span>));
+</code></pre>
+<p>Signature verification with C#:</p>
+<pre><code class="hljs css language-c#"><span class="hljs-keyword">using</span> System;
+<span class="hljs-keyword">using</span> System.Security.Cryptography;
+<span class="hljs-keyword">using</span> System.Text;
+<span class="hljs-keyword">using</span> System.Text.RegularExpressions;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title">Test</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"></span>)</span>
+    {
+        <span class="hljs-keyword">var</span> key = <span class="hljs-string">@"&lt;RSAKeyValue&gt;
+  &lt;Modulus&gt;qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==&lt;/Modulus&gt;
+  &lt;Exponent&gt;AQAB&lt;/Exponent&gt;
+&lt;/RSAKeyValue&gt;"</span>;
+
+        <span class="hljs-keyword">var</span> signature = <span class="hljs-string">"MUE536c4UJSAmycs7V6qFaLMATrKMQA8TYj5xX1+fwHINz3/BafgaRt0ycoD5IxTxaclLWavrGSza4xSBHraEw=="</span>;
+        <span class="hljs-keyword">var</span> data = <span class="hljs-string">"zzz"</span>;
+
+        <span class="hljs-keyword">var</span> signatureBytes = Convert.FromBase64String(signature);
+        <span class="hljs-keyword">var</span> dataBytes = Encoding.ASCII.GetBytes(data);
+
+        <span class="hljs-keyword">var</span> rsa = RSA.Create();
+        rsa.FromXmlString(key);
+
+        <span class="hljs-keyword">var</span> result = rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+        Console.WriteLine(result ? <span class="hljs-string">"valid"</span> : <span class="hljs-string">"invalid"</span>);
+    }
+}
+</code></pre>
+<p>Using <a href="https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsapkcs1signaturedeformatter?view=netcore-3.0">RSAPKCS1SignatureDeformatter</a> is not recommended because that class requires you hash the data and then compare that to the hash in the signature. ie. it's more steps and more opportunities to screw up.</p>
 <h2><a class="anchor" aria-hidden="true" id="c-1"></a><a href="#c-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>C</h2>
 <p>All C code samples use <a href="https://en.wikipedia.org/wiki/OpenSSL">OpenSSL</a>.</p>
 <h3><a class="anchor" aria-hidden="true" id="rsa-decryption-4"></a><a href="#rsa-decryption-4" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h3>
@@ -1063,7 +1144,7 @@ openssl_private_decrypt(base64_decode($ciphertext), $plaintext, $private, OPENSS
 <span class="hljs-keyword">echo</span> $plaintext;
 </code></pre>
 <p>OAEP padding is supported but <a href="https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466">only with sha1 as the hash / MGF hash</a> (no doubt because php-src is using OpenSSL's <a href="https://www.openssl.org/docs/man1.0.2/man3/RSA_private_decrypt.html">RSA_private_decrypt</a> is being used as opposed to OpenSSL's newer <a href="https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_decrypt.html">EVP_PKEY_decrypt</a>)</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/benchmarks"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/docs/connect"><span>Connecting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#python">Python</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption">RSA Decryption</a></li><li><a href="#rsa-signature-verification">RSA Signature Verification</a></li></ul></li><li><a href="#java">Java</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-1">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-1">RSA Decryption</a></li><li><a href="#rsa-signature-verification-1">RSA Signature Verification</a></li></ul></li><li><a href="#javascript">JavaScript</a><ul class="toc-headings"><li><a href="#rsa-decryption-with-web-crypto-api">RSA Decryption with Web Crypto API</a></li></ul></li><li><a href="#nodejs">Node.js</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-with-cryptojs">AES-128-CBC Decryption with CryptoJS</a></li><li><a href="#rsa-decryption-2">RSA Decryption</a></li><li><a href="#rsa-decryption-with-nodersa">RSA Decryption with NodeRSA</a></li></ul></li><li><a href="#c">C#</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-2">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-3">RSA Decryption</a></li></ul></li><li><a href="#c-1">C</a><ul class="toc-headings"><li><a href="#rsa-decryption-4">RSA Decryption</a></li></ul></li><li><a href="#php">PHP</a><ul class="toc-headings"><li><a href="#rsa-decryption-5">RSA Decryption</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><section class="copyright">Copyright © 2021 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/benchmarks"><span class="arrow-prev">← </span><span>Previous</span></a><a class="docs-next button" href="/docs/connect"><span>Connecting</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#python">Python</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption">RSA Decryption</a></li><li><a href="#rsa-signature-verification">RSA Signature Verification</a></li></ul></li><li><a href="#java">Java</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-1">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-1">RSA Decryption</a></li><li><a href="#rsa-signature-verification-1">RSA Signature Verification</a></li></ul></li><li><a href="#javascript">JavaScript</a><ul class="toc-headings"><li><a href="#rsa-decryption-with-web-crypto-api">RSA Decryption with Web Crypto API</a></li></ul></li><li><a href="#nodejs">Node.js</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-with-cryptojs">AES-128-CBC Decryption with CryptoJS</a></li><li><a href="#rsa-decryption-2">RSA Decryption</a></li><li><a href="#rsa-decryption-with-nodersa">RSA Decryption with NodeRSA</a></li></ul></li><li><a href="#c">C#</a><ul class="toc-headings"><li><a href="#aes-128-cbc-decryption-2">AES-128-CBC Decryption</a></li><li><a href="#rsa-decryption-3">RSA Decryption</a></li><li><a href="#rsa-signature-verification-2">RSA Signature Verification</a></li></ul></li><li><a href="#c-1">C</a><ul class="toc-headings"><li><a href="#rsa-decryption-4">RSA Decryption</a></li></ul></li><li><a href="#php">PHP</a><ul class="toc-headings"><li><a href="#rsa-decryption-5">RSA Decryption</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><section class="copyright">Copyright © 2021 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
