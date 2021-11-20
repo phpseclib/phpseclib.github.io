@@ -973,9 +973,102 @@ v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
 
         rsa.ImportRSAPrivateKey(keyBytes, out _);
 ```
-OAEP encryption is also supported.
+[ImportPkcs8PrivateKey](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsa.importpkcs8privatekey) can be used to load PKCS8 formatted keys.
 
-To load PKCS8 formatted keys [BouncyCastle](https://www.bouncycastle.org/csharp/index.html) can be used.
+Now let us consider OAEP decryption. Here's the phpseclib to generate OAEP encrypted strings:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----');
+$key = $key
+    //->withPadding(RSA::ENCRYPTION_OAEP)
+    ->withHash('sha1')
+    ->withMGFHash('sha1');
+echo base64_encode($key->encrypt('test'));
+```
+<sup>_(sha1 is being used because the key is a 512-bit key from [Sample RSA Keys](/docs/rsa-keys); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](/docs/rsa#rsaencryption_oaep))_</sup>
+
+Here are the modifications we need to do to the above C# program to perform OAEP decryption:
+
+```c#
+#
+#-----[ FIND ]------------------------------------------
+#
+        var ciphertext = "L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ==";
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        var ciphertext = "XZ/zwGTyLwm3S1A2N7vg87qlpqtqB4sLo5t6BlayLIfW3kICEiol46ryz/oSsOypAH6GKxcn5TvQF/gJvMOFBg==";
+#
+#-----[ FIND ]------------------------------------------
+#
+        var plaintextBytes = rsa.Decrypt(ciphertextBytes, RSAEncryptionPadding.Pkcs1);
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        var plaintextBytes = rsa.Decrypt(ciphertextBytes, RSAEncryptionPadding.OaepSHA1);
+```
+If you want or need to use non-matching MGFHash and Hash algorithms in OAEP then you'll need to use [BouncyCastle](https://www.bouncycastle.org/csharp/index.html).
+
+### RSA Signature Verification
+
+Signature creation with PHP:
+
+```php
+use phpseclib3\Crypt\PublicKeyLoader;
+
+$key = PublicKeyLoader::load('-----BEGIN RSA PRIVATE KEY-----
+MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
+KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm
+o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k
+TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7
+9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy
+v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
+/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00
+-----END RSA PRIVATE KEY-----')
+    //->withHash('sha256')
+    ->withPadding(RSA::SIGNATURE_PKCS1);
+
+echo base64_encode($key->sign('zzz'));
+```
+
+Signature verification with C#:
+
+```c#
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+
+class Test
+{
+    static void Main()
+    {
+        var key = @"<RSAKeyValue>
+  <Modulus>qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==</Modulus>
+  <Exponent>AQAB</Exponent>
+</RSAKeyValue>";
+
+        var signature = "MUE536c4UJSAmycs7V6qFaLMATrKMQA8TYj5xX1+fwHINz3/BafgaRt0ycoD5IxTxaclLWavrGSza4xSBHraEw==";
+        var data = "zzz";
+
+        var signatureBytes = Convert.FromBase64String(signature);
+        var dataBytes = Encoding.ASCII.GetBytes(data);
+
+        var rsa = RSA.Create();
+        rsa.FromXmlString(key);
+
+        var result = rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+        Console.WriteLine(result ? "valid" : "invalid");
+    }
+}
+```
+Using [RSAPKCS1SignatureDeformatter](https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsapkcs1signaturedeformatter?view=netcore-3.0) is not recommended because that class requires you hash the data and then compare that to the hash in the signature. ie. it's more steps and more opportunities to screw up.
 
 ## C
 
