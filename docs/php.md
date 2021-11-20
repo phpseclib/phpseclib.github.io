@@ -41,4 +41,4 @@ openssl_private_decrypt(base64_decode($ciphertext), $plaintext, $private, OPENSS
 
 echo $plaintext;
 ```
-OAEP padding is supported but [only with sha1 as the hash / MGF hash](https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466) (no doubt because php-src is using OpenSSL's [RSA_private_decrypt](https://www.openssl.org/docs/man1.0.2/man3/RSA_private_decrypt.html) is being used as opposed to OpenSSL's newer [EVP_PKEY_decrypt](https://www.openssl.org/docs/man1.0.2/man3/EVP_PKEY_decrypt.html))
+OAEP padding is supported but [only with sha1 as the hash / MGF hash](https://www.php.net/manual/en/function.openssl-public-encrypt.php#118466) (no doubt because php-src is using OpenSSL's [RSA_private_decrypt](https://www.openssl.org/docs/man1.1.1/man3/RSA_private_decrypt.html) is being used as opposed to OpenSSL's newer [EVP_PKEY_decrypt](https://www.openssl.org/docs/man1.1.1/man3/EVP_PKEY_decrypt.html))
