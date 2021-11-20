@@ -1,0 +1,206 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>C · phpseclib</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="All C code samples use [OpenSSL](https://en.wikipedia.org/wiki/OpenSSL)."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="C · phpseclib"/><meta property="og:type" content="website"/><meta property="og:url" content="https://phpseclib.com/"/><meta property="og:description" content="All C code samples use [OpenSSL](https://en.wikipedia.org/wiki/OpenSSL)."/><meta property="og:image" content="https://phpseclib.com/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://phpseclib.com/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="phpseclib"/><h2 class="headerTitleWithLogo">phpseclib</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/why" target="_self">Docs</a></li><li class=""><a href="https://api.phpseclib.com" target="_self">API</a></li><li class=""><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_self">Support</a></li><li class=""><a href="https://github.com/phpseclib/phpseclib" target="_self">GitHub</a></li><li class=""><a href="/docs/for-enterprise" target="_self">For Enterprise</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Interoperability</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/why">Why phpseclib?</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">SSH2</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/connect">Connecting</a></li><li class="navListItem"><a class="navItem" href="/docs/auth">Authenticating</a></li><li class="navListItem"><a class="navItem" href="/docs/commands">Running Commands</a></li><li class="navListItem"><a class="navItem" href="/docs/sftp">SFTP</a></li><li class="navListItem"><a class="navItem" href="/docs/diagnosis">Diagnosing Issues</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Public Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/publickeys">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/rsa">RSA</a></li><li class="navListItem"><a class="navItem" href="/docs/dsa">DSA</a></li><li class="navListItem"><a class="navItem" href="/docs/ec">Elliptic Curves</a></li><li class="navListItem"><a class="navItem" href="/docs/dh">(EC)DH</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Symmetric Keys</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/symmetric">Overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">X.509</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/x509">X.509</a></li><li class="navListItem"><a class="navItem" href="/docs/csr">CSR</a></li><li class="navListItem"><a class="navItem" href="/docs/spkac">SPKAC</a></li><li class="navListItem"><a class="navItem" href="/docs/crl">CRL</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Interoperability</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/interop">Overview</a></li><li class="navListItem"><a class="navItem" href="/docs/python">Python</a></li><li class="navListItem"><a class="navItem" href="/docs/java">Java</a></li><li class="navListItem"><a class="navItem" href="/docs/javascript">JavaScript</a></li><li class="navListItem"><a class="navItem" href="/docs/nodejs">Node.js</a></li><li class="navListItem"><a class="navItem" href="/docs/csharp">C#</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/c">C</a></li><li class="navListItem"><a class="navItem" href="/docs/php">PHP</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">C</h1></header><article><div><span><p>All C code samples use <a href="https://en.wikipedia.org/wiki/OpenSSL">OpenSSL</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="rsa-decryption"></a><a href="#rsa-decryption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RSA Decryption</h2>
+<p>Encryption with PHP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key-&gt;withPadding(RSA::ENCRYPTION_PKCS1);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p>Decryption with C:</p>
+<!-- gcc -x c test.c -lcrypto && ./a.out -->
+<pre><code class="hljs css language-c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/evp.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/pem.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span> <span class="hljs-params">(<span class="hljs-keyword">void</span>)</span>
+</span>{
+    <span class="hljs-keyword">char</span> privateKey[] = <span class="hljs-string">"-----BEGIN RSA PRIVATE KEY-----\n"</span>\
+<span class="hljs-string">"MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\n"</span>\
+<span class="hljs-string">"KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\n"</span>\
+<span class="hljs-string">"o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\n"</span>\
+<span class="hljs-string">"TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\n"</span>\
+<span class="hljs-string">"9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\n"</span>\
+<span class="hljs-string">"v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\n"</span>\
+<span class="hljs-string">"/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00\n"</span>\
+<span class="hljs-string">"-----END RSA PRIVATE KEY-----\n"</span>;
+    <span class="hljs-keyword">char</span> ciphertext[] = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+    <span class="hljs-comment">// base64 decode ciphertext</span>
+    EVP_DecodeBlock(ciphertext, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+
+    BIO* bo = BIO_new(BIO_s_mem());
+    BIO_write(bo, privateKey, <span class="hljs-built_in">strlen</span>(privateKey));
+    EVP_PKEY* pkey = <span class="hljs-number">0</span>;
+    PEM_read_bio_PrivateKey(bo, &amp;pkey, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+    BIO_free(bo);
+
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(pkey, <span class="hljs-literal">NULL</span>);
+    EVP_PKEY_decrypt_init(ctx);
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_padding_mode"</span>, <span class="hljs-string">"pkcs1"</span>);
+
+    <span class="hljs-keyword">size_t</span> plaintext_len;
+    <span class="hljs-keyword">unsigned</span> <span class="hljs-keyword">char</span>* plaintext;
+
+    <span class="hljs-comment">// determine output size</span>
+    EVP_PKEY_decrypt(ctx, <span class="hljs-literal">NULL</span>, &amp;plaintext_len, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+
+    <span class="hljs-comment">// allocate memory (+1 for terminating null-character)</span>
+    plaintext = OPENSSL_malloc(plaintext_len + <span class="hljs-number">1</span>);
+    EVP_PKEY_decrypt(ctx, plaintext, &amp;plaintext_len, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+    plaintext[plaintext_len] = <span class="hljs-string">'\0'</span>; <span class="hljs-comment">// required for %s</span>
+
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s\n"</span>, plaintext);
+}
+</code></pre>
+<p>PKCS8 private keys can be loaded using this technique as well. OAEP is also supported.</p>
+<p>Here's the phpseclib code to encrypt something with OAEP:</p>
+<pre><code class="hljs css language-php"><span class="hljs-keyword">use</span> <span class="hljs-title">phpseclib3</span>\<span class="hljs-title">Crypt</span>\<span class="hljs-title">PublicKeyLoader</span>;
+
+$key = PublicKeyLoader::load(<span class="hljs-string">'-----BEGIN RSA PUBLIC KEY-----
+MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
+S30WAvQCCo2yU1orfgqr41mM70MBAgMBAAE=
+-----END RSA PUBLIC KEY-----'</span>);
+$key = $key
+    <span class="hljs-comment">//-&gt;withPadding(RSA::ENCRYPTION_OAEP)</span>
+    -&gt;withHash(<span class="hljs-string">'md5'</span>)
+    -&gt;withMGFHash(<span class="hljs-string">'sha1'</span>);
+<span class="hljs-keyword">echo</span> base64_encode($key-&gt;encrypt(<span class="hljs-string">'test'</span>));
+</code></pre>
+<p><sup><em>(sha1 is being used because the key is a 512-bit key from <a href="/docs/rsa-keys">Sample RSA Keys</a>; 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at <a href="/docs/rsa#rsaencryption_oaep">RSA::ENCRYPTION_OAEP</a>)</em></sup></p>
+<p>To decrypt that with C / OpenSSL you'll need to make the following changes to the above C code (using the <a href="https://wiki.phpbb.com/MOD_Text_Template">phpBB MOD Text Template</a>):</p>
+<pre><code class="hljs css language-c">#
+#-----[ FIND ]------------------------------------------
+<span class="hljs-meta">#
+    char ciphertext[] = <span class="hljs-meta-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;</span>
+#
+#-----[ REPLACE WITH ]----------------------------------
+<span class="hljs-meta">#
+    char ciphertext[] = <span class="hljs-meta-string">"h3j3zLT2jXCaZuwF7cgUE/Zmc/5IsIfKbaTiBhpCJo86AiyuoA3Yvni+Lrm5wu2OGv2h5R7Zu3voFcHugiystw=="</span>;</span>
+#
+#-----[ FIND ]------------------------------------------
+#
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_padding_mode"</span>, <span class="hljs-string">"pkcs1"</span>);
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_padding_mode"</span>, <span class="hljs-string">"oaep"</span>);
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_oaep_md"</span>, <span class="hljs-string">"md5"</span>);
+    EVP_PKEY_CTX_ctrl_str(ctx, <span class="hljs-string">"rsa_mgf1_md"</span>, <span class="hljs-string">"sha1"</span>);
+    <span class="hljs-comment">//EVP_PKEY_CTX_ctrl_str(ctx, "rsa_oaep_label", "");</span>
+</code></pre>
+<p>The parameters passed to <code>EVP_PKEY_CTX_ctrl_str</code> correspond to the <a href="https://www.openssl.org/docs/man1.1.1/man1/openssl-pkeyutl.html">pkeyopt values in pkeyutil</a>.</p>
+<p>An older API for decrypting RSA does exist but the hash and the MGF hash are hard-coded as sha1 for OAEP (which are the <a href="https://datatracker.ietf.org/doc/html/rfc8017#appendix-A.2.1">default values in the ASN.1 definition of RSAES-OAEP-params in PKCS1</a>).</p>
+<p>Here's an example of PKCS1 decryption with that older API:</p>
+<pre><code class="hljs css language-c"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/evp.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;openssl/pem.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;string.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span> <span class="hljs-params">(<span class="hljs-keyword">void</span>)</span>
+</span>{
+    <span class="hljs-keyword">char</span> privateKey[] = <span class="hljs-string">"-----BEGIN RSA PRIVATE KEY-----\n"</span>\
+<span class="hljs-string">"MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu\n"</span>\
+<span class="hljs-string">"KUpRKfFLfRYC9AIKjbJTWit+CqvjWYzvQwECAwEAAQJAIJLixBy2qpFoS4DSmoEm\n"</span>\
+<span class="hljs-string">"o3qGy0t6z09AIJtH+5OeRV1be+N4cDYJKffGzDa88vQENZiRm0GRq6a+HPGQMd2k\n"</span>\
+<span class="hljs-string">"TQIhAKMSvzIBnni7ot/OSie2TmJLY4SwTQAevXysE2RbFDYdAiEBCUEaRQnMnbp7\n"</span>\
+<span class="hljs-string">"9mxDXDf6AU0cN/RPBjb9qSHDcWZHGzUCIG2Es59z8ugGrDY+pxLQnwfotadxd+Uy\n"</span>\
+<span class="hljs-string">"v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs\n"</span>\
+<span class="hljs-string">"/5OiPgoTdSy7bcF9IGpSE8ZgGKzgYQVZeN97YE00\n"</span>\
+<span class="hljs-string">"-----END RSA PRIVATE KEY-----\n"</span>;
+    <span class="hljs-keyword">char</span> ciphertext[] = <span class="hljs-string">"L812/9Y8TSpwErlLR6Bz4J3uR/T5YaqtTtB5jxtD1qazGPI5t15V9drWi58colGOZFeCnGKpCrtQWKk4HWRocQ=="</span>;
+
+    <span class="hljs-comment">// base64 decode ciphertext</span>
+    EVP_DecodeBlock(ciphertext, ciphertext, <span class="hljs-built_in">strlen</span>(ciphertext));
+
+    BIO* bo = BIO_new(BIO_s_mem());
+    BIO_write(bo, privateKey, <span class="hljs-built_in">strlen</span>(privateKey));
+    EVP_PKEY* pkey = <span class="hljs-number">0</span>;
+    PEM_read_bio_PrivateKey(bo, &amp;pkey, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+    BIO_free(bo);
+    RSA* rsa = EVP_PKEY_get1_RSA(pkey);
+    <span class="hljs-keyword">char</span> plaintext[RSA_size(rsa)];
+
+    RSA_private_decrypt(<span class="hljs-built_in">strlen</span>(ciphertext), ciphertext, plaintext, rsa, RSA_PKCS1_PADDING);
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">"%s\n"</span>, plaintext);
+}
+</code></pre>
+<p>To do OAEP with that API you'd swap out <code>RSA_PKCS1_PADDING</code> with <code>RSA_PKCS1_OAEP_PADDING</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/csharp"><span class="arrow-prev">← </span><span>C#</span></a><a class="docs-next button" href="/docs/php"><span>PHP</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#rsa-decryption">RSA Decryption</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="phpseclib" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/why">Introduction</a><a href="/docs/en/connect">SSH2 / SFTP</a><a href="/docs/en/publickeys">Public Key Crypto</a><a href="/docs/en/symmetric">Symmetric Key Crypto</a><a href="/docs/en/x509">X.509 / CSR / SPKAC / CRL</a></div><div><h5>Support</h5><a href="http://phpseclib.sourceforge.net/">Docs (1.0 / 2.0)</a><a href="https://stackoverflow.com/questions/tagged/phpseclib" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://github.com/phpseclib/phpseclib">GitHub</a><a class="github-button" href="https://github.com/phpseclib/phpseclib" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Sponsor</h5><a href="https://patreon.com/phpseclib" target="_blank" rel="noreferrer noopener">Patreon</a><a href="https://github.com/sponsors/terrafrost" target="_blank" rel="noreferrer noopener">GitHub</a><a href="https://sourceforge.net/donate/index.php?group_id=198487" target="_blank" rel="noreferrer noopener">PayPal</a></div></section><section class="copyright">Copyright © 2021 Jim Wigginton</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '981175a1328b86301b68efbff3a39ce8',
+                indexName: 'phpseclib',
+                inputSelector: '#search_input_react',
+                algoliaOptions: {}
+              });
+            </script></body></html>
