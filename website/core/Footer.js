@@ -52,6 +52,9 @@ class Footer extends React.Component {
             <a href={this.docUrl('x509', this.props.language)}>
               X.509 / CSR / SPKAC / CRL
             </a>
+            <a href={this.docUrl('interop', this.props.language)}>
+              Interoperability
+            </a>
           </div>
           <div>
             <h5>Support</h5>
