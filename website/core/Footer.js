@@ -37,22 +37,22 @@ class Footer extends React.Component {
           </a>
           <div>
             <h5>Docs</h5>
-            <a href={this.docUrl('why', this.props.language)}>
+            <a href={this.docUrl('why')}>
               Introduction
             </a>
-            <a href={this.docUrl('connect', this.props.language)}>
+            <a href={this.docUrl('connect')}>
               SSH2 / SFTP
             </a>
-            <a href={this.docUrl('publickeys', this.props.language)}>
+            <a href={this.docUrl('publickeys')}>
               Public Key Crypto
             </a>
-            <a href={this.docUrl('symmetric', this.props.language)}>
+            <a href={this.docUrl('symmetric')}>
               Symmetric Key Crypto
             </a>
-            <a href={this.docUrl('x509', this.props.language)}>
+            <a href={this.docUrl('x509')}>
               X.509 / CSR / SPKAC / CRL
             </a>
-            <a href={this.docUrl('interop', this.props.language)}>
+            <a href={this.docUrl('interop')}>
               Interoperability
             </a>
           </div>
