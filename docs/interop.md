@@ -25,7 +25,7 @@ In the RSA examples, a 512-bit key is used for brevity, but this also means that
 
 ## Common Themes
 
-Java and C have two different API's for working with RSA. So early on the [PKCS1 standards](https://en.wikipedia.org/wiki/PKCS_1) just had the eponymously named PKCS1 encryption scheme and the PKCS1 signature scheme. PKCS1 signatures took one parameter - the signature algorithm. PKCS1 encryption didn't take any parameters. The OAEP padding scheme was introduced in September 1998 in PKCS1 v2.0 and introduced three parameters: Hash, MGF Hash and Label. The problem is that the function definitions were already set in stone and couldn't easily be changed.
+Java and C have two different API's for working with RSA. So early on the [PKCS1 standards](https://en.wikipedia.org/wiki/PKCS_1) just had the eponymously named PKCS1 encryption scheme and the PKCS1 signature scheme. PKCS1 signatures took one parameter - the hash algorithm. PKCS1 encryption didn't take any parameters. The OAEP padding scheme was introduced in September 1998 in PKCS1 v2.0 and introduced three parameters: Hash, MGF Hash and Label. The problem is that the function definitions were already set in stone and couldn't easily be changed.
 
 C's `RSA_public_encrypt` and `RSA_private_decrypt` already had a `padding` parameter so they just added a new constant that could be passed to that parameter - `RSA_PKCS1_OAEP_PADDING`. This new constant would utilize the [default values in the ASN.1 definition of RSAES-OAEP-params in PKCS1](https://datatracker.ietf.org/doc/html/rfc8017#appendix-A.2.1) - sha1 for both the Hash and MGF Hash and an empty label.
 
