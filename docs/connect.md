@@ -134,5 +134,5 @@ _chacha20-poly1305[]()@openssh.com_ is the latest hotness in the cryptographic c
 
 <div style="font-size: 11px">
 
-<sup style="color: red"><strong>[1]</strong></sup> _zlib[]()@openssh.com_ and _zlib_ support were introduced in phpseclib v3.0.11 and require PHP 7.0 and that the [zlib extension be installed](https://www.php.net/manual/en/zlib.installation.php) (until such time that a shim can be written).
+<sup style="color: red"><strong>[1]</strong></sup> _zlib[]()@openssh.com_ and _zlib_ support were introduced in phpseclib v3.0.11, require PHP 7.0+ and that the [zlib extension be installed](https://www.php.net/manual/en/zlib.installation.php) (until such time that a shim can be written).
 </div>
