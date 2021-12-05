@@ -103,7 +103,7 @@ const siteConfig = {
   // Expand/collapse the links and subcategories under categories.
   docsSideNavCollapsible: true,
 
-  gaTrackingId: 'G-7M7XG2FC7M',
+  gaTrackingId: 'UA-213702042-2',
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,
