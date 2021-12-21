@@ -187,7 +187,54 @@ If you expand the `$sftp->rawlist()` output in the earlier example you'll see a 
 
 Each bit corresponds to the following:
 
-![](/img/perms.png)
+<style>
+#bitmask { font-weight: 550 }
+#bitmask tr:nth-child(1), #bitmask tr:nth-child(1) td,
+#bitmask tr:nth-child(3), #bitmask tr:nth-child(3) td
+    { border: none }
+#bitmask tr:nth-child(2) { background: white; text-align: center }
+#bitmask tr:nth-child(2) td { border-color: black }
+</style>
+
+<table id="bitmask">
+  <tr>
+    <td>16</td>
+    <td>15</td>
+    <td>14</td>
+    <td>13</td>
+    <td>12</td>
+    <td>11</td>
+    <td>10</td>
+    <td>9</td>
+    <td>8</td>
+    <td>7</td>
+    <td>6</td>
+    <td>5</td>
+    <td>4</td>
+    <td>3</td>
+    <td>2</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td colspan="4">File Type</td>
+    <td colspan="3">Special Modes</td>
+    <td colspan="3">Owner</td>
+    <td colspan="3">Group</td>
+    <td colspan="3">Others</td>
+  </tr>
+  <tr>
+    <td colspan="7"></td>
+    <td>r</td>
+    <td>w</td>
+    <td>x</td>
+    <td>r</td>
+    <td>w</td>
+    <td>x</td>
+    <td>r</td>
+    <td>w</td>
+    <td>x</td>
+  </tr>
+</table>
 
 This first four bits mean that it's a regular file (`NET_SFTP_TYPE_REGULAR`). The last nine bits mean that the file's permissions, in numeric notation, are 644 or, in symbolic notation, `-rw-r--r-`. Here are a few scenarios;
 
