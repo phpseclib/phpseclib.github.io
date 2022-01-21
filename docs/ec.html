@@ -77,11 +77,11 @@
 <ul>
 <li>Public keys start off with <code>---- BEGIN SSH2 PUBLIC KEY ----</code></li>
 </ul></li>
-<li><strong>OpenSSH</strong> <sup style="color: red"><strong>[2]</strong></sup>
+<li><strong>OpenSSH</strong> <sup style="color: red"><strong>[2]</strong></sup><sup style="color: red"><strong>[3]</strong></sup>
 <ul>
 <li>Private keys start with <code>-----BEGIN OPENSSH PRIVATE KEY-----</code></li>
 </ul></li>
-<li><strong>XML</strong> <sup style="color: red"><strong>[3]</strong></sup></li>
+<li><strong>XML</strong> <sup style="color: red"><strong>[4]</strong></sup></li>
 </ul>
 <p>A more in-depth discussion of the common formats can be found in <a href="/docs/publickeys#common-key-formats">Common Key Formats</a>. See <a href="/docs/ec-keys">Sample EC Keys</a> for actual samples.</p>
 <div style="font-size: 11px">
@@ -95,7 +95,8 @@
 </ul>
 <p>The first three are the required curves of <a href="https://tools.ietf.org/html/rfc5656#section-10.1">RFC5656</a> and the last one is specified in <a href="https://tools.ietf.org/html/draft-ietf-curdle-ssh-ed25519-02">draft-ietf-curdle-ssh-ed25519-02</a>.</p>
 <p>Specified curves are not supported - only named curves.</p>
-<p><sup style="color: red"><strong>[3]</strong></sup> Supports <a href="https://www.w3.org/TR/xmldsig-core/#sec-ECKeyValue">regular ECKeyValues</a> and <a href="https://www.w3.org/TR/xmldsig-core/#sec-RFC4050Compat">RFC4050 formatted ECKeyValues</a>. Supports named curves and has expiremental specified prime curve support. Specified binary curves are not supported at all.</p>
+<p><sup style="color: red"><strong>[3]</strong></sup> Quoting the <a href="https://www.openssh.com/txt/release-6.5">OpenSSH 6.5/6.5p1 (2014-01-30) changelog</a>, &quot;<em>this format is used unconditionally for Ed25519 keys</em>&quot;. <a href="https://www.openssh.com/releasenotes.html">No newer version of OpenSSH</a>, as of this writing, seems to change this.</p>
+<p><sup style="color: red"><strong>[4]</strong></sup> Supports <a href="https://www.w3.org/TR/xmldsig-core/#sec-ECKeyValue">regular ECKeyValues</a> and <a href="https://www.w3.org/TR/xmldsig-core/#sec-RFC4050Compat">RFC4050 formatted ECKeyValues</a>. Supports named curves and has expiremental specified prime curve support. Specified binary curves are not supported at all.</p>
 </div>
 <h3><a class="anchor" aria-hidden="true" id="parameters"></a><a href="#parameters" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Parameters</h3>
 <p>Parameters consist of either the curve name or the curve parameters. They correspond to <a href="https://tools.ietf.org/html/rfc5480#section-2.1.1">ECParameters in RFC5480</a>.</p>
