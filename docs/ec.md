@@ -13,9 +13,9 @@ Loading and saving keys is discussed in [Public Keys: Overview](publickeys.md).
   - Keys start with `-----BEGIN PRIVATE KEY-----` or `-----BEGIN ENCRYPTED PRIVATE KEY-----` or `-----BEGIN PUBLIC KEY-----`
 - **PuTTY** <sup style="color: red"><strong>[2]</strong></sup>
   - Public keys start off with `---- BEGIN SSH2 PUBLIC KEY ----`
-- **OpenSSH** <sup style="color: red"><strong>[2]</strong></sup>
+- **OpenSSH** <sup style="color: red"><strong>[2]</strong></sup><sup style="color: red"><strong>[3]</strong></sup>
   - Private keys start with `-----BEGIN OPENSSH PRIVATE KEY-----`
-- **XML** <sup style="color: red"><strong>[3]</strong></sup>
+- **XML** <sup style="color: red"><strong>[4]</strong></sup>
 
 A more in-depth discussion of the common formats can be found in [Common Key Formats](publickeys.md#common-key-formats). See [Sample EC Keys](ec-keys.md) for actual samples.
 
@@ -37,7 +37,9 @@ The first three are the required curves of [RFC5656](https://tools.ietf.org/html
 
 Specified curves are not supported - only named curves.
 
-<sup style="color: red"><strong>[3]</strong></sup> Supports [regular ECKeyValues](https://www.w3.org/TR/xmldsig-core/#sec-ECKeyValue) and [RFC4050 formatted ECKeyValues](https://www.w3.org/TR/xmldsig-core/#sec-RFC4050Compat). Supports named curves and has expiremental specified prime curve support. Specified binary curves are not supported at all.
+<sup style="color: red"><strong>[3]</strong></sup> Quoting the [OpenSSH 6.5/6.5p1 (2014-01-30) changelog](https://www.openssh.com/txt/release-6.5), "_this format is used unconditionally for Ed25519 keys_". [No newer version of OpenSSH](https://www.openssh.com/releasenotes.html), as of this writing, seems to change this.
+
+<sup style="color: red"><strong>[4]</strong></sup> Supports [regular ECKeyValues](https://www.w3.org/TR/xmldsig-core/#sec-ECKeyValue) and [RFC4050 formatted ECKeyValues](https://www.w3.org/TR/xmldsig-core/#sec-RFC4050Compat). Supports named curves and has expiremental specified prime curve support. Specified binary curves are not supported at all.
 </div>
 
 ### Parameters
