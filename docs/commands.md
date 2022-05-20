@@ -18,6 +18,21 @@ To get the exit status you can call `$ssh->getExitStatus()`.
 
 To see whether or not "quiet mode" is enabled do `$ssh->isQuietModeEnabled()`.
 
+### Callbacks
+
+```php
+$ssh->exec('ping 127.0.0.1', function($str) {
+    echo $str;
+    //if (strpos($str, 'icmp_seq=5') !== false) {
+    //    return true;
+    //}
+});
+```
+
+This example is best run via the CLI. Run it via the webbrowser and you may need to [flush](http://php.net/flush) the output buffer and even then YMMV.
+
+The commented out code shows how you could use a callback method to return early based on whatever your criteria might be. ie. if the callback method returns `bool(true)` then `exec()` will return early.
+
 ### Gotcha: Successive calls to exec()
 
 ```php
@@ -313,21 +328,6 @@ Get specific help:  It is possible to go directly to whatever you want help
 &quot;help.txt&quot; [readonly] 221L, 8239C</pre>
 
 The output may look different than vim when ran through, for example, PuTTY, because PuTTY uses `xterm` as it's shell whereas phpseclib uses `vt100`.
-
-## Callbacks
-
-```php
-$ssh->exec('ping 127.0.0.1', function($str) {
-    echo $str;
-    //if (strpos($str, 'icmp_seq=5') !== false) {
-    //    return true;
-    //}
-});
-```
-
-This example is best run via the CLI. Run it via the webbrowser and you may need to [flush](http://php.net/flush) the output buffer and even then YMMV.
-
-The commented out code shows how you could use a callback method to return early based on whatever your criteria might be. ie. if the callback method returns `bool(true)` then `exec()` will return early.
 
 ## exec() with and without a PTY vs Interactive Shells
 
