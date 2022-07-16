@@ -64,8 +64,10 @@ Supported block cipher modes of operation are as follows:
 - ctr
 - ecb
 - cbc
+- cfb
 - cfb8
 - ofb
+- ofb8
 - gcm
 
 ### setIV() vs setNonce()
