@@ -310,12 +310,8 @@ $subject = <span class="hljs-keyword">new</span> X509;
 $subject-&gt;setDNProp(<span class="hljs-string">'id-at-organizationName'</span>, <span class="hljs-string">'phpseclib demo cert'</span>);
 $subject-&gt;setPublicKey($pubKey);
 
-$issuer = <span class="hljs-keyword">new</span> X509;
-$issuer-&gt;setPrivateKey($CAPrivKey);
-$issuer-&gt;setDN($CASubject-&gt;getDN());
-
 $x509 = <span class="hljs-keyword">new</span> X509;
-$result = $x509-&gt;sign($issuer, $subject);
+$result = $x509-&gt;sign($CAIssuer, $subject);
 <span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\nthe stunnel.pem contents are as follows:\r\n\r\n"</span>;
 <span class="hljs-keyword">echo</span> $privKey;
 <span class="hljs-keyword">echo</span> <span class="hljs-string">"\r\n"</span>;
