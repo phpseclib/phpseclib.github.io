@@ -88,9 +88,9 @@ Supported key formats for a given algorithm can be determined by doing `\phpsecl
 
 **PuTTY** keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported <sup style="color: red"><strong>[3]</strong></sup>.
 
-**OpenSSH** keys have the same limitations as PuTTY keys and one additional limitation: encrypted private keys are not supported <sup style="color: red"><strong>[4]</strong></sup>. Both public and private keys are supported <sup style="color: red"><strong>[5]</strong></sup>. Notably, this is the only format that OpenSSH supports for Ed25519 <sup style="color: red"><strong>[6]</strong></sup>.
+**OpenSSH** keys have the same limitations as PuTTY keys. Both public and private keys are supported <sup style="color: red"><strong>[4]</strong></sup>. Notably, this is the only format that OpenSSH supports for Ed25519 <sup style="color: red"><strong>[5]</strong></sup>.
 
-**XML** keys only support private keys for RSA. Public keys are supported for all other algorithms, including RSA, but not Ed25519 / Curve25519 <sup style="color: red"><strong>[7]</strong></sup>.
+**XML** keys only support private keys for RSA. Public keys are supported for all other algorithms, including RSA, but not Ed25519 / Curve25519 <sup style="color: red"><strong>[6]</strong></sup>.
 
 <div style="font-size: 11px">
 
@@ -102,13 +102,11 @@ In PKCS1 the "[pre-encapsulation boundaries](https://tools.ietf.org/html/rfc1421
 
 <sup style="color: red"><strong>[3]</strong></sup> The public key format conforms to [RFC4716](https://tools.ietf.org/html/rfc4716). phpseclib calls it PuTTY because puttygen is package I've seen that supports this format and because PuTTY doesn't otherwise have a public key format.
 
-<sup style="color: red"><strong>[4]</strong></sup> Encrypted keys are not supported (an exception will be thrown if you try to use them) because they use a customized version of [bcrypt](https://en.wikipedia.org/wiki/Bcrypt), which encrypts OxychromaticBlowfishSwatDynamite 64x instead of OrpheanBeholderScryDoubt. Because of this customization PHP's [built-in bcrypt implementation](http://php.net/password-hash) cannot be used and a pure-PHP implementation is far to slow.
+<sup style="color: red"><strong>[4]</strong></sup> Private keys conform to the format described in [PROTOCOL.key](https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/PROTOCOL.key?rev=1.1) and were made the default format for OpenSSH in [the 7.8 release (2018)](https://www.openssh.com/txt/release-7.8). Public keys are of the same format utilized by `~/.ssh/authorized_keys` and conform to [RFC4253](https://tools.ietf.org/html/rfc4253#page-15) / [RFC5656](https://tools.ietf.org/html/rfc5656#section-3.1).
 
-<sup style="color: red"><strong>[5]</strong></sup> Private keys conform to the format described in [PROTOCOL.key](https://cvsweb.openbsd.org/cgi-bin/cvsweb/~checkout~/src/usr.bin/ssh/PROTOCOL.key?rev=1.1) and were made the default format for OpenSSH in [the 7.8 release (2018)](https://www.openssh.com/txt/release-7.8). Public keys are of the same format utilized by `~/.ssh/authorized_keys` and conform to [RFC4253](https://tools.ietf.org/html/rfc4253#page-15) / [RFC5656](https://tools.ietf.org/html/rfc5656#section-3.1).
+<sup style="color: red"><strong>[5]</strong></sup> Quoting the [OpenSSH 6.5/6.5p1 (2014-01-30) changelog](https://www.openssh.com/txt/release-6.5), "_this format is used unconditionally for Ed25519 keys_". [No newer version of OpenSSH](https://www.openssh.com/releasenotes.html), as of this writing, seems to change this.
 
-<sup style="color: red"><strong>[6]</strong></sup> Quoting the [OpenSSH 6.5/6.5p1 (2014-01-30) changelog](https://www.openssh.com/txt/release-6.5), "_this format is used unconditionally for Ed25519 keys_". [No newer version of OpenSSH](https://www.openssh.com/releasenotes.html), as of this writing, seems to change this.
-
-<sup style="color: red"><strong>[7]</strong></sup> RSA Private Keys conform to the format described in the [XML Key Management Specification (XKMS)](https://en.wikipedia.org/wiki/XKMS). Public keys (for all algorithms, save for Ed25519 / Curve25519) conform to the format described in the [XML Signature](https://en.wikipedia.org/wiki/XML_Signature) standard.
+<sup style="color: red"><strong>[6]</strong></sup> RSA Private Keys conform to the format described in the [XML Key Management Specification (XKMS)](https://en.wikipedia.org/wiki/XKMS). Public keys (for all algorithms, save for Ed25519 / Curve25519) conform to the format described in the [XML Signature](https://en.wikipedia.org/wiki/XML_Signature) standard.
 </div>
 
 ## Saving Keys

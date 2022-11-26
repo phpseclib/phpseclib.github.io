@@ -267,6 +267,22 @@ bmVyYXRlZC1rZXkB
 -----END OPENSSH PRIVATE KEY-----
 ```
 
+### Encrypted Private Keys
+
+Generated with `$key->withPassword('demo')->toString('OpenSSH')`.
+
+```
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABAadYAW13
+jKwd2h4/sgh9dvAAAAEAAAAAEAAABoAAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlz
+dHAyNTYAAABBBKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A
+1L0jdHnRx91Cj+UD08+HDpciDzK10AAACwkOE6duVEIZ9scCkgw3Q/SFIgyaU9f2K0UChk
+DZRCuS5jzwpw5cTvCuCBGocd9QtdZJPoiVxphzXdOfoaeKeWBE5rcLr7CYQyxhOyoZbJHP
+mBAQ0SmtdXOFvgr9SrgU04Czovt6/d50oDImbKvwtiH/QetzkIRDiSpUwpXLF118H67vXH
+NqH410tqKJYGAlKDZZV9HO68cQpUId4VlCn60Qt2Q0Ug3o0uBkg2M4erWks=
+-----END OPENSSH PRIVATE KEY-----
+```
+
 ### Public Keys
 
 Generated with `$key->getPublicKey()->toString('OpenSSH')`.
