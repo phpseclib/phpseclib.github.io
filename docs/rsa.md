@@ -18,6 +18,8 @@ Loading and saving keys is discussed in [Public Keys: Overview](publickeys.md).
   - Public keys start off with `---- BEGIN SSH2 PUBLIC KEY ----`
 - **OpenSSH**
   - Private keys start with `-----BEGIN OPENSSH PRIVATE KEY-----`
+- **JWK**
+  - Keys are JSON encoded
 - **XML**
 - **MSBLOB** <sup style="color: red"><strong>*</strong></sup>
   - Private keys correspond to the format described in [Private Key BLOBs](https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs#private-key-blobs)

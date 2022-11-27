@@ -245,6 +245,48 @@ Generated with `$key->getPublicKey()->toString('OpenSSH')`.
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnxS30WAvQCCo2yU1orfgqr41mM70MB phpseclib-generated-key
 ```
 
+## JWK
+
+Note that the actual keys generated are not "beautified" as these examples are.
+
+### Private Keys
+
+Generated with `$key->toString('JWK')`.
+
+```
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "n": "qPfgaTEWEP3S9w0tgsicURfo-nLW09_0KfOPinhYZ4ouzU-3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq-NZjO9DAQ==",
+      "e": "AQAB",
+      "d": "IJLixBy2qpFoS4DSmoEmo3qGy0t6z09AIJtH-5OeRV1be-N4cDYJKffGzDa88vQENZiRm0GRq6a-HPGQMd2kTQ==",
+      "p": "oxK_MgGeeLui385KJ7ZOYktjhLBNAB69fKwTZFsUNh0=",
+      "q": "AQlBGkUJzJ26e_ZsQ1w3-gFNHDf0TwY2_akhw3FmRxs1",
+      "dp": "bYSzn3Py6AasNj6nEtCfB-i1p3F35TK_87DlPSrmAgk=",
+      "dq": "yS4RaI9YG8EWx_2w0T67ZUVAw8eOMB6BIUg0Xcu-3ok=",
+      "qi": "E6z_k6I-ChN1LLttwX0galITxmAYrOBhBVl433tgTTQ="
+    }
+  ]
+}
+```
+
+### Public Keys
+
+Generated with `$key->getPublicKey()->toString('JWK')`.
+
+```
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "n": "qPfgaTEWEP3S9w0tgsicURfo-nLW09_0KfOPinhYZ4ouzU-3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq-NZjO9DAQ==",
+      "e": "AQAB"
+    }
+  ]
+}
+```
+
 ## XML
 
 ### Private Keys

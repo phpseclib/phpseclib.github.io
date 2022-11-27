@@ -330,6 +330,45 @@ Generated with `$key->getPublicKey()->toString('OpenSSH')`.
 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08+HDpciDzK10= phpseclib-generated-key
 ```
 
+## JWK
+
+Note that the actual keys generated are not "beautified" as these examples are.
+
+### Private Keys
+
+Generated with `$key->toString('JWK')`.
+
+```
+{
+  "keys": [
+    {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "rPJyxEu2_oKCrJaaTVTrq39DKJ2XcN6W-k8UvGf-Y_k=",
+      "y": "Q1jWxYrUKHGm7A1L0jdHnRx91Cj-UD08-HDpciDzK10=",
+      "d": "SpP55ELdXswj9JRZAPRwtTfS4CNRqpKIs-28rNHiPAo="
+    }
+  ]
+}
+```
+
+### Public Keys
+
+Generated with `$key->getPublicKey()->toString('JWK')`.
+
+```
+{
+  "keys": [
+    {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "rPJyxEu2_oKCrJaaTVTrq39DKJ2XcN6W-k8UvGf-Y_k=",
+      "y": "Q1jWxYrUKHGm7A1L0jdHnRx91Cj-UD08-HDpciDzK10="
+    }
+  ]
+}
+```
+
 ## XML
 
 ### Public Keys
