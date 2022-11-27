@@ -202,7 +202,7 @@ A0IABKzycsRLtv6CgqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L
 
 ## PuTTY
 
-### Private Keys
+### Private Keys (v2)
 
 Generated with `$key->toString('PuTTY')`.
 
@@ -219,7 +219,7 @@ AAAAIQBKk/nkQt1ezCP0lFkA9HC1N9LgI1Gqkoiz7bys0eI8Cg==
 Private-MAC: 9239cacc5e71079d25f63d03941c5a35b5304f6c
 ```
 
-### Encrypted Private Keys
+### Encrypted Private Keys (v2)
 
 Generated with `$key->withPassword('demo')->toString('PuTTY')`.
 
@@ -234,6 +234,45 @@ gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
 Private-Lines: 1
 U43Vy/gRjjfRA8Nbsy4Mremrnz3n49fTCwDdB2t1Nr9di16WaoBb582T489sn5ff
 Private-MAC: 1a89ef91b9a3fcc4d3ad9033a06bf5cbd36395d9
+```
+
+### Private Keys (v3)
+
+Generated with `$key->toString('PuTTY', ['version' => 3])`.
+
+```
+PuTTY-User-Key-File-3: ecdsa-sha2-nistp256
+Encryption: none
+Comment: phpseclib-generated-key
+Public-Lines: 3
+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6C
+gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
++HDpciDzK10=
+Private-Lines: 1
+AAAAIEqT+eRC3V7MI/SUWQD0cLU30uAjUaqSiLPtvKzR4jwK
+Private-MAC: 434b8765b1cca200a07daf361e7f1cbc6f7b801c0acc5bac0ad81d57144d179a
+```
+
+### Encrypted Private Keys (v3)
+
+Generated with `$key->withPassword('demo')->toString('PuTTY', ['version' => 3])`.
+
+```
+PuTTY-User-Key-File-3: ecdsa-sha2-nistp256
+Encryption: aes256-cbc
+Comment: phpseclib-generated-key
+Public-Lines: 3
+AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKzycsRLtv6C
+gqyWmk1U66t/Qyidl3DelvpPFLxn/mP5Q1jWxYrUKHGm7A1L0jdHnRx91Cj+UD08
++HDpciDzK10=
+Key-Derivation: Argon2id
+Argon2-Memory: 8192
+Argon2-Passes: 13
+Argon2-Parallelism: 1
+Argon2-Salt: a682b1d606e5e3baab0ef26e754f1c68
+Private-Lines: 1
+Vv79j4MLaDOCn/UPKDKiAyuMpyxhHwcnN136PKJbUqGhSByQoTYRbNtmzPK3DDVd
+Private-MAC: 626ddc4a6d6a14aa2bfdc16c591e9d12c05f2b4ddf8cde9c973a38fd0ef0618e
 ```
 
 ### Public Keys
