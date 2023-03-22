@@ -22,7 +22,7 @@ jobs:
           cache: yarn
           cache-dependency-path: '**/yarn.lock'
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --non-interactive
+        run: yarn install
       - name: Build
         run: yarn build
       - name: Setup Pages
