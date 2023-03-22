@@ -86,11 +86,11 @@ Supported key formats for a given algorithm can be determined by doing `\phpsecl
 
 **<span style="color: green">PKCS8</span>** keys are the only keys that support all public key algorithms. Both private and public keys are supported <sup style="color: red"><strong>[2]</strong></sup> as are PEM encoded keys and binary encoded keys. <span style="color: green">_This is the default format that phpseclib uses_</span>.
 
-**PuTTY** keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported <sup style="color: red"><strong>[3]</strong></sup> as are v2 and v3 formatted keys (with v2 being the default).
+**PuTTY** keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported <sup style="color: red"><strong>[3]</strong></sup> as are v2 and, as of phpseclib v3.0.14, v3 formatted keys (with v2 being the default).
 
-**OpenSSH** keys have the same limitations as PuTTY keys. Both public and private keys are supported <sup style="color: red"><strong>[4]</strong></sup>. Notably, this is the only format that OpenSSH supports for Ed25519 <sup style="color: red"><strong>[5]</strong></sup>.
+**OpenSSH** keys have the same limitations as PuTTY keys. Both public and private keys are supported <sup style="color: red"><strong>[4]</strong></sup>. Notably, this is the only format that OpenSSH supports for Ed25519 <sup style="color: red"><strong>[5]</strong></sup>. Encrypted keys are supported as of phpseclib v3.0.15.
 
-**JWK** keys do not work for DSA and encrypted private keys are not supported.
+**JWK** keys are supported as of phpseclib v3.0.15. DSA and encrypted private keys are not supported.
 
 **XML** keys only support private keys for RSA. Public keys are supported for all other algorithms, including RSA, but not Ed25519 / Curve25519 <sup style="color: red"><strong>[6]</strong></sup>.
 
