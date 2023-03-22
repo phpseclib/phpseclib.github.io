@@ -4,13 +4,16 @@ on:
     branches:
       - source
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     defaults:
       run:
         working-directory: 'website'
