@@ -5,6 +5,8 @@ on:
       - source
 permissions:
   contents: write
+  pages: write
+  id-token: write
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
