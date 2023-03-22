@@ -311,7 +311,7 @@ There are seven different versions of SFTP that are defined (v0 through v6). Ope
 
 SFTP servers that support multiple versions will have a default version (usually v3) and will specifiy what other SFTP versions they support through the use of an extension.
 
-If you're running phpseclib &#8805; 3.0.11 you can set the preferred version by calling `setPreferredVersion(6)`. You can see what version was ultimately negotiated by calling `getNegotiatedVersion()`. You can see what versions the server supports by calling `getSupportedVersions()`. When muliple verisons of SFTP are supported here's what the output of this method will look like:
+If you're running phpseclib &#8805; 3.0.11 you can set the preferred version by calling `setPreferredVersion(6)`. You can see what version was ultimately negotiated by calling `getNegotiatedVersion()`. You can see what versions the server supports by calling `getSupportedVersions()`. When multiple verisons of SFTP are supported here's what the output of this method will look like:
 
 <ul class="printr" style="margin-bottom: 15px"><li><span class="name">version</span><ul><li>3</li></ul></li><li><span class="name">extensions</span><ul><li>3,4,5,6</li></ul></li></ul>
 
