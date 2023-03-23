@@ -402,3 +402,21 @@ The default window size is 80x24 (80 columns, 24 rows).
 The number of rows can be adjusted by calling `$ssh->setWindowRows()`. The number of columns can be adjusted by calling `$ssh->setWindowColumns()`. Both can be adjusted at the same time by calling `$ssh->setWindowSize(80, 24)`.
 
 The number of rows and columns can be determined by calling `$ssh->getWindowRows()` and `$ssh->getWindowColumns()`, respectively.
+
+## Multiple Channels
+
+Let's say you ran a command with `$ssh->exec()` with a PTY open but that you also wanted to, simultaniously, run a command on an interactive shell. Nothing presented in the documentation, up to this point, really enables that, however, as of phpseclib v3.0.20, an additional parameter - `$channel` - has been added to `read()`, `write()` and `reset()`, so that now you can do this:
+
+```php
+$ssh->enablePTY();
+$ssh->exec('sudo ls -latr');
+$ssh->write("sudo ls -latr\n", SSH2::CHANNEL_SHELL);
+$ssh->read('#[pP]assword[^:]*:|username@username:~\$#', SSH2::READ_REGEX, SSH2::CHANNEL_EXEC);
+```
+You can also, as of phpseclib v3.0.20, see the status of a channel by calling any of the following:
+
+- `isShellOpen()`
+- `isPTYOpen()`
+- `isInteractiveChannelOpen($channel)`
+
+Note that phpseclib does not currently let you have multiple shells or exec's with PTY or subsystems open.
