@@ -17,7 +17,7 @@ phpseclib 3.0.x offers a completely redesigned public key interface featuring im
 
 More modern symmetric key algorithms have been added as well, including ChaCha20-Poly1305 and GCM modes.
 
-The default hash algorithm has also been changed from sha1 to sha256 and public keys are now immutable. So let's say you had created an RSA encrypted ciphertext with phpseclib 2.0 using the default encryption mode and default hashes. Here's how you'd decrypt it with phpseclib 2:
+The default hash algorithm has also been changed from sha1 to sha256 and public keys are now immutable. So let's say you had created an RSA encrypted ciphertext with phpseclib 2 using the default encryption mode and default hashes. Here's how you'd decrypt it with phpseclib 2:
 
 ```php
 use phpseclib\Crypt\RSA;
@@ -35,6 +35,8 @@ use phpseclib3\Crypt\PublicKeyLoader;
 $key = PublicKeyLoader::load(...)->withHash('sha1')->withMGFHash('sha1');
 echo $key->decrypt(...);
 ```
+
+For symmetric keys, the constructor's parameter has changed from being a constant (eg. `AES::MODE_CBC` to being a string (eg. `'cbc'`) and is now required. phpseclib 3 is also a lot less error tolerant than phpseclib 2 was. For example, if you gave phpseclib 2 a 10 byte key when the smallest key a particular algorithm accepts is 16 bytes, phpseclib 2 would null pad it to the appropriate length whereas phpseclib 3 will throw an exception. The motiviation behind this change is to overall make it harder to do cryptography unless you know what you're doing. Like there's no real benefit to cryptography if you just pass an empty string in as the key and let phpseclib null pad it to the minimum length. This is the direction mcrypt had been headed prior to it's deprecation in PHP 7.0. In particular, quoting [PHP 5.6.0 Release Announcement](https://www.php.net/releases/5_6_0.php), "_Mcrypt functions now require valid keys and IVs_".
 
 SSH2, SFTP and X.509 are largely unchanged.
 
