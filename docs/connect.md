@@ -94,11 +94,11 @@ echo $ssh->exec('ls -latr');
 use phpseclib3\Net\SSH2;
 
 // http://php.net/manual/en/context.socket.php
-$opts = array(
-    'socket' => array(
+$opts = [
+    'socket' => [
         'bindto' => '127.255.255.255:0',
-    ),
-);
+    ],
+];
 $context = stream_context_create($opts);
 $socket = stream_socket_client('tcp://localhost:22', $errno, $errstr, ini_get('default_socket_timeout'), STREAM_CLIENT_CONNECT, $context);
 
