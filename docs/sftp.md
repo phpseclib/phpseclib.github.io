@@ -295,6 +295,8 @@ See [Permissions](#permissions) for more information on `mode` or `fileperms()`.
 
 `is_readable()` and `is_writeable()` only work on files. They work by actually opening up a file for reading or writing and then closing the file immediately thereafter. The same technique does not work for directories.
 
+As of phpseclib v3.0.20 `filesize()` accepts an optional second parameter - `$recursive`. By default this parameter is `false` but if you set it to `true` it'll recurse through a directory and return the size of all the files in that directory and it's subdirectories.
+
 ## Delete and Rename
 
 ```php
