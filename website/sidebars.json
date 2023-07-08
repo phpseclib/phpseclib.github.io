@@ -4,7 +4,7 @@
       "why",
       "install",
       "compat",
-      "benchmarks"
+      "speed"
     ],
     "SSH2": [
       "connect",
