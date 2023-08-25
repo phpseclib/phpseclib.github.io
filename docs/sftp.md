@@ -309,7 +309,7 @@ $sftp->rename('filename.remote', 'newname.remote');
 
 ## Changing SFTP Versions
 
-There are seven different versions of SFTP that are defined (v0 through v6). OpenSSH only supports one version (v3) but some SFTP servers (eg. Syncplify.me Server!<sup style="color: red"><strong>[1]</strong></sup>) can be configured to support all versions.
+There are seven different versions of SFTP that are defined (v0 through v6). OpenSSH only supports one version (v3) but some SFTP servers (eg. [Bitvise SSH Server](https://www.bitvise.com/ssh-server)) can be configured to support all versions.
 
 SFTP servers that support multiple versions will have a default version (usually v3) and will specifiy what other SFTP versions they support through the use of an extension.
 
@@ -318,11 +318,6 @@ If you're running phpseclib &#8805; 3.0.11 you can set the preferred version by 
 <ul class="printr" style="margin-bottom: 15px"><li><span class="name">version</span><ul><li>3</li></ul></li><li><span class="name">extensions</span><ul><li>3,4,5,6</li></ul></li></ul>
 
 If only one version of SFTP is supported then the extensions key will most likely not be present.
-
-<div style="font-size: 11px">
-
-<sup style="color: red"><strong>[1]</strong></sup> If Syncplify, Inc. or any other organization that makes an SFTP server that supports multiple versions of SFTP wants me to actually include a hyperlink to them I'd be willing to do so for $5.00 / month [via Patreon](https://www.patreon.com/phpseclib).
-</div>
 
 ## Stream Wrapper
 
