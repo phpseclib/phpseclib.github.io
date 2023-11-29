@@ -40,7 +40,7 @@ For symmetric keys, the constructor's parameter has changed from being a constan
 
 SSH2, SFTP and X.509 are largely unchanged.
 
-The name space has also been changed from `\phpseclib` to `\phpsecib3`.
+The name space has also been changed from `\phpseclib` to `\phpseclib3`.
 
 phpseclib 1.0 / 2.0 documentation lives at http://phpseclib.sourceforge.net/
 
