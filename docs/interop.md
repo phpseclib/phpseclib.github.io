@@ -11,6 +11,7 @@ The languages discussed are:
 - [Java](java.md)
 - [JavaScript](javascript.md)
 - [Node.js](nodejs.md)
+- [Go](go.md)
 - [Ruby](ruby.md)
 - [C#](csharp.md)
 - [C](c.md)
