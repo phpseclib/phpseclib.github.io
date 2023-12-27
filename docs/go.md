@@ -4,6 +4,7 @@ title: Go
 ---
 
 <!-- go run test.go -->
+
 All the Go code samples can be previewed on https://go.dev/play/
 
 ## RSA Decryption
@@ -247,11 +248,39 @@ PSS signatures are supported as well. Here's the phpseclib code to sign somethin
 ```php
 use phpseclib3\Crypt\PublicKeyLoader;
 
-$key = PublicKeyLoader::load('...')
+$key = PublicKeyLoader::load('...');
+    // the following are implied:
     //->withPadding(RSA::SIGNATURE_PSS)
     //->withHash('sha256')
-    ->withMGFHash('sha1');
+    //->withMGFHash('sha256')
 
 echo base64_encode($key->sign('zzz'));
 ```
 <sup>_(the actual key is omitted because, for this example, a larger key than the 512-bit key we've been using, is needed)_</sup>
+
+To perform PSS signature verification one need only make the following changes to the original script:
+
+```go
+#
+#-----[ FIND ]------------------------------------------
+#
+    signature := "MUE536c4UJSAmycs7V6qFaLMATrKMQA8TYj5xX1+fwHINz3/BafgaRt0ycoD5IxTxaclLWavrGSza4xSBHraEw==";
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+    signature := "oa7eJv3Ocl4Uh+6M2UBalglijFtCLiYOxRSFafzRt3mp6eNnxsS5GMqvs3nXzRT2KhDlMelssjDJE2wULsnDySld64Wm7+0SYTAQNU1tFVO4JUMpROodT9We24MuLlOssgssr71scolg4NPc+ltCDGu5Y+NRHEwG0vtA7lwLM3c=";
+#
+#-----[ FIND ]------------------------------------------
+#
+    err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashed[:], signatureBytes)
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+    opts := &rsa.PSSOptions{
+        Hash: crypto.SHA256,
+        SaltLength: rsa.PSSSaltLengthEqualsHash, // == crypto.Hash.Size(crypto.SHA256)
+    }
+
+    err = rsa.VerifyPSS(publicKey, crypto.SHA256, hashed[:], signatureBytes, opts)
+```
+Note that, at this time, Go does not let you set the Hash and MGFHash to different values, per https://github.com/golang/go/issues/46233
