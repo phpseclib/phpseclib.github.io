@@ -58,7 +58,7 @@ Calling `isConnected()` prior to any of these methods will return `bool(false)`.
 
 ## getErrors(), getLastError()
 
-`getErrors()` returns an array of all errors or messages that have been reported by the server. `getLastError()` returns the most recent of these errors / messages.
+`getErrors()` returns an array of all errors or messages that have been reported by the server at the SSH layer. `getLastError()` returns the most recent of these errors / messages.
 
 `getSFTPErrors()` and `getSFTPLastError()` work similarily for the SFTP layer.
 
