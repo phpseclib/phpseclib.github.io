@@ -54,6 +54,12 @@ SSH2.php doesn't connect to a server after the constructor has been called - it 
 
 Calling `isConnected()` prior to any of these methods will return `bool(false)`. Premature closure of the session will also result in `isConnected()` returning `bool(false)`.
 
+As of phpseclib 3.0.36 `isConnected()` optionally takes a `$level` parameter that can be used to select the method used to test if the connection is still opened or not. The various levels are:
+
+- `isConnected(0)`. The default method.  Calls `feof()` on the socket object, which often means that the [server has closed the connection](https://stackoverflow.com/a/1321716/569976)
+- `isConnected(1)`. Sends a SSH_MSG_IGNORE packet to the server.
+- `isConnected(2)`. Sends a SSH_MSG_CHANNEL_OPEN packet to the server and then immediately closes the channel. Unlike `isConnected(1)` this method actually results in the server sending a response, however, some servers may limit the number of open channels that you can have, most notably, Cisco IOS Routers, which limit you to just one channel per session.
+
 `isAuthenticated()` returns `bool(true)` only after you've been successfully logged in.
 
 ## getErrors(), getLastError()
