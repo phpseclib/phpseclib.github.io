@@ -48,11 +48,11 @@ function str2ab(str) {
     return buf;
 }
 
-keyData = keyData
+key = keyData
     .replace(/-+[^-]+-+/g, '')
     .replace("\n", '')
     .replace("\r", '');
-keyData = str2ab(window.atob(keyData));
+key = str2ab(window.atob(key));
 
 ciphertext = str2ab(window.atob(ciphertext));
 
