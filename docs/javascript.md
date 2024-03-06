@@ -3,6 +3,60 @@ id: javascript
 title: JavaScript
 ---
 
+## AES-128-CBC Decryption
+
+Encrypting a string using AES-128-CBC with phpseclib:
+
+```php
+use phpseclib3\Crypt\AES;
+
+$cipher = new AES('cbc');
+$cipher->setKey(str_repeat('a', 16));
+$cipher->setIV(str_repeat('b', 16));
+
+echo bin2hex($cipher->encrypt('test'));
+```
+
+Decryption with JavaScript using [Web Cryptography API](https://en.wikipedia.org/wiki/Web_Cryptography_API):
+
+```javascript
+var key = 'aaaaaaaaaaaaaaaa'
+var iv = 'bbbbbbbbbbbbbbbb';
+var ciphertext = '10f42fd95857ed2775cfbc4b471bc213';
+
+function hex2ab(hex){
+    return new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {return parseInt(h, 16)}));
+}
+
+key = new TextEncoder().encode(key);
+iv = new TextEncoder().encode(iv);
+ciphertext = hex2ab(ciphertext);
+
+window.crypto.subtle.importKey(
+    'raw',
+    key,
+    {
+        name: 'AES-CBC'
+    },
+    true, // can the key be extracted using SubtleCrypto.exportKey() / SubtleCrypto.wrapKey()?
+    ['decrypt'] // keyUsages
+).then(function(key) {
+    window.crypto.subtle.decrypt(
+        {
+            name: "AES-CBC",
+            iv: iv
+        },
+        key,
+        ciphertext
+    ).then(function(plaintext) {
+        console.log(new TextDecoder().decode(plaintext));
+    })
+});
+```
+Note that although the specifications [do provide for AES-192-CBC](https://www.w3.org/TR/WebCryptoAPI/#aes-cbc-operations), Google Chrome [only supports AES-128-CBC and AES-256-CBC](https://sites.google.com/a/chromium.org/dev/blink/webcrypto#TOC-AES-support).
+
+See it in action at https://jsfiddle.net/ewaysj3b/
+
 ## RSA Decryption with Web Crypto API
 
 Encryption with PHP:
