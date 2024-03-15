@@ -19,6 +19,4 @@ As for the middle number...  the last time a release was made wherein that numbe
 
 ## Long Term Support
 
-Versions of PHP wherein the middle number is changed receive '(security) support for [three years after their initial release](https://www.php.net/supported-versions.php). eg. 8.3.x was first released on Nov 23, 2023 and will receive security support until Nov 23, 2026.
-
-Versions of phpseclib wherein the middle number is changed are intended to be supported into perpetuity, contingent upon my ability to provide said support. At this time this is not overwhelmingly burdensome as there are relatively few MAJOR versions.
+All MAJOR versions have phpseclib (eg. 1.0.x, 2.0.x, 3.0.x) are intended to be supported into perpetuity, contingent upon my ability to provide said support. At this time this is not overwhelmingly burdensome as there are relatively few MAJOR versions.
