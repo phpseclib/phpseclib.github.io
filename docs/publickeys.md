@@ -338,6 +338,8 @@ To make it so that keys can be saved using these custom format plugins you'll ne
 
 The exact parameters and return values depend on the algorithm being used. Check the files in the `Crypt/*/Formats/Keys` directories for specific examples.
 
+Note that when adding custom key formats that care should be taken to ensure that the code isn't over broad. For example, let's say  you wrote a custom key format that takes any string, of any length, and loads that as a specific Ed25519 private key. Like no matter the string that's passed to it the same Ed25519 private key is returned. That's cool if you want to do that but you should also understand that if you do that then `PublicKeyLoader::load()` isn't going throw an exception when an otherwise invalid RSA private key is loaded.
+
 ## Public Key Fingerprints
 [Public key fingerprints](https://en.wikipedia.org/wiki/Public_key_fingerprint) can be obtained by doing `$publicKey->getFingerprint($algorithm)`. The only supported values for `$algorithm` are `'sha256'` and `'md5'`. What phpseclib returns is identical to what you'd get by running `ssh-keygen -lf key.pub` on the command line.
 
