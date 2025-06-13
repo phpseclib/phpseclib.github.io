@@ -98,7 +98,7 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: 'phpseclib is designed to be ultra-portable.  The 3.0 version works on PHP 5.6+ and doesn\'t require any extensions. For purposes of speed, OpenSSL, GMP, libsodium or mcrypt are used, if they\'re available, but they are not required.',
+            content: 'phpseclib is designed to be ultra-portable.  The 3.0 version works on PHP 5.6+ and doesn\'t require any extensions. For <a href="/docs/speed">purposes of speed</a>, OpenSSL, GMP, libsodium or mcrypt are used, if they\'re available, but they are not required.',
             image: `${baseUrl}img/undraw_react.svg`,
             imageAlign: 'top',
             title: 'Portability',
