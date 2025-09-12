@@ -113,11 +113,34 @@ class Index extends React.Component {
       </Block>
     );
 
+    const Sponsors = () => (
+        <Container
+          id="sponsors"
+          background={null}>
+          <div className="sponsors-header">
+            <h2>Special Thanks</h2>
+          </div>
+          <GridBlock
+            align="center"
+            layout="fourColumn"
+            contents={[
+              {
+                image: `${baseUrl}img/sponsors/sovereign-tech-agency.webp`,
+                imageAlign: 'top',
+                imageAlt: 'Sovereign Tech Agency',
+                imageLink: 'https://www.sovereign.tech/tech/phpseclib',
+              },
+            ]}
+          />
+        </Container>
+      );
+
     return (
       <div>
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
+          <Sponsors />
         </div>
       </div>
     );
