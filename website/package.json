@@ -12,12 +12,15 @@
     "cheerio": "0.22.0"
   },
   "devDependencies": {
-    "docusaurus": "1.14.7",
     "cheerio": "0.22.0",
-    "truncate-html": "1.0.4",
-    "enzyme": "2.9.1"
+    "docusaurus": "1.14.7",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.7",
+    "truncate-html": "1.0.4"
   },
   "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-treebeard": "^3.2.4"
   }
 }
