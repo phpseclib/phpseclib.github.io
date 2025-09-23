@@ -38,7 +38,7 @@ The first three are the required curves of [RFC5656](https://tools.ietf.org/html
 
 Specified curves are not supported - only named curves.
 
-<sup style="color: red"><strong>[3]</strong></sup> Quoting the [OpenSSH 6.5/6.5p1 (2014-01-30) changelog](https://www.openssh.com/txt/release-6.5), "_this format is used unconditionally for Ed25519 keys_". [No newer version of OpenSSH](https://www.openssh.com/releasenotes.html), as of this writing, seems to change this.
+<sup style="color: red"><strong>[3]</strong></sup> Quoting the [OpenSSH 6.5/6.5p1 (2014-01-30) changelog](https://www.openssh.com/txt/release-6.5), "_this format is used unconditionally for Ed25519 keys_". Quoting the [OpenSSH 9.6/9.6p1 (2023-12-18) changelog](https://www.openssh.com/txt/release-9.6), "_add support for reading ED25519 private keys in PEM PKCS8 format. Previously only the OpenSSH private key format was supported._".
 
 <sup style="color: red"><strong>[4]</strong></sup> The only curves supported by this format are as follows:
 
