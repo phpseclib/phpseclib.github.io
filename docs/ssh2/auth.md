@@ -1,5 +1,6 @@
 ---
 title: Authenticating
+sidebar_position: 2
 ---
 
 ## Password

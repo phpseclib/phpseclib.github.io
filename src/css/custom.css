@@ -28,3 +28,17 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+a[href^="mailto:"] {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+em:has(> a[href^="mailto:"]) {
+  cursor: text
+}
+
+code {
+  white-space: nowrap
+}
