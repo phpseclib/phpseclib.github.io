@@ -1,0 +1,8 @@
+{
+  "label": "SSH2",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "SSH2 and SFTP"
+  }
+}
