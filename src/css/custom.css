@@ -42,3 +42,25 @@ em:has(> a[href^="mailto:"]) {
 code {
   white-space: nowrap
 }
+
+/* Keep exact spacing in code blocks */
+.theme-code-block pre,
+.theme-code-block pre code,
+.prism-code,
+.prism-code code {
+  white-space: pre !important;      /* or pre-wrap if you want wrapping without collapsing spaces */
+  tab-size: 4;                      /* optional: adjust tab rendering */
+}
+
+.console {
+  color: white;
+  background: black;
+  font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+  font-size: 13px;
+  line-height: 13px
+}
+
+.console .inverted {
+  color: black;
+  background: white
+}
