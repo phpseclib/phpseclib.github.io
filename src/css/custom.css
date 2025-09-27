@@ -52,19 +52,6 @@ code {
   tab-size: 4;                      /* optional: adjust tab rendering */
 }
 
-.console {
-  color: white;
-  background: black;
-  font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
-  font-size: 13px;
-  line-height: 13px
-}
-
-.console .inverted {
-  color: black;
-  background: white
-}
-
 /* base table styling you already had */
 #bitmask { font-weight: 550; }
 
