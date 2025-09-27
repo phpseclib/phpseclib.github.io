@@ -253,7 +253,7 @@ $ansi = new ANSI;
 $ansi->appendString($ssh->read());
 ```
 
-A table of special characters and the keys they correspond to can be found at [SSH2 Special Characters](special-chars.md). The output of the above program is as follows:
+A table of special characters and the keys they correspond to can be found at [Special Characters](special-chars.md). The output of the above program is as follows:
 
 <iframe
   src="/html/ansi3.html"
