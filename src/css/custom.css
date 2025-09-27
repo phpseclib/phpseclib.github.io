@@ -64,3 +64,46 @@ code {
   color: black;
   background: white
 }
+
+/* base table styling you already had */
+#bitmask { font-weight: 550; }
+
+#bitmask tr:nth-child(1),
+#bitmask tr:nth-child(1) td,
+#bitmask tr:nth-child(3),
+#bitmask tr:nth-child(3) td {
+  border: none;
+}
+
+/* Use theme variables instead of hard-coded colors */
+:root {
+  --bitmask-legend-bg: var(--ifm-background-surface-color);
+  --bitmask-legend-border: var(--ifm-table-border-color);
+}
+
+html[data-theme='dark'] {
+  /* Slightly brighter row on dark; adjust 100/200/300 to taste */
+  --bitmask-legend-bg: var(--ifm-color-emphasis-200);
+  --bitmask-legend-border: var(--ifm-color-emphasis-300);
+}
+
+/* Second row (“legend”) styles */
+#bitmask tr:nth-child(2) {
+  background: var(--bitmask-legend-bg);
+  text-align: center;
+  color: var(--ifm-font-color-base);
+}
+
+#bitmask tr:nth-child(2) td {
+  border-color: var(--bitmask-legend-border);
+}
+
+.tree details { margin: .25rem 0 .25rem .75rem; }
+.tree details > summary { cursor: pointer; list-style: none; }
+.tree details > summary::-webkit-details-marker { display: none; }
+
+/* simple “tree line” look */
+.tree details ul { margin: .25rem 0 .25rem 1rem; padding-left: .75rem; border-left: 1px solid var(--ifm-toc-border-color, #ddd); }
+
+.tree .alert { padding: 8px }
+.tree .collapsibleContent_i85q { padding-top: 0; margin-top: 0 }
