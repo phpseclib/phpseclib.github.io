@@ -2,8 +2,6 @@
 title: Special Characters
 ---
 
-In an interactive shell it may be desirable to send special characters from time to time. See [Running Commands: Sending Special Characters](commands.md#sending-special-characters) for more context.
-
 |Key|String|
 |---|---|
 |<kbd>Ctrl</kbd> + <kbd>C</kbd>|`"\x03"`|

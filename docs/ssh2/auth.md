@@ -32,7 +32,7 @@ if (!$ssh->login('username', $key)) {
 
 Public Key Authentication is one of the most secure ways to connect to a server. Even if the server is being "spoofed" or otherwise compromised the worst thing that'll happen is that the public key will be exposed to the attacker. The private key remains private and the hostile actor will be unable to login as you. This is in contrast to password authentication wherein supplying your password to a "spoofed" server means that the attacker could use that same password to login as you to the legit server.
 
-[RSA](rsa.md), [DSA](dsa.md), [ECDSA and EdDSA (Ed25519)](ec.md) keys are supported, in a myriad of different formats. Click the links for a more detailed breakdown.
+[RSA](publickeys/rsa.md), [DSA](publickeys/dsa.md), [ECDSA and EdDSA (Ed25519)](publickeys/ec.md) keys are supported, in a myriad of different formats. Click the links for a more detailed breakdown.
 
 ## Password Protected Public Key
 
