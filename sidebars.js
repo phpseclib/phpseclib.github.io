@@ -29,6 +29,11 @@ const sidebars = {
       label: 'Public Keys',
       items: ['publickeys/overview', 'publickeys/rsa', 'publickeys/dsa', 'publickeys/ec', 'publickeys/dh', 'publickeys/jwt'],
     },
+    {
+      type: 'category',
+      label: 'Symmetric Keys',
+      items: ['symmetric/overview'],
+    },
   ],
 };
 
