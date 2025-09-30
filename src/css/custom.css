@@ -96,3 +96,11 @@ html[data-theme='dark'] {
 .tree .collapsibleContent_i85q { padding-top: 0; margin-top: 0 }
 
 .default { color: blue }
+
+.hero--primary {
+    --ifm-hero-background-color: #1a5db3;
+}
+
+html[data-theme='dark'] .hero--primary {
+  --ifm-hero-background-color: #8892bf;
+}

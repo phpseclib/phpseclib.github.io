@@ -13,8 +13,8 @@ import rehypeKatex from 'rehype-katex';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'phpseclib',
+  tagline: 'PHP Secure Communications Library',
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -94,27 +94,43 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      // should be absolute path?
       image: 'img/phpseclib-social-card.jpg',
       navbar: {
         title: 'phpseclib',
         logo: {
           alt: 'phpseclib',
           src: 'img/logo.svg',
+          srcDark: 'img/logo-dark.svg',
         },
         items: [
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
-            position: 'left',
+            position: 'right',
             label: 'Docs',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://api.phpseclib.com/',
+            label: 'API',
+            position: 'right',
+          },
+          {
+            href: 'https://stackoverflow.com/questions/tagged/phpseclib',
+            label: 'Support',
+            position: 'right',
+          },
+          {
+            href: 'https://github.com/phpseclib/phpseclib',
             label: 'GitHub',
             position: 'right',
           },
+
+//          {to: '/blog', label: 'API', position: 'left'},
+//          {
+//            href: 'https://github.com/facebook/docusaurus',
+//            label: 'GitHub',
+//            position: 'right',
+//          },
         ],
       },
       footer: {

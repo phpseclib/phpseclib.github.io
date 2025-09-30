@@ -4,32 +4,32 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Portability',
+    Svg: require('@site/static/img/portability.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        phpseclib doesn't require any extensions. For <a href="/docs/intro/speed">purposes of speed</a>, OpenSSL, GMP or libsodium
+        are used, if they're available, but they are not required.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Interoperability',
+    Svg: require('@site/static/img/interoperability.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        phpseclib is designed to be fully interoperable with <a href="/docs/interop/overview">standardized
+        cryptography libraries</a> and protocols.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Long-term support',
+    Svg: require('@site/static/img/lts.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Don't have PHP 8.1+? Try phpseclib 3.0 (PHP 5.6+),
+        phpseclib 2.0 (PHP 5.3+) or phpseclib 1.0 (PHP 4.4+).
       </>
     ),
   },

@@ -16,8 +16,29 @@
   }
 }
 
+/* Make the container wrap and add space between buttons */
 .buttons {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem; /* or var(--ifm-spacing-horizontal) */
+  justify-content: center; /* or flex-start */
+}
+
+/* Tweak button sizing a bit further (optional) */
+.buttons :global(.button) {
+  /* Let long labels wrap on small screens */
+  white-space: normal;
+
+  /* Optional: make them a touch smaller than button--sm */
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+}
+
+/* Force nice stacking on narrow phones */
+@media (max-width: 480px) {
+  .buttons :global(.button) {
+    /* Let each button take full row when needed */
+    flex: 1 1 100%;
+    text-align: center;
+  }
 }
