@@ -1,0 +1,50 @@
+/* src/components/SpecialThanks/styles.module.css */
+.wrap {
+  text-align: center;
+  border-top: 1px solid var(--ifm-toc-border-color, #e5e7eb);
+  background: var(--ifm-color-emphasis-0);
+}
+
+.inner {
+  max-width: var(--ifm-container-width-xl);
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.grid {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;   /* centers the items */
+  gap: 1.5rem;               /* space between items */
+  padding: 0;
+  margin: 0;
+}
+
+.item { margin: 0; }
+
+/* no card/border anymore, just logo + text stacked */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo {
+  width: 200px; /* tweak as needed */
+  height: auto;
+  margin-bottom: 0.25rem;
+}
+
+.name {
+  color: var(--ifm-font-color-base);
+  font-size: 0.9rem;
+}
