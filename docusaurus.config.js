@@ -124,13 +124,6 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
-
-//          {to: '/blog', label: 'API', position: 'left'},
-//          {
-//            href: 'https://github.com/facebook/docusaurus',
-//            label: 'GitHub',
-//            position: 'right',
-//          },
         ],
       },
       footer: {
@@ -140,38 +133,50 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'SSH / SFTP',
+                to: '/ssh2/connect',
+              },
+              {
+                label: 'Public Key Crypto',
+                to: '/publickeys/overview',
+              },
+              {
+                label: 'Symmetric Key Crypto',
+                to: '/symmetric/overview',
               },
             ],
           },
           {
-            title: 'Community',
+            title: 'Support',
             items: [
+              {
+                label: 'Docs (1.0 / 2.0)',
+                href: 'https://phpseclib.sourceforge.net/',
+              },
               {
                 label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                href: 'https://stackoverflow.com/questions/tagged/phpseclib',
               },
               {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'X',
-                href: 'https://x.com/docusaurus',
+                label: 'GitHub Issues',
+                href: 'https://github.com/phpseclib/phpseclib/issues',
               },
             ],
           },
           {
-            title: 'More',
+            title: 'Sponsor',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'Patreon',
+                href: 'https://patreon.com/phpseclib',
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                href: 'https://github.com/sponsors/terrafrost',
+              },
+              {
+                label: 'PayPal',
+                href: 'https://sourceforge.net/donate/index.php?group_id=198487',
               },
             ],
           },
