@@ -34,6 +34,11 @@ const sidebars = {
       label: 'Symmetric Keys',
       items: ['symmetric/overview'],
     },
+      {
+      type: 'category',
+      label: 'X.509',
+      items: ['x509/x509'],
+    },
   ],
 };
 

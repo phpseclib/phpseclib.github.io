@@ -104,3 +104,13 @@ html[data-theme='dark'] {
 html[data-theme='dark'] .hero--primary {
   --ifm-hero-background-color: #8892bf;
 }
+
+.tree a {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.tree div:has(> a) {
+  cursor: text
+}
