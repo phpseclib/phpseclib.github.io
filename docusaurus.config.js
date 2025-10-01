@@ -144,6 +144,10 @@ const config = {
                 label: 'Symmetric Key Crypto',
                 to: '/symmetric/overview',
               },
+              {
+                label: 'X509 / PFX / CMS / etc',
+                to: '/docs/x509',
+              },
             ],
           },
           {
