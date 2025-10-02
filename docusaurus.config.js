@@ -146,7 +146,7 @@ const config = {
               },
               {
                 label: 'X509 / PFX / CMS / etc',
-                to: '/docs/x509',
+                to: '/docs/asn1/x509',
               },
             ],
           },

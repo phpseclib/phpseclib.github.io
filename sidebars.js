@@ -37,7 +37,7 @@ const sidebars = {
       {
       type: 'category',
       label: 'X.509',
-      items: ['x509/x509'],
+      items: ['asn1/x509'],
     },
   ],
 };
