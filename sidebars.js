@@ -34,10 +34,26 @@ const sidebars = {
       label: 'Symmetric Keys',
       items: ['symmetric/overview'],
     },
-      {
+    {
       type: 'category',
       label: 'X.509',
       items: ['asn1/x509', 'asn1/csr', 'asn1/spkac', 'asn1/crl'],
+    },
+    {
+      type: 'category',
+      label: 'Interoperability',
+      items: [
+        'interop/overview',
+        'interop/python',
+        'interop/java',
+        'interop/javascript',
+        'interop/nodejs',
+        'interop/go',
+        'interop/ruby',
+        'interop/csharp',
+        'interop/c',
+        'interop/php',
+      ],
     },
   ],
 };
