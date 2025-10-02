@@ -1,0 +1,22 @@
+---
+title: CRL
+---
+
+## Reading CRLs
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = new X509();
+$crl = $x509->loadCRL(file_get_contents('crl.bin'));
+
+var_dump($crl);
+```
+<sup>([download crl.bin](pathname:///asn1/crl.bin))</sup>
+
+Running the above will produce an array that looks something like this:
+
+import CRL from './crl-raw.md';
+
+<CRL />
+
