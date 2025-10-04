@@ -253,7 +253,7 @@ Note that the actual keys generated are not "beautified" as these examples are.
 
 Generated with `$key->toString('JWK')`.
 
-```
+```json
 {
   "keys": [
     {
@@ -275,7 +275,7 @@ Generated with `$key->toString('JWK')`.
 
 Generated with `$key->getPublicKey()->toString('JWK')`.
 
-```
+```json
 {
   "keys": [
     {
@@ -293,7 +293,7 @@ Generated with `$key->getPublicKey()->toString('JWK')`.
 
 Generated with `$key->toString('XML')`.
 
-```
+```xml
 <RSAKeyPair>
   <Modulus>qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==</Modulus>
   <Exponent>AQAB</Exponent>
@@ -310,7 +310,7 @@ Generated with `$key->toString('XML')`.
 
 Generated with `$key->getPublicKey()->toString('XML')`.
 
-```
+```xml
 <RSAKeyValue>
   <Modulus>qPfgaTEWEP3S9w0tgsicURfo+nLW09/0KfOPinhYZ4ouzU+3xC4pSlEp8Ut9FgL0AgqNslNaK34Kq+NZjO9DAQ==</Modulus>
   <Exponent>AQAB</Exponent>

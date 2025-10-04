@@ -330,7 +330,7 @@ ssh-dss AAAAB3NzaC1kc3MAAACBALaCtSX6h9VrsDu0HxAgKrIm53KVehDvpAz5W3Ka+dga16OtXqLa
 
 Generated with `$key->getPublicKey()->toString('XML')`.
 
-```
+```xml
 <DSAKeyValue>
   <P>toK1JfqH1WuwO7QfECAqsibncpV6EO+kDPlbcpr52BrXo61eotrkFgXveGWvc1ZM9ZM+ul42OJUHQUN0aqU9CjpyDwogWdrHHJdTCm1anINKeq5wBsMsxskST+Y8N43pHIHl88315r35WUj4wX4Sbm+jT6rHyWgjziaOQHnCz0E=</P>
   <Q>pdmOyrFA8VstYlztyLJ9LzgCDSU=</Q>

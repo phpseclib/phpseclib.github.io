@@ -133,16 +133,20 @@ const config = {
             title: 'Docs',
             items: [
               {
+                label: 'Introduction',
+                to: '/docs/intro/why',
+              },
+              {
                 label: 'SSH / SFTP',
-                to: '/ssh2/connect',
+                to: '/docs/ssh2/connect',
               },
               {
                 label: 'Public Key Crypto',
-                to: '/publickeys/overview',
+                to: '/docs/publickeys/overview',
               },
               {
                 label: 'Symmetric Key Crypto',
-                to: '/symmetric/overview',
+                to: '/docs/symmetric/overview',
               },
               {
                 label: 'X509 / PFX / CMS / etc',

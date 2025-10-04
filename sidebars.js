@@ -21,6 +21,11 @@ const sidebars = {
   tutorialSidebar: [
     {
       type: 'category',
+      label: 'Introduction',
+      items: ['intro/why', 'intro/install', 'intro/speed', 'intro/versioning'],
+    },
+    {
+      type: 'category',
       label: 'SSH2',
       items: ['ssh2/connect', 'ssh2/auth', 'ssh2/commands', 'ssh2/sftp', 'ssh2/diagnosis'],
     },
