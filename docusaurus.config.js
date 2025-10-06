@@ -50,6 +50,12 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          lastVersion: '4.0', // ?? tells Docusaurus 4.0 is the current maintained version
+          versions: {
+            current: { label: 'Next', banner: 'none' }, // hide banner for unreleased docs
+            '4.0': { label: '4.0', banner: 'unmaintained' },    // hide banner for current version
+            '3.0': { label: '3.0', banner: 'unmaintained' }, // show banner only for 3.0
+          },
           remarkPlugins: [remarkGfm, remarkMath],
           rehypePlugins: [rehypeKatex],
           sidebarPath: './sidebars.js',
@@ -123,6 +129,10 @@ const config = {
             href: 'https://github.com/phpseclib/phpseclib',
             label: 'GitHub',
             position: 'right',
+          },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right'
           },
         ],
       },

@@ -1,0 +1,66 @@
+{
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Support": {
+    "message": "Support",
+    "description": "The title of the footer links column with title=Support in the footer"
+  },
+  "link.title.Sponsor": {
+    "message": "Sponsor",
+    "description": "The title of the footer links column with title=Sponsor in the footer"
+  },
+  "link.item.label.Introduction": {
+    "message": "Introduction",
+    "description": "The label of footer link with label=Introduction linking to /docs/intro/why"
+  },
+  "link.item.label.SSH / SFTP": {
+    "message": "SSH / SFTP",
+    "description": "The label of footer link with label=SSH / SFTP linking to /docs/ssh2/connect"
+  },
+  "link.item.label.Public Key Crypto": {
+    "message": "Public Key Crypto",
+    "description": "The label of footer link with label=Public Key Crypto linking to /docs/publickeys/overview"
+  },
+  "link.item.label.Symmetric Key Crypto": {
+    "message": "Symmetric Key Crypto",
+    "description": "The label of footer link with label=Symmetric Key Crypto linking to /docs/symmetric/overview"
+  },
+  "link.item.label.X509 / PFX / CMS / etc": {
+    "message": "X509 / PFX / CMS / etc",
+    "description": "The label of footer link with label=X509 / PFX / CMS / etc linking to /docs/asn1/x509"
+  },
+  "link.item.label.Interoperability": {
+    "message": "Interoperability",
+    "description": "The label of footer link with label=Interoperability linking to /docs/interop/overview"
+  },
+  "link.item.label.Docs (1.0 / 2.0)": {
+    "message": "Docs (1.0 / 2.0)",
+    "description": "The label of footer link with label=Docs (1.0 / 2.0) linking to https://phpseclib.sourceforge.net/"
+  },
+  "link.item.label.Stack Overflow": {
+    "message": "Stack Overflow",
+    "description": "The label of footer link with label=Stack Overflow linking to https://stackoverflow.com/questions/tagged/phpseclib"
+  },
+  "link.item.label.GitHub Issues": {
+    "message": "GitHub Issues",
+    "description": "The label of footer link with label=GitHub Issues linking to https://github.com/phpseclib/phpseclib/issues"
+  },
+  "link.item.label.Patreon": {
+    "message": "Patreon",
+    "description": "The label of footer link with label=Patreon linking to https://patreon.com/phpseclib"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/sponsors/terrafrost"
+  },
+  "link.item.label.PayPal": {
+    "message": "PayPal",
+    "description": "The label of footer link with label=PayPal linking to https://sourceforge.net/donate/index.php?group_id=198487"
+  },
+  "copyright": {
+    "message": "Copyright © 2025 Jim Wigginton. Built with Docusaurus.",
+    "description": "The footer copyright"
+  }
+}

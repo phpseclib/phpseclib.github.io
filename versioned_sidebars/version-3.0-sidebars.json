@@ -1,0 +1,70 @@
+{
+  "tutorialSidebar": [
+    {
+      "type": "category",
+      "label": "Introduction",
+      "items": [
+        "intro/why",
+        "intro/install",
+        "intro/speed",
+        "intro/versioning"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "SSH2",
+      "items": [
+        "ssh2/connect",
+        "ssh2/auth",
+        "ssh2/commands",
+        "ssh2/sftp",
+        "ssh2/diagnosis"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Public Keys",
+      "items": [
+        "publickeys/overview",
+        "publickeys/rsa",
+        "publickeys/dsa",
+        "publickeys/ec",
+        "publickeys/dh",
+        "publickeys/jwt"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Symmetric Keys",
+      "items": [
+        "symmetric/overview"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "X.509",
+      "items": [
+        "asn1/x509",
+        "asn1/csr",
+        "asn1/spkac",
+        "asn1/crl"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Interoperability",
+      "items": [
+        "interop/overview",
+        "interop/python",
+        "interop/java",
+        "interop/javascript",
+        "interop/nodejs",
+        "interop/go",
+        "interop/ruby",
+        "interop/csharp",
+        "interop/c",
+        "interop/php"
+      ]
+    }
+  ]
+}
