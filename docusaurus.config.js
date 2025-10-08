@@ -50,6 +50,12 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          includeCurrentVersion: false,
+          lastVersion: '4.0',
+          versions: {
+            '4.0': { label: '4.0', banner: 'none' },
+            '3.0': { label: '3.0', banner: 'unmaintained' },
+          },
           remarkPlugins: [remarkGfm, remarkMath],
           rehypePlugins: [rehypeKatex],
           sidebarPath: './sidebars.js',
