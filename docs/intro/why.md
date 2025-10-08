@@ -104,25 +104,25 @@ phpseclib 3.0 supports best practices algorithms that libssh2 [does not support]
 
 The following table shows how long, in seconds, it took to transfer a 10mb file via phpseclib and libssh2 to localhost.
 
-<table border="1" style={{display: 'table'}}>
+<table border="1" style={{display: 'table'}} id="sftpSpeed">
   <tbody>
     <tr>
-      <td style={{background: 'tan'}} rowspan="2">Upload</td>
+      <td class="direction" rowspan="2">Upload</td>
       <td><strong>libssh2</strong></td>
       <td>0.6125</td>
     </tr>
     <tr>
       <td><strong>phpseclib</strong></td>
-      <td style={{background: 'lightgreen'}}>0.1680</td>
+      <td class="speed">0.1680</td>
     </tr>
     <tr>
-      <td style={{background: 'tan'}} rowspan="2">Download</td>
+      <td class="direction" rowspan="2">Download</td>
       <td><strong>libssh2</strong></td>
       <td>1.5422</td>
     </tr>
     <tr>
       <td><strong>phpseclib</strong></td>
-      <td style={{background: 'lightgreen'}}>0.2389</td>
+      <td class="speed">0.2389</td>
     </tr>
   </tbody>
 </table>
