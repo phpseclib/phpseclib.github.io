@@ -34,7 +34,7 @@ The benchmarks were [performed on GitHub Actions](https://github.com/phpseclib/b
       <td class="highlight">
         <b>PHP 4.4</b>
       </td>
-      <td class="red_d0">7.033</td>
+      <td class="red_0d">7.033</td>
       <td class="red_61">4.606</td>
       <td class="red_b0">2.310</td>
       <td class="red_e7">0.710</td>
