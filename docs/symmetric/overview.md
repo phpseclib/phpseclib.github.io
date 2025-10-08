@@ -92,7 +92,7 @@ Passwords should still follow good password guidelines. A number, an upper case 
 The current best practices method for generating keys from passwords is actually [Argon2](https://en.wikipedia.org/wiki/Argon2), which is not implemented by phpseclib. The reason phpseclib doesn't support this is two fold
 
 1. Speed considerations. It's too slow for [sodium_compat](https://github.com/paragonie/sodium_compat) to implement and it's too slow for phpseclib to implement. Maybe [PHP8's JIT](https://wiki.php.net/rfc/jit) will change this.
-2. [PKCS8](publickeys.md#common-key-formats) support. The key derivation functions that phpseclib does implement are all used, in one form or another, for PKCS8 public keys.
+2. [PKCS8](publickeys/overview.md#common-key-formats) support. The key derivation functions that phpseclib does implement are all used, in one form or another, for PKCS8 public keys.
 
 The parameters `setPassword` takes are as follows:
 

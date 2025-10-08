@@ -39,7 +39,7 @@ All successfully loaded keys are an instance of `phpseclib3\Crypt\Common\Asymmet
 
 The format of a successfully loaded key can be determined by looking at `$key->getLoadedFormat()`. This will return a string. Note that keys embedded within X.509 certificates will not identify themselves as X.509 - rather, they'll identify themselves as PKCS8, due to various technical reasons.
 
-[^x509]: When an X.509 key is loaded _no_ validation is performed. A public key will be returned even if the certificate is expired and even if the signature is invalid. The _best_ way to get the public key in an X.509 cert is to use the explicit [X.509 functionality](x509.md) that phpseclib provides but PublicKeyLoader does work, as well, albeit suboptimally.
+[^x509]: When an X.509 key is loaded _no_ validation is performed. A public key will be returned even if the certificate is expired and even if the signature is invalid. The _best_ way to get the public key in an X.509 cert is to use the explicit [X.509 functionality](asn1/x509.md) that phpseclib provides but PublicKeyLoader does work, as well, albeit suboptimally.
 
 ## PublicKey vs. PrivateKey
 
@@ -342,6 +342,6 @@ Due to the SSH2 tie-in a public key algorithm with parameters not supported by S
 See [RFC4716](https://tools.ietf.org/html/rfc4716#section-4) for more information.
 
 ## Comments
-Only PuTTY and OpenSSH formatted keys support comments. See [Saving Keys](publickeys.md#saving-keys) for information on saving keys.
+Only PuTTY and OpenSSH formatted keys support comments. See [Saving Keys](overview.md#saving-keys) for information on saving keys.
 
 To read keys doing `$key->getComment()` is sufficient. If the loaded key is in a format that does not support keys then `NULL` will be returned.

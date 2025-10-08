@@ -2,7 +2,7 @@
 title: PHP
 ---
 
-Despite the fact that PHP has built-in support for some cryptographic operations via OpenSSL there are still reasons to use phpseclib. See [phpseclib vs OpenSSL](why.md#phpseclib-vs-openssl)
+Despite the fact that PHP has built-in support for some cryptographic operations via OpenSSL there are still reasons to use phpseclib. See [phpseclib vs OpenSSL](intro/why.md#phpseclib-vs-openssl)
 
 ## RSA Decryption
 
