@@ -1,0 +1,32 @@
+<div class="tree">
+  <details>
+    <summary>extnId</summary>
+    <div>id-ce-cRLDistributionPoints</div>
+  </details>
+  <details>
+    <summary>extnValue</summary>
+    <details>
+      <summary>0</summary>
+      <details>
+        <summary>distributionPoint</summary>
+        <details>
+          <summary>fullName</summary>
+          <details>
+            <summary>0</summary>
+            <details>
+              <summary>uniformResourceIdentifier</summary>
+              <details open>
+                <summary>phpseclib3\File\ASN1\Types\IA5String</summary>
+                <div>http://crl.thawte.com/ThawteSGCCA.crl</div>
+              </details>
+            </details>
+          </details>
+        </details>
+      </details>
+    </details>
+  </details>
+  <details>
+    <summary>critical</summary>
+    <div></div>
+  </details>
+</div>

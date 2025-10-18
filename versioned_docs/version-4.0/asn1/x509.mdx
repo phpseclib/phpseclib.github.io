@@ -2,534 +2,39 @@
 title: X.509
 ---
 
+import GoodX509 from './inc/x509-good.md';
+import ListExtensions from './inc/x509-list-extensions.md';
+import GetExtension from './inc/x509-get-extension.md';
+import EmptyX509 from './inc/x509-empty.md';
+
 ## Reading Certificates
 
 ```php
 use phpseclib3\File\X509;
 
-$x509 = new X509();
-$cert = $x509->loadX509(file_get_contents('google.crt'));
+$x509 = X509::load(file_get_contents('google.crt'));
 
-var_dump($cert);
+print_r($x509);
 ```
 <sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
 
-Running the above will produce an array that looks something like this:
+`$x509`, in this case, is an X509 object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$x509` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
-<div class="tree">
-<details>
-  <summary>tbsCertificate</summary>
-<details>
-<summary>version</summary>
-<div>v3</div>
-</details>
-<details>
-<summary>serialNumber</summary>
-<div>105827261859531100510423749949966875981</div>
-</details>
-<details>
-  <summary>signature</summary>
-<details>
-<summary>algorithm</summary>
-<div>sha1WithRSAEncryption</div>
-</details>
-<details>
-  <summary>parameters</summary>
-<details>
-<summary>null</summary>
-<div></div>
-</details>
-</details>
-</details>
-<details>
-  <summary>issuer</summary>
-<details>
-  <summary>rdnSequence</summary>
-<details>
-  <summary>0</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-countryName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>printableString</summary>
-<div>ZA</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>1</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-organizationName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>printableString</summary>
-<div>Thawte Consulting (Pty) Ltd.</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>2</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-commonName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>printableString</summary>
-<div>Thawte SGC CA</div>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>validity</summary>
-<details>
-  <summary>notBefore</summary>
-<details>
-<summary>utcTime</summary>
-<div>Wed, 26 Oct 2011 00:00:00 +0000</div>
-</details>
-</details>
-<details>
-  <summary>notAfter</summary>
-<details>
-<summary>utcTime</summary>
-<div>Mon, 30 Sep 2013 23:59:59 +0000</div>
-</details>
-</details>
-</details>
-<details>
-  <summary>subject</summary>
-<details>
-  <summary>rdnSequence</summary>
-<details>
-  <summary>0</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-countryName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>printableString</summary>
-<div>US</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>1</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-stateOrProvinceName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>printableString</summary>
-<div>California</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>2</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-localityName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>teletexString</summary>
-<div>Mountain View</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>3</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-organizationName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>teletexString</summary>
-<div>Google Inc</div>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>4</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>type</summary>
-<div>id-at-commonName</div>
-</details>
-<details>
-  <summary>value</summary>
-<details>
-<summary>teletexString</summary>
-<div>www.google.com</div>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>subjectPublicKeyInfo</summary>
-<details>
-  <summary>algorithm</summary>
-<details>
-<summary>algorithm</summary>
-<div>rsaEncryption</div>
-</details>
-<details>
-  <summary>parameters</summary>
-<details>
-<summary>null</summary>
-<div></div>
-</details>
-</details>
-</details>
-<details>
-<summary>subjectPublicKey</summary>
-<div><pre>-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDetyZDppmFzTinFQm5zw/Jw1WM
-iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
-2XGMzM0nEx6dQl049qes7/pi8xiB1CRGfwF3fMYqiRSZu5g5HagZ+zkARH0blGp4
-LWmtwHos+tDaIBKY0wIDAQAB
------END PUBLIC KEY-----</pre></div>
-</details>
-</details>
-<details>
-  <summary>extensions</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>extnId</summary>
-<div>id-ce-basicConstraints</div>
-</details>
-<details>
-<summary>critical</summary>
-<div>1</div>
-</details>
-<details>
-  <summary>extnValue</summary>
-<details>
-<summary>cA</summary>
-<div></div>
-</details>
-</details>
-</details>
-<details>
-  <summary>1</summary>
-<details>
-<summary>extnId</summary>
-<div>id-ce-cRLDistributionPoints</div>
-</details>
-<details>
-<summary>critical</summary>
-<div></div>
-</details>
-<details>
-  <summary>extnValue</summary>
-<details>
-  <summary>0</summary>
-<details>
-  <summary>distributionPoint</summary>
-<details>
-  <summary>fullName</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>uniformResourceIdentifier</summary>
-<div>http://crl.thawte.com/ThawteSGCCA.crl</div>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>2</summary>
-<details>
-<summary>extnId</summary>
-<div>id-ce-extKeyUsage</div>
-</details>
-<details>
-<summary>critical</summary>
-<div></div>
-</details>
-<details>
-  <summary>extnValue</summary>
-<details>
-<summary>0</summary>
-<div>id-kp-serverAuth</div>
-</details>
-<details>
-<summary>1</summary>
-<div>id-kp-clientAuth</div>
-</details>
-<details>
-<summary>2</summary>
-<div>2.16.840.1.113730.4.1</div>
-</details>
-</details>
-</details>
-<details>
-  <summary>3</summary>
-<details>
-<summary>extnId</summary>
-<div>id-pe-authorityInfoAccess</div>
-</details>
-<details>
-<summary>critical</summary>
-<div></div>
-</details>
-<details>
-  <summary>extnValue</summary>
-<details>
-  <summary>0</summary>
-<details>
-<summary>accessMethod</summary>
-<div>id-ad-ocsp</div>
-</details>
-<details>
-  <summary>accessLocation</summary>
-<details>
-<summary>uniformResourceIdentifier</summary>
-<div>http://ocsp.thawte.com</div>
-</details>
-</details>
-</details>
-<details>
-  <summary>1</summary>
-<details>
-<summary>accessMethod</summary>
-<div>id-ad-caIssuers</div>
-</details>
-<details>
-  <summary>accessLocation</summary>
-<details>
-<summary>uniformResourceIdentifier</summary>
-<div>http://www.thawte.com/repository/Thawte_SGC_CA.crt</div>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-</details>
-<details>
-  <summary>signatureAlgorithm</summary>
-<details>
-<summary>algorithm</summary>
-<div>sha1WithRSAEncryption</div>
-</details>
-<details>
-  <summary>parameters</summary>
-<details>
-<summary>null</summary>
-<div></div>
-</details>
-</details>
-</details>
-<details>
-<summary>signature</summary>
-<div>...</div>
-</details>
-</div>
+<GoodX509 />
 
-### getDNProp()
+All elements and subelements of the above X509 object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$x509['tbsCertificate']['subjectPublicKeyInfo']` or you could do `$x509->getPublicKey()`. It's these helper functions that set the X509 class apart from \phpseclib3\File\ASN1\Constructed.
 
-```php
-print_r($x509->getDNProp('CN'));
-```
-That will produce the following:
-
-<div class="tree">
-<details>
-<summary>0</summary>
-<div>www.google.com</div>
-</details>
-</div>
-
-An array is returned because each distinguished name property can (in theory) have multiple values
-
-Valid property names are enumerated upon at [Distinguished Property Names](dnprops.md).
-
-`getIssuerDNProp()` returns the issuer distinguished name as opposed to the subject distinguished name.
-
-### getDN()
-
-```php
-print_r($x509->getDN());
-```
-
-`getDN()` / `getIssuerDN()` accept several different parameters:
-
-- `X509::DN_ARRAY` (the default value) returns an array who's keys are based on the ASN.1 syntax for X.509:
-  <div class="tree">
-  <details>
-    <summary>rdnSequence</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-  <summary>type</summary>
-  <div>id-at-countryName</div>
-  </details>
-  <details>
-    <summary>value</summary>
-  <details>
-  <summary>printableString</summary>
-  <div>US</div>
-  </details>
-  </details>
-  </details>
-  </details>
-  <details>
-    <summary>1</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-  <summary>type</summary>
-  <div>id-at-stateOrProvinceName</div>
-  </details>
-  <details>
-    <summary>value</summary>
-  <details>
-  <summary>printableString</summary>
-  <div>California</div>
-  </details>
-  </details>
-  </details>
-  </details>
-  <details>
-    <summary>2</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-  <summary>type</summary>
-  <div>id-at-localityName</div>
-  </details>
-  <details>
-    <summary>value</summary>
-  <details>
-  <summary>teletexString</summary>
-  <div>Mountain View</div>
-  </details>
-  </details>
-  </details>
-  </details>
-  <details>
-    <summary>3</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-  <summary>type</summary>
-  <div>id-at-organizationName</div>
-  </details>
-  <details>
-    <summary>value</summary>
-  <details>
-  <summary>teletexString</summary>
-  <div>Google Inc</div>
-  </details>
-  </details>
-  </details>
-  </details>
-  <details>
-    <summary>4</summary>
-  <details>
-    <summary>0</summary>
-  <details>
-  <summary>type</summary>
-  <div>id-at-commonName</div>
-  </details>
-  <details>
-    <summary>value</summary>
-  <details>
-  <summary>teletexString</summary>
-  <div>www.google.com</div>
-  </details>
-  </details>
-  </details>
-  </details>
-  </details>
-  </div>
-
-- `X509::DN_STRING` returns an OpenSSL-style string:
-  ```
-  C=US, ST=California, L=Mountain View, O=Google Inc, CN=www.google.com
-  ```
-
-- `X509::DN_OPENSSL` returns an OpenSSL-style array:
-  <div class="tree">
-  <details>
-  <summary>C</summary>
-  <div>US</div>
-  </details>
-  <details>
-  <summary>ST</summary>
-  <div>California</div>
-  </details>
-  <details>
-  <summary>L</summary>
-  <div>Mountain View</div>
-  </details>
-  <details>
-  <summary>O</summary>
-  <div>Google Inc</div>
-  </details>
-  <details>
-  <summary>CN</summary>
-  <div>www.google.com</div>
-  </details>
-  </div>
-
-- `X509::DN_ASN1` returns a DER encoded binary string
-- `X509::DN_CANON` returns a "canonicalized" DER encoded binary string wherein SEQUENCE around RDNs and all string values normalized as trimmed lowercase UTF-8 with all spacing as one blank. Constructed RDNs are not canonicalized.
+To learn more about the capabilities afforded to the X509 class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
 ### getPublicKey()
+
+Returns an instance of [\phpseclib3\Crypt\Common\PublicKey](publickeys/overview.md#publickey-vs-privatekey).
 
 ```php
 echo $x509->getPublicKey();
 ```
-Returns a `\phpseclib3\Crypt\Common\PublicKey` object that, by default, gets cast to a PKCS8-encoded public key:
+
+Running the above will output the following:
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -539,6 +44,239 @@ iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
 LWmtwHos+tDaIBKY0wIDAQAB
 -----END PUBLIC KEY-----
 ```
+Note that if the key is in an unsupported format then `$x509->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$x509['tbsCertificate']['subjectPublicKeyInfo']`.
+
+### listExtensions()
+
+"_Extensions can convey such data as additional subject identification information, key attribute information, policy information, and certification path constraints._" -- [RFC520 pp. 10](https://www.rfc-editor.org/rfc/rfc5280#page-10)
+
+```php
+print_r($x509->listExtensions());
+```
+
+Running the above will produce an array with all the extensions that are in the certificate:
+
+<ListExtensions />
+
+### getExtension()
+
+Returns an array representing the first instance of an extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+
+If said extension isn't present then null is returned.
+
+```php
+print_r($x509->getExtension('id-ce-cRLDistributionPoints'));
+```
+
+Since `id-ce-cRLDistributionPoints` exists in `$x509`, running the above will produce an array with three elements:
+
+<GetExtension />
+
+You can search by the extension name or the OID for the extension (`2.5.29.31`, in this case).
+
+If you just want to see if the extension exists you could do `getExtension() !== null` or you could call `hasExtension()`:
+
+```php
+echo $x509->hasExtension('id-ce-cRLDistributionPoints') ? 't' : 'f';
+```
+`hasExtension()` works largely the same way that `getExtension()` does, except that it returns true or false depending on if the extension exists or not.
+
+### getDN() / getDNProps()
+
+An X.509 certificate has a subject and an issuer distinguished name (DN for short). For self signed certs, when the subject and issuer DNs are the same, you can call [`getDN()`](detail-dns.mdx#getdn), [`hasDNProp()`](detail-dns.mdx#hasdnprop) and [`getDNProps()`](detail-dns.mdx#getdnprops).
+
+If the subject and issuer DNs are different then calling `getDN()`, `hasDNProp()` or `getDNProps()` will throw an exception and you'll need to call either the subject or issuer versions of those methods instead. eg.
+
+Subject DN Methods:
+
+- [`getSubjectDN()`](detail-dns.mdx#getdn)
+- [`hasSubjectDNProp()`](detail-dns.mdx#hasdnprop)
+- [`getSubjectDNProps()`](detail-dns.mdx#getdnprops)
+
+Issuer DN Methods:
+
+- [`getIssuerDN()`](detail-dns.mdx#getdn)
+- [`hasIssuerDNProps()`](detail-dns.mdx#hasdnprop)
+- [`getSubjectDNProps()`](detail-dns.mdx#getdnprops)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Creating Certificates
+
+### Minimalistic Certificate
+
+Consider the following:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = new X509();
+echo $x509;
+```
+The certificate that that would produce would look something like this:
+
+```
+-----BEGIN CERTIFICATE-----
+MEUwO6ADAgECAgEBMAMGAQAwADAeFw03MDAxMDEwMDAwMDBaFw03MTAxMDEwMDAw
+MDBaMAAwCDADBgEAAwEAMAMGAQADAQA=
+-----END CERTIFICATE-----
+```
+This certificate has no extensions, does not have a subject or an issuer distinguished name, does not have a signature and it does not have a public key.
+
+If you saved this certificate as test.pem and then did `openssl x509 -noout -text -in test.pem` on that certificate you'd get this:
+
+```
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: 0.0
+        Issuer:
+        Validity
+            Not Before: Jan  1 00:00:00 1970 GMT
+            Not After : Jan  1 00:00:00 1971 GMT
+        Subject:
+        Subject Public Key Info:
+            Public Key Algorithm: 0.0
+            Unable to load Public Key
+4047192EA37F0000:error:03000072:digital envelope routines:X509_PUBKEY_get0:decode error:../crypto/x509/x_pubkey.c:458:
+4047192EA37F0000:error:03000072:digital envelope routines:X509_PUBKEY_get0:decode error:../crypto/x509/x_pubkey.c:458:
+    Signature Algorithm: 0.0
+    Signature Value:
+```
+If you did `print_r($x509)` on that certificate you'd get this:
+
+<EmptyX509/>
+
+That said, even when doing this, there are 3x things that are (probably) going to be different every time:
+
+1. The serial number. It's set to be a random 160-bit positive number.
+2. The start date. It's set to the current time.
+3. The end date. It's set to one year from the current time.
+
+
+### Setting the Public Key
+
+Let's say you created your public key thusly:
+
+```php
+use phpseclib3\Crypt\EC;
+
+$private = EC::createKey('nistp256');
+$public = $private->getPublicKey();
+```
+At this point you could set the public key for the X.509 certificate using any number of techniques:
+
+```php
+$x509 = new X509($public);
+echo $x509;
+```
+
+```php
+$x509 = new X509();
+$x509->setPublicKey($public);
+echo $x509;
+```
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = new CSR($public);
+$x509 = new X509($csr);
+echo $x509;
+```
+If you set the public key via a CSR then, if the CSR also had a subject DN set and extensions requested, those would also be auto set as well.
+
+### Setting DNs
+
+An X.509 certificate has a subject and an issuer distinguished name (DN for short). For self signed certs, when the subject and issuer DNs are the same, you can call [`setDN()`](detail-dns.mdx#setdn), [`resetDN()`](detail-dns.mdx#resetdn), [`addDNProp()`](detail-dns.mdx#adddnprop), [`addDNProps()`](detail-dns.mdx#adddnprops) and [`removeDNProps()`](detail-dns.mdx#removednprops)
+
+If the subject and issuer DNs are different then calling `setDN()`, `resetDN()`, `addDNProp()`, `addDNProps()` or `removeDNProps()` will throw an exception and you'll need to call either the subject or issuer versions of those methods instead. eg.
+
+Subject DN Methods:
+
+- [`setSubjectDN()`](detail-dns.mdx#setdn)
+- [`resetSubjectDN()`](detail-dns.mdx#resetdn)
+- [`addSubjectDNProp()`](detail-dns.mdx#adddnprop)
+- [`addSubjectDNProps()`](detail-dns.mdx#adddnprops)
+- [`removeSubjectDNProps()`](detail-dns.mdx#removednprops)
+
+Issuer DN Methods:
+
+- [`setIssuerDN()`](detail-dns.mdx#setdn)
+- [`resetIssuerDN()`](detail-dns.mdx#resetdn)
+- [`addIssuerDNProp()`](detail-dns.mdx#adddnprop)
+- [`addIssuerDNProps()`](detail-dns.mdx#adddnprops)
+- [`removeIssuerDNProps()`](detail-dns.mdx#removednprops)
+
+The subject DN can also be set by passing an instance of `\phpseclib3\File\CSR` to the X509 constructor. eg.
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = CSR::load('...');
+$x509 = new X509($csr);
+echo $x509;
+```
+
+### Signing
+
+Certificates can be signed with private key objects or PFX objects.
+
+Here's an example of how you'd create a self signed CA cert with a private key object:
+
+```php
+use phpseclib3\Crypt\EC;
+use phpseclib3\File\X509;
+
+$CAprivate = EC::createKey('nistp256');
+$CApublic = $CAprivate->getPublicKey();
+
+$CAX509 = new X509($CApublic);
+$CAX509->makeCA();
+$CAX509->setDN('O=whatever');
+$CAprivate->sign($CAX509);
+```
+
+Here's an example of how you'd create a CA signed cert with a PFX object that builds on the above:
+
+```php
+$pfx->add($CAprivate);
+$pfx->add($CAX509);
+
+$private = EC::createKey('nistp256');
+$public = $private->getPublicKey();
+
+$x509 = new X509($public);
+$ca->setDN('O=child organization');
+$pfx->sign($x509);
+```
+This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that are in the PFX.
+
+Signing the certifcate before the DNs or extensions or whatever have been set will result in the certificate having a bad signature. Like modifications done after the signature was added do not automatically result in the signature being updated to reflect those changes.
+
+
+
+
+
+
+
+
+
+
+
 
 ## Validating Certificates
 

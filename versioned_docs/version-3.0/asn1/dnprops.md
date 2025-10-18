@@ -3,7 +3,7 @@ title: DNS Properties
 ---
 
 ## Valid Distinguished Name Property Names
-The property names are intended to be self-explanatory and are grouped together by they're aliases. They are case insensitive.
+The property names are intended to be self-explanatory and are grouped together by their aliases. They are case insensitive.
 
 - id-at-countryName
 

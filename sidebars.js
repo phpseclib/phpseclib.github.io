@@ -41,7 +41,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'X.509',
+      label: 'File Formats',
       items: ['asn1/x509', 'asn1/csr', 'asn1/spkac', 'asn1/crl'],
     },
     {

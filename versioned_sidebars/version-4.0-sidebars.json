@@ -42,12 +42,14 @@
     },
     {
       "type": "category",
-      "label": "X.509",
+      "label": "Files",
       "items": [
         "asn1/x509",
         "asn1/csr",
         "asn1/spkac",
-        "asn1/crl"
+        "asn1/crl",
+        "asn1/detail-constructed",
+        "asn1/detail-dns"
       ]
     },
     {

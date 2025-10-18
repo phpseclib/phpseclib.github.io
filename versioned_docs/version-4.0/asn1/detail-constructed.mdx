@@ -1,0 +1,183 @@
+---
+title: "Deep Dive: ASN1\\Constructed Objects"
+---
+
+import SimpleX509 from './inc/x509-simple.md';
+import BadX509_1 from './inc/x509-bad-1.md';
+
+## Overview
+
+A `\phpseclib3\File\ASN1\Constructed` object (hereinafter referred to as `Constructed`) most typically corresponds to either an [ASN.1 SEQUENCE](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/sequence.html) or an [ASN.1 SET](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/set.html) and contains one or more child elements. They're essentially [trees](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) whose leaf nodes are non-`Constructed` instances of `\phpseclib3\File\ASN1\Types\BaseTypes`.
+
+The following code sample shows how to load an X.509 certificate as a `Constructed` object:
+
+```php
+use phpseclib3\File\ASN1;
+use phpseclib3\File\ASN1\Maps\Certificate;
+
+$x509 = ASN1::extractBER(file_get_contents('google.crt'));
+$x509 = ASN1::decodeBER($x509);
+$x509 = ASN1::map($x509, Certificate::MAP);
+
+print_r($x509);
+```
+<sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
+
+In this example the `ASN1::extractBER()` is only needed because the X.509 certificate is a base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail). If it were a so-called DER (which stands for [Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), which is a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding)) then the `ASN1::extractBER()` call would be unnecessary.
+
+Anyway, the output of the above code snippet is this:
+
+<SimpleX509 />
+
+Superficially this looks identical to the [X509: Reading Certificates](x509#reading-certificates) example but there are a few key differences:
+
+- **Helper methods not defined**
+
+  None of the helper methods (eg. `getPublicKey()`, `listExtensions()`, `getExtension()`, `setExtension()`, etc) are present. `Constructed` classes are super generic and don't know enough about the underlying data structure to define helper methods.
+- **PublicKey is a BitString**
+
+  `$x509['tbsCertificate']['subjectPublicKeyInfo']` is _not_ an instance of `phpseclib3\Crypt\Common\PublicKey`. Indeed, `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString`. This is because `Constructed` is super generic and doesn't know how to further decode that.
+- **Extensions are OctetStrings**
+
+  None of the extensions (`$x509['tbsCertificate']['extensions']`) are fleshed out. Like `$x509['tbsCertificate']['extensions'][1]['extnValue']` (id-ce-cRLDistributionPoints) is an instance of `\phpseclib3\File\ASN1\Types\OctetString`. As before, this is because `Constructed` is super generic and doesn't know how to further decode extensions.
+
+In spite of that `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. What that means is that both `X509` (or any class that's a "thin wrapper" around `Constructed`) has the following features:
+
+## getEncoded()
+
+If you wanted to get the original BER encoding of the above X.509 certificate one need simply do this:
+
+```php
+$x509->getEncoded();
+```
+That's not super useful, however, so let's consider how one might validate a CSR signature. CSR's are easier to deal with in this case because you don't have to look at extensions or the date or anything like that.
+
+The easiest way to validate a CSR signature would be to use the **validateSignature helper method**, however, one could also do this:
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = CSR::load(file_get_contents('csr.csr'))
+
+$result = $csr->getPublicKey()->withHash('sha1')->verify(
+    $csr['certificationRequestInfo']->getEncoded(),
+    substr($csr['signature'], 1)
+);
+
+echo $result ? 'valid' : 'invalid';
+```
+<sup>([download csr.csr](pathname:///asn1/csr.csr.txt))</sup>
+
+The output of that is `valid`.
+
+In this example `CSR::load()` is being used instead of `ASN1` exclusive methods because it makes getting the public key easier and makes for a more succinct example.
+
+In theory, for CSR's, the specific hashes could be auto set from `$csr['signatureAlgorithm']['algorithm']`, however, that doesn't work as well for (for example) X.509 certificates. Like for those the signed cert would be the one that'd need to identify what algorithm the signing cert used - not the other way around. Plus, you should really be using `$x509->validateSignature()` instead, anyway.
+
+`$csr['signature']` has the first byte dropped (vis-a-vis `substr()`) for this reason (from [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2):
+
+> The initial octet shall encode, as an unsigned binary integer with bit 1 as the least significant bit, the number of unused bits in the final subsequent octet. The number shall be in the range zero to seven.
+
+`substr($csr['signature'], 1)` is an over simplification of that but (1) I have never seen a DER encoded string where the initial octet was anything other than 0 and (2) even if I had I'm trying to keep this example short and sweet.
+
+## Lazy and Eager Loading
+
+By default `Constructed` objects are [lazy loaded](https://en.wikipedia.org/wiki/Lazy_loading). To eager load a `Constructed` object (or any class that thinly wraps around said objects) one need only do `->toArray()` on the object in question.
+
+Some of the consequences of choosing one approach over another are discussed below.
+
+### Memory Usage
+
+The big advantage of lazy loading is lower memory usage.
+
+Consider the following code, employing lazy loading:
+
+```php
+use phpseclib3\File\CRL;
+
+$crl = CRL::load(file_get_contents('bigcrl.bin'));
+
+$match = $crl->isRevoked(new BigInteger('120cd8', 16));
+
+echo 'memory usage = ' . memory_get_peak_usage() . "\n"; exit;
+```
+
+[bigcrl.bin](pathname:///asn1/bigcrl.bin) is a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present, and `120cd8` is the 40,000'th revoked serial number.
+
+On PHP 8.3.14 the peak memory usage is ~43mb, which isn't great, but it sure beats the peak memory usage of the same CRL being eagerly loaded:
+
+```php
+use phpseclib3\File\CRL;
+
+$crl = CRL::load(file_get_contents('bigcrl.bin'))->toArray();
+
+echo 'memory usage = ' . memory_get_peak_usage() . "\n"; exit;
+```
+
+On PHP 8.3.14 the peak memory usage of that is ~326mb.
+
+### Error Concealment
+
+A disadvantage of lazy loading is that errors may be overlooked.
+
+Consider the following lazy loaded X.509 certificate:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = file_get_contents('google.crt');
+$x509 = ASN1::extractBER($x509);
+$x509[100] = '.';
+$x509 = X509::load($x509);
+print_r($x509['tbsCertificate']['extensions'][1]->toArray());
+```
+<sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
+
+The `id-ce-cRLDistributionPoints` extension is able to be displayed without issue.
+
+Now consider the following eagerly loaded X.509 certificate:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = file_get_contents('google.crt');
+$x509 = ASN1::extractBER($x509);
+$x509[100] = '.';
+print_r(X509::load($x509)->toArray());
+```
+That throws an Exception.
+
+Lazy loading only results in exceptions being thrown if you try to access the malformed part of the X.509 certificate. So like `$x509['tbsCertificate']['extensions'][1]->toArray()` doesn't result in an error but `$x509['tbsCertificate']->toArray()` does.
+
+But where exactly is the error? That brings us to our next topic of discussion.
+
+## Error Pinpointing
+
+Consider the following code:
+
+```php
+use phpseclib3\File\X509;
+
+ASN1::enableBlobsOnBadDecodes();
+
+$x509 = file_get_contents('google.crt');
+$x509 = ASN1::extractBER($x509);
+$x509[100] = '.';
+$x509 = X509::load($x509)->toArray();
+print_r($x509);
+```
+If it weren't for the `ASN1::enableBlobsOnBadDecodes()` call, the above code would throw an exception. With that method call, however, we get this:
+
+<BadX509_1 />
+
+From that we can see that `$x509['tbsCertificate']['issue']` is set to an instance of `phpseclib3\File\ASN1\MalformedData`. This is where the issue is.
+
+## Array-Like Interface
+
+Despite being an object, the dynamic elements of `Constructed` objects are accessed using array syntax. eg. `$x509['tbsCertificate']['extensions']`. This is due to `Constucted` objects implementing the [`ArrayAccess`](https://www.php.net/manual/en/class.arrayaccess.php) interface.
+
+Because `Constructed` objects implement the [`Countable`](https://www.php.net/manual/en/class.countable.php) interface you can do `count($x509['tbsCertificate']['extensions'])` and because `Constructed` objects implement the [`Iterator`](https://www.php.net/manual/en/class.iterator.php) interface you can do `foreach` on a `Constructed` object.
+
+There are some things that PHP can do with arrays that don't make a lot of sense in the context `Constructed`. For example, it's unclear why one would want to [`sort()`](https://www.php.net/sort) a `Constructed` object. It is actually for that reason that `Constructed` objects do NOT implement the [`ArrayObject`](https://www.php.net/manual/en/class.arrayobject.php).
+
+That said, there are other things that PHP can do with arrays that _would_ make sense for `Constructed` objects to support but for which no mechanism exists in PHP. The most notable example of this is probably [`array_keys()`](https://www.php.net/array-keys), however, one can get similar functionality by doing `->keys()`.

@@ -1,0 +1,613 @@
+---
+title: "Deep Dive: Distinguished Names (DNs)"
+---
+
+import DNArray from './inc/dn-array.md';
+import DNOpenSSLArray from './inc/dn-openssl-array.md';
+import DNOpenSSLArrayMulti from './inc/dn-openssl-array-multi.md';
+import DNPostalAddress from './inc/dn-postaladdress.md';
+
+## Overview
+
+[X509 objects](x509.mdx) have both a subject DN and an issuer DN. For self-signed certificates they're the same and one may call the various distinguished name functions without specifying if you're wanting the subject or issuer DN. eg. `$x509->getDN()` vs `$x509->getSubjectDN()` or `$x509->getIssuerDN()`.
+
+[CSR objects](csr.mdx) just have a subject DN and that's it. Consequently there are no issuer DN methods and whether or not you include the method you're calling has the word "subject" within it is entirely up to you. eg. both `getDN()` and `getSubjectDN()` work.
+
+[CRL objects](crl.mdx) just have an issuer DN and that's it. Consequently there are no subject DN methods and whether or not you include the method you're calling has the word "issue" within it is entirely up to you. eg. both `getDN()` and `getIssuerDN()` work.
+
+## getDN()
+
+`getDN()` (and `getSubjectDN()` / `getIssuerDN()`, when appropriate) takes one parameter - `$format` (an integer) - and returns either an array or string, depending on what the parameter passed to it was.
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = X509::load(file_get_contents('ca.crt'));
+
+print_r($x509->getDN());
+```
+<sup>([download google.crt](pathname:///asn1/ca.crt.txt))</sup>
+
+### X509::DN_ARRAY
+
+The default value. Returns an array that basically mirrors the internal structure that phpseclib uses:
+
+<DNArray />
+
+### X509::DN_STRING
+
+Returns a string:
+```
+C = US, O = Internet Security Research Group, CN = ISRG Root X1
+```
+The string is of the same format that you see when you do `openssl x509 -noout -text -in ca.crt` on the CLI for sufficiently new versions of OpenSSL. This string is similar but not the same as the "name" string that [`openssl_x509_parse()`](https://www.php.net/openssl-x509-parse) returns. [DN String Format Comparison](#dn-string-format-comparison) talks more about the reasons as to why.
+
+### X509::DN_OPENSSL
+
+Returns an array:
+
+<DNOpenSSLArray />
+
+Mostly the same as `openssl_x509_parse('...')['issuer']`. When fed into `setDN()` constructed stuff (outside of postalAddress) may not work very well.
+
+If a DN property appears multiple times (eg. CN = ISRG Root X1 AND CN = phpseclib) you'll get something like this:
+
+<DNOpenSSLArrayMulti />
+
+### X509::DN_ASN1
+
+Returns a binary encoded string.
+
+If one does `echo base64_decode($x509->getDN(X509::DN_ASN1))` one would get this:
+
+```
+ME8xCzAJBgNVBAYTAlVTMSkwJwYDVQQKEyBJbnRlcm5ldCBTZWN1cml0eSBSZXNlYXJjaCBHcm91cDEVMBMGA1UEAxMMSVNSRyBSb290IFgx
+```
+If you put that into a file named test.pem and then do `openssl asn1parse -in test.pem` you'd get this:
+
+```
+  0:d=0  hl=2 l=  79 cons: SEQUENCE
+  2:d=1  hl=2 l=  11 cons: SET
+  4:d=2  hl=2 l=   9 cons: SEQUENCE
+  6:d=3  hl=2 l=   3 prim: OBJECT            :countryName
+ 11:d=3  hl=2 l=   2 prim: PRINTABLESTRING   :US
+ 15:d=1  hl=2 l=  41 cons: SET
+ 17:d=2  hl=2 l=  39 cons: SEQUENCE
+ 19:d=3  hl=2 l=   3 prim: OBJECT            :organizationName
+ 24:d=3  hl=2 l=  32 prim: PRINTABLESTRING   :Internet Security Research Group
+ 58:d=1  hl=2 l=  21 cons: SET
+ 60:d=2  hl=2 l=  19 cons: SEQUENCE
+ 62:d=3  hl=2 l=   3 prim: OBJECT            :commonName
+ 67:d=3  hl=2 l=  12 prim: PRINTABLESTRING   :ISRG Root X1
+```
+
+Should be the same thing as `$x509['tbsCertificate']['subject']->getEncoded()`. Cannot be fed into `setDN()`.
+
+### X509::DN_CANON
+
+Returns a binary encoded string.
+
+This one is similar to `X509::DN_ASN1` with the following differences:
+
+- All the `\phpseclib3\File\ASN1\Types\BaseString`'s are normalized to `\phpseclib3\File\ASN1\Types\UTF8String`'s, if possible.
+- All the strings are ran through PHP's [`strtolower()`](https://www.php.net/strtolower)` function.
+- All sequences white space (`\s+` in [`preg_replace()`](https://www.php.net/preg-replace)) are replaced with a single space.
+- The various SET elements are not wrapped by a SEQUENCE tag
+
+To visualize the differences let's first do `echo base64_decode($x509->getDN(X509::DN_CANON))`:
+
+```
+MQswCQYDVQQGDAJ1czEpMCcGA1UECgwgaW50ZXJuZXQgc2VjdXJpdHkgcmVzZWFyY2ggZ3JvdXAxFTATBgNVBAMMDGlzcmcgcm9vdCB4MQ==
+```
+
+If you put that into a file named test.pem and then do `openssl asn1parse -in test.pem` you'd get this:
+
+```
+  0:d=0  hl=2 l=  11 cons: SET
+  2:d=1  hl=2 l=   9 cons: SEQUENCE
+  4:d=2  hl=2 l=   3 prim: OBJECT            :countryName
+  9:d=2  hl=2 l=   2 prim: UTF8STRING        :us
+ 13:d=0  hl=2 l=  41 cons: SET
+ 15:d=1  hl=2 l=  39 cons: SEQUENCE
+ 17:d=2  hl=2 l=   3 prim: OBJECT            :organizationName
+ 22:d=2  hl=2 l=  32 prim: UTF8STRING        :internet security research group
+ 56:d=0  hl=2 l=  21 cons: SET
+ 58:d=1  hl=2 l=  19 cons: SEQUENCE
+ 60:d=2  hl=2 l=   3 prim: OBJECT            :commonName
+ 65:d=2  hl=2 l=  12 prim: UTF8STRING        :isrg root x1
+```
+Note how the it's not SEQUENCE / SET / SEQUENCE at the beginning but, instead, just SET / SEQUENCE.
+
+### X509::DN_HASH
+
+Returns a string. More specifically, `X509::DN_HASH` returns the first 32-bits of the sha1 hash of the X509::DN_CANON output.
+
+## hasDNProp()
+
+`hasDNProp()` (and `hasSubjectDNProp()` / `hasIssuerDNProp()`, when appropriate) takes one parameter - `$propName` (a string) - and returns either a true or a false, depending on if the DN Prop is present or not.
+
+Example:
+
+```php
+echo $x509->hasDNProp('O') ? 't' : 'f';
+```
+An exception is thrown if an unsupported name is passed to it. See [Valid DN Property Names](#valid-dn-property-names) for the supported names.
+
+## getDNProps()
+
+`getDNProps()` (and `getSubjectDNProps()` / `getIssuerDNProps()`, when appropriate) takes one parameter - `$propName` (a string) - and returns an array containing every instance that the property occurs in the DN (ie. `id-at-organizationName` can occur multiple times in a DN).
+
+Example:
+
+```php
+print_r($x509->getSubjectDNProps('O'));
+```
+
+Output:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <details open>
+      <summary>phpseclib3\File\ASN1\Types\TeletexString</summary>
+      <div>Google Inc</div>
+    </details>
+  </details>
+</div>
+
+An exception is thrown if an unsupported name is passed to it. See [Valid DN Property Names](#valid-dn-property-names) for the supported names.
+
+## setDN()
+
+`setDN()` (and `setSubjectDN()` / `setIssuerDN()`, when appropriate) takes one parameter - `$props` (either a string, an array or an instance of `phpseclib3\File\ASN1\Element`).
+
+### String input
+
+In-so-far as strings go, `$props` can can match the output of [X509::DN_STRING](#x509dn_string):
+
+```php
+$x509->setDN('C = US, O = Internet Security Research Group, CN = ISRG Root X1');
+```
+The spaces on either side of the equal sign and the space after the comma are optional.
+
+As discussed in [DN String Format Comparison](#dn-string-format-comparison) there are several different standards for representing DNs as strings. The above (and indeed X509::DN_STRING) corresponds to the output that _OpenSSL 3.0 CLI_ gives, however, the output that _PHP's openssl_x509_parse() with OpenSSL 3.0_ gives is also supported:
+
+```php
+$x509->setDN('/C=US/O=Internet Security Research Group/CN=ISRG Root X1');
+```
+
+Note that the leading `/` is required for this format to be used. If you omit it and do this:
+
+```php
+$x509->setDN('C=US/O=Internet Security Research Group/CN=ISRG Root X1');
+print_r($x509->getDN());
+```
+
+You'll get this:
+
+<div class="tree">
+  <details>
+    <summary>C</summary>
+    <div>US/O=Internet Security Research Group/CN=ISRG Root X1</div>
+  </details>
+</div>
+
+As opposed to this:
+
+<DNOpenSSLArray />
+
+### Array input
+
+In-so-far as arrays go, `$props` can match [X509::DN_OPENSSL](#x509dn_openssl) or [X509::DN_ARRAY](#x509dn_array).
+
+An example with X509::DN_OPENSSL:
+
+```php
+$x509->setDN([
+    'C' => 'US',
+    'O' => 'Internet Security Research Group',
+    'CN'=> [
+        'ISRG Root X1',
+        'phpseclib',
+    ],
+]);
+```
+
+An example with X509::DN_ARRAY:
+
+```php
+$x509->setDN(
+    [
+        'rdnSequence' => [
+            [
+                [
+                    'type' => 'id-at-countryName',
+                    'value'=> 'US',
+                ]
+            ],
+            [
+                [
+                    'type' => 'id-at-organizationName',
+                    'value'=> 'Internet Security Research Group',
+                ]
+            ],
+            [
+                [
+                    'type' => 'id-at-commonName',
+                    'value'=> 'ISRG Root X1',
+                ]
+            ]
+        ]
+    ]
+);
+```
+An advantage of using arrays over strings is that you can more precicisely control the type. By default, phpseclib assumes all strings are UTF8String's, but what if you wanted to do PrintableString's? At that point you could do this:
+
+```php
+use phpseclib3\File\ASN1\Types\PrintableString;
+
+$x509->setDN([
+    'C' => new PrintableString('US'),
+    'O' => new PrintableString('Internet Security Research Group'),
+    'CN'=> new PrintableString('ISRG Root X1'),
+]);
+```
+
+### Element input
+
+In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [X509::DN_ASN1](#x509dn_asn1).
+
+Example:
+
+```php
+use phpseclib3\File\ASN1\Element;
+
+$raw = 'ME8xCzAJBgNVBAYTAlVTMSkwJwYDVQQKEyBJbnRlcm5ldCBTZWN1cml0eSBSZXNlYXJjaCBHcm91cDEVMBMGA1UEAxMMSVNSRyBSb290IFgx';
+$x509->setDN(new Element(base64_decode($raw)));
+```
+
+## resetDN()
+
+Clears the DN of all properties.
+
+Example:
+
+```php
+$x509->resetDN();
+```
+
+Basically the same thing as doing any of these:
+
+```php
+$x509->setDN([]);
+$x509->setDN('');
+```
+
+## addDNProp()
+
+Adds an individual DN property.
+
+Example:
+
+```php
+$x509->addDNProp('O', 'phpseclib');
+```
+An exception is thrown if the property name is unsupported. See [Valid DN Property Names](#valid-dn-property-names) for the supported names.
+
+## addDNProps()
+
+Adds multiple DN properties with matching names.
+
+Example:
+
+```php
+$x509->addDNProp('O', ['phpseclib', 'whatever']);
+```
+An exception is thrown if the property name is unsupported. See [Valid DN Property Names](#valid-dn-property-names) for the supported names.
+
+## removeDNProps()
+
+Has one parameter - `$propName` (a string). All DN properties matching `$propName` are removed by `removeDNProps()`.
+
+Example:
+
+```php
+$x509->removeDNProps('O');
+```
+An exception is thrown if the property name is unsupported. See [Valid DN Property Names](#valid-dn-property-names) for the supported names.
+
+## id-at-postalAddress
+
+`id-at-postalAddress` is is a strange DN property. Literally every other DN property that phpseclib supports is a primitive, but `id-at-postalAddress` is a [Constructed](detail-constructed.mdx) type.
+
+There's no syntactic sugar for decoding it (it decodes as an instance of `\phpseclib3\File\ASN1\Constructed`), however, there is some syntactic sugar for encoding it:
+
+```php
+$x509->addDNProp('id-at-postalAddress', [
+    'John Doe',
+    '111 Anywhere St',
+    'Anytown, TX, USA',
+]);
+print_r($x509->getDNProps('id-at-postalAddress')[0]);
+```
+The output of that is this:
+
+<DNPostalAddress />
+
+As that demonstrates it doesn't decode the same way it can encode.
+
+This can be contrasted with `id-at-organizationName`:
+
+```php
+$x509->addDNProp('id-at-organizationName', 'phpseclib organization');
+print_r($x509->getDNProps('id-at-organizationName')[0]);
+```
+The output of that is this:
+
+<details open>
+  <summary>phpseclib3\File\ASN1\Types\UTF8String</summary>
+  <div>phpseclib organization</div>
+</details>
+
+Alternative ways that `id-at-postalAddress` can be saved are:
+
+```php
+use phpseclib3\File\ASN1\Types\UTF8String;
+
+$x509->addDNProp('postalAddress', ['xxx']);
+$x509->addDNProp('postalAddress', [['utf8String' => 'xxx']]);
+$x509->addDNProp('postalAddress', [['utf8String' => new UTF8String('xxx')]]);
+```
+
+## DN String Format Comparison
+
+Consider this code:
+
+```php
+$x509 = new X509();
+$x509->addDNProp('C', 'À'); // eg. a capital A with the grave accent
+$x509->addDNProp('O', 'B');
+$x509->addDNProp('serialNumber', 'C');
+echo $x509;
+```
+
+That produces the following certificate:
+
+```
+-----BEGIN CERTIFICATE-----
+MIGjMIGYoAMCAQICFFy68Tg45wH46O5wDXChJ53P0z4uMAMGAQAwJTELMAkGA1UE
+BgwCw4AxCjAIBgNVBAoMAUIxCjAIBgNVBAUMAUMwHhcNMjUxMDEzMjMzOTIzWhcN
+MjYxMDEzMjMzOTIzWjAlMQswCQYDVQQGDALDgDEKMAgGA1UECgwBQjEKMAgGA1UE
+BQwBQzAIMAMGAQADAQAwAwYBAAMBAA==
+-----END CERTIFICATE-----
+```
+
+Here is how the subject and issuer DNs look in various different string formats:
+
+| Format | Output |
+|---|---|
+|OpenSSL 3.0 CLI|C = \C3\80, O = B, serialNumber = C|
+|PHP's openssl_x509_parse() with OpenSSL 3.0|/C=\xC3\x80/O=B/serialNumber=C|
+|OpenSSL 1.0|C=\xC3\x80, O=B/serialNumber=C|
+|phpseclib 1.0 - 3.0|C=À, O=B/serialNumber=C|
+
+phpseclib v4 can read the the first two but `getDN()` only returns the OpenSSL 3.0 CLI string format. The reason being that that format eliminates ambiguities that PHP's `openssl_x509_parse()` format does not.
+
+### Ambiguities
+
+Consider the following:
+
+```php
+$ref = new X509();
+$ref->addDNProp('postalAddress', ['xxx']);
+$r = openssl_x509_parse($ref);
+
+$demo1 = new X509();
+$demo1->addDNProp('2.9999999', str_replace('/postalAddress=', '', $r['name']));
+echo "$demo1\n\n";
+
+$demo2 = new X509();
+$demo2->addDNProp('2.9999999', new Element($ref['tbsCertificate']['subject']['rdnSequence'][0][0]['value']->getEncoded()));
+echo "$demo2\n\n";
+
+print_r($demo1->getDNProps('2.9999999')[0]);
+print_r($demo2->getDNProps('2.9999999')[0]);
+
+$r = openssl_x509_parse($demo1);
+echo $r['name'] . "\n";
+$r = openssl_x509_parse($demo2);
+echo $r['name'] . "\n";
+```
+So the basic idea here is that we're taking a constructed DN property, [`id-at-postalAddress`](#id-at-postaladdress), and using it to set the value of an unknown DN property - `2.9999999`. Like is `2.9999999` supposed to be constructed? Is it supposed to be primitive? We don't know.
+
+In the first `echo $r['name']` line we're setting `2.9999999` to the value that `openssl_x509_parse()` gave us and then decoding that new certificate with `openssl_x509_parse()`. In the second `echo $r['name']` line we're setting `2.9999999` to the actual encoded value  and then decoding that new certificate with `openssl_x509_parse()`. The output is as follows:
+
+```
+-----BEGIN CERTIFICATE-----
+MIGRMIGGoAMCAQICFCbKypGye6Z//5xLSHpO/+LUIM9xMAMGAQAwHDEaMBgGBITi
+rU8MEDBceDA1XHgwQ1x4MDN4eHgwHhcNMjUxMDE0MDI0NjAzWhcNMjYxMDE0MDI0
+NjAzWjAcMRowGAYEhOKtTwwQMFx4MDVceDBDXHgwM3h4eDAIMAMGAQADAQAwAwYB
+AAMBAA==
+-----END CERTIFICATE-----
+
+-----BEGIN CERTIFICATE-----
+MHowcKADAgECAhRhMUDkPSYignMi3qxY6VGYtRkshjADBgEAMBExDzANBgSE4q1P
+MAUMA3h4eDAeFw0yNTEwMTQwMjQ2MDNaFw0yNjEwMTQwMjQ2MDNaMBExDzANBgSE
+4q1PMAUMA3h4eDAIMAMGAQADAQAwAwYBAAMBAA==
+-----END CERTIFICATE-----
+
+phpseclib3\File\ASN1\Types\UTF8String Object
+(
+    [value] => 0\x05\x0C\x03xxx
+)
+phpseclib3\File\ASN1\Element Object
+(
+    [value] => 30050c03787878
+)
+/2.9999999=0\x05\x0C\x03xxx
+/2.9999999=0\x05\x0C\x03xxx
+```
+So although phpseclib sees both DN prpoerties differently, `openssl_x509_parse()` does not. Here's what OpenSSL 3.0 CLI returns when parsing the two first certificates:
+
+```
+2.9999999 = 0\\x05\\x0C\\x03xxx
+2.9999999 = #30050C03787878
+```
+So OpenSSL 3.0 CLI renders them differently, eliminating ambiguities, but `openssl_x509_parse()` does not.
+
+At this point one might wonder...  can we force ambiguities in OpenSSL 3.0 CLI? Like maybe we could do this:
+
+```php
+$ref = new X509();
+$ref->addDNProp('postalAddress', ['xxx']);
+$r = openssl_x509_parse($ref);
+
+$demo = new X509();
+$demo->addDNProp('2.9999999', new Element($ref['tbsCertificate']['subject']['rdnSequence'][0][0]['value']->getEncoded()));
+echo "$demo\n\n";
+
+$demo = new X509();
+$demo->addDNProp('2.9999999', '#30050C03787878');
+echo $demo;
+```
+If you run that and then parse the output with OpenSSL 3.0 CLI you'll find that there are still no ambiguities:
+
+```
+2.9999999 = #30050C03787878
+2.9999999 = "#30050C03787878"
+```
+So like if it's a hexadecimal sequence of characters preceeded by a `#` but not encapsulated in double quotes we know it's constructed. But being an unknown DN prop we still don't know how to parse it. The following code demonstrates how phpseclib would deal with that:
+
+```php
+$cert = new X509();
+$cert->setDN('2.9999999 = #30050C03787878');
+print_r($cert->getDNProps('2.9999999')[0]);
+```
+The output of that is this:
+
+```
+phpseclib3\File\ASN1\Element Object
+(
+    [value] => 30050c03787878
+)
+```
+Of course that's better than what we'd have if we set the DN prop to what `openssl_x509_parse()` would have given us:
+
+```php
+$cert = new X509();
+$cert->setDN('/2.9999999=0\x05\x0C\x03xxx');
+print_r($cert->getDNProps('2.9999999')[0]);
+```
+The output of that is this:
+
+```
+phpseclib3\File\ASN1\Types\UTF8String Object
+(
+    [value] => 0
+                xxx
+)
+```
+Since it has no real way to know it just kinda assumes it's a string and moves on. Sure, technically, phpseclib could test to see if it's a valid UTF8 string but then what if it's supposed to be a GraphicString?
+
+That said, phpseclib does differ from `openssl_x509_parse()` in other ways as well. Consider this code:
+
+```php
+$x509 = new X509();
+$x509->addDNProp('id-at-postalAddress', [
+    'John Doe',
+    '111 Anywhere St',
+    'Anytown, TX, USA',
+]);
+$x509->addDNProp('O', '😊');
+$x509->addDNProp('2.99999', 'zzzz');
+$r = openssl_x509_parse("$x509");
+print_r($r);
+```
+`array_keys($r['subject'])` will only have two keys in this instance - `O` and `UNDEF`. `2.99999` is converted to `UNDEF` and constructed DNs are excluded all together.
+
+## Valid DN Property Names
+The property names are intended to be self-explanatory and are grouped together by their aliases. They are case insensitive.
+
+- id-at-countryName
+
+  countryName
+
+  C
+- id-at-organizationName
+
+  organizationName
+
+  O
+- id-at-dnQualifier
+
+  dnQualifier
+- id-at-commonName
+
+  commonName
+
+  CN
+- id-at-stateOrProvinceName
+
+  state
+
+  province
+
+  provincename
+
+  ST
+- id-at-localityName
+
+  localityName
+
+  L
+- id-emailAddress
+
+  emailAddress
+- id-at-serialNumber
+
+  serialNumber
+- id-at-postalCode
+
+  postalCode
+- id-at-streetAddress
+
+  streetAddress
+- id-at-name
+
+  name
+- id-at-givenName
+
+  givenName
+
+  GN
+- id-at-surname
+
+  surname
+- id-at-initials
+
+  initials
+- id-at-generationQualifier
+
+  generationQualifier
+- id-at-organizationalUnitName
+
+  organizationalUnitName
+
+  OU
+- id-at-pseudonym
+
+  pseudonym
+- id-at-title
+
+  title
+- id-at-description
+
+  description
+- id-at-role
+
+  role
+- id-at-uniqueidentifier
+
+  uniqueidentifier
+
+  x500uniqueidentifier

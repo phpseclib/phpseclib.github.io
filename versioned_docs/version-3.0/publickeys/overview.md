@@ -73,7 +73,7 @@ All of these methods are discussed elsewhere, either on this page or on the algo
 
 ## Immutability
 
-All AsymmetricKey object are [immutable](https://en.wikipedia.org/wiki/Immutable_object). Consequently, if you want to set a parameter (eg. the hash) you do `$key = $key->withHash('sha256')` (instead of `$key->setHash('sha256')`).
+All AsymmetricKey objects are [immutable](https://en.wikipedia.org/wiki/Immutable_object). Consequently, if you want to set a parameter (eg. the hash) you do `$key = $key->withHash('sha256')` (instead of `$key->setHash('sha256')`).
 
 ## Supported Key Formats
 
