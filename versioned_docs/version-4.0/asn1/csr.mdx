@@ -1,0 +1,429 @@
+---
+title: CSR
+---
+
+import GoodCSR from './inc/csr-good.md';
+import EmptyCSR from './inc/csr-empty.md';
+
+CSR is an acronym for [Certificate Signing Request](https://en.wikipedia.org/wiki/Certificate_signing_request). CSR's are mainly used to request X.509 certificates from certificate authorities.
+
+## Reading CSRs
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = CSR::load(file_get_contents('csr.big'));
+
+print_r($csr);
+```
+<sup>([download csr.big](pathname:///asn1/csr.big.txt))</sup>
+
+`$csr`, in this case, is a CSR object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$csr` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+
+<GoodCSR />
+
+All elements and subelements of the above CSR object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$csr['certificationRequestInfo']['subjectPKInfo']` or you could do `$csr->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib3\File\ASN1\Constructed.
+
+To learn more about the capabilities afforded to the CSR class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+
+### getPublicKey()
+
+Returns an instance of [\phpseclib3\Crypt\Common\PublicKey](publickeys/overview.md#publickey-vs-privatekey).
+
+```php
+echo $csr->getPublicKey();
+```
+
+Running the above will output the following:
+
+```
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDetyZDppmFzTinFQm5zw/Jw1WM
+iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
+2XGMzM0nEx6dQl049qes7/pi8xiB1CRGfwF3fMYqiRSZu5g5HagZ+zkARH0blGp4
+LWmtwHos+tDaIBKY0wIDAQAB
+-----END PUBLIC KEY-----
+```
+Note that if the key is in an unsupported format then `$csr->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$csr['certificationRequestInfo']['subjectPKInfo']`.
+
+Very rarely, CSRs may not have a public key at all. You can test for this by doing `$csr->hasPublicKey()`, which returns a boolean based on whether or not the CSR in question has a public key or not.
+
+### listAttributes()
+
+"_The intention of including a set of attributes is twofold: to provide other information about a given entity , or a "challenge password" by which the entity may later request certificate revocation; and to provide attributes for inclusion in X.509 certificates._" - [RFC2986 § 1. Introduction](https://datatracker.ietf.org/doc/html/rfc2986#section-1)
+
+```php
+print_r($csr->listAttributes());
+```
+
+Running the above will produce an array with all the attributes that are in the CSR:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <div>1.3.6.1.4.1.311.13.2.3</div>
+  </details>
+  <details>
+    <summary>1</summary>
+    <div>pkcs-9-at-extensionRequest</div>
+  </details>
+</div>
+
+`1.3.6.1.4.1.311.13.2.3`, in this case, is [szOID_OS_VERSION](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/f4eb50d5-62f6-470b-8846-9489af9dea62), a Microsoft specific attribute that phpseclib doesn't (currently) support. If support for this attribute is desired one need only ask!
+
+### getAttribute()
+
+Some attributes have built in dedicated functions for retrieving them:
+
+- **pkcs-9-at-challengePassword** has a built in dedicated function for retrieving it's value, when it exists - `$csr->getChallengePassword()`. The return value is a string if the attribute exists or a null, otherwise.
+
+  Obviously for some things - like encrypted private keys - being able to retrieve the password would be a bad thing, however, in this case, the use case is more for CAs. Like a CA generates an X.509 certificate from a CSR and then, later, the person who generated the CSR wants to revoke the X.509 certificate or something. The password is intended to verify that the person who generated the CSR that created the X.509 certificate is the one who is trying to get it revoked.
+
+- **pkcs-9-at-extensionRequest** can have it's individual values retrieved by either [`$csr->listExtensions()`](#listextensions) or [`$csr->getExtension()`](#getextension).
+
+For all other attributes (or even the ones above if you need more fine tuned control) there's `getAttribute()`, which returns an array representing the first instance of an attribute even if there are multiple instances.
+
+If said attribute isn't present then `getAttribute()` returns null.
+
+Example:
+
+```php
+print_r($csr->getAttribute('1.3.6.1.4.1.311.13.2.3'));
+```
+
+Since `1.3.6.1.4.1.311.13.2.3` exists in `$csr`, running the above will produce the following:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <details open>
+      <summary>phpseclib3\File\ASN1\Types\IA5String</summary>
+      <div>6.3.9600.2.</div>
+    </details>
+  </details>
+</div>
+
+<!--
+per https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-osversioninfoa?redirectedfrom=MSDN 6.3.9600.2 is either Windows Server 2012 R2 or Windows Windows 8.1
+-->
+
+You can search by the attribute name (if phpseclib knows about the attribute, which in this case, it doesn't) or the OID for the attribute.
+
+If you just want to see if the attribute exists you could do `getAttribute() !== null` or you could call `hasAttribute()`:
+
+```php
+echo $csr->hasAttribute('1.3.6.1.4.1.311.13.2.3') ? 't' : 'f';
+```
+`hasAttribute()` works largely the same way that `getAttribute()` does, except that it returns true or false depending on if the attribute exists or not.
+
+### listExtensions()
+
+Returns all the extensions contained within the _each_ of the `pkcs-9-at-extensionRequest` attributes. Given that these are really _requested_ extensions it may well be the case that `$csr->listRequestedExtensions()` would be a better name but whatever.
+
+Example:
+
+```php
+print_r($csr->listExtensions());
+```
+Running the above will produce an array with all the extensions that the CSR is requesting:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <div>1.3.6.1.4.1.311.21.1</div>
+  </details>
+  <details>
+    <summary>1</summary>
+    <div>id-ce-subjectKeyIdentifier</div>
+  </details>
+  <details>
+    <summary>2</summary>
+    <div>1.3.6.1.4.1.311.20.2</div>
+  </details>
+  <details>
+    <summary>3</summary>
+    <div>id-ce-keyUsage</div>
+  </details>
+  <details>
+    <summary>4</summary>
+    <div>id-ce-basicConstraints</div>
+  </details>
+</div>
+
+### getExtension()
+
+Returns an array representing the first instance of a requested extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+
+If said extension request isn't present then null is returned.
+
+```php
+print_r($csr->getExtension('id-ce-keyUsage'));
+```
+
+Since `id-ce-keyUsage` is requested in `$csr`, running the above will produce an array with three elements:
+
+<div class="tree">
+  <details>
+    <summary>extnId</summary>
+    <div>id-ce-keyUsage</div>
+  </details>
+  <details>
+    <summary>extnValue</summary>
+    <details>
+      <summary>0</summary>
+      <div>cRLSign</div>
+    </details>
+    <details>
+      <summary>1</summary>
+      <div>keyCertSign</div>
+    </details>
+    <details>
+      <summary>2</summary>
+      <div>digitalSignature</div>
+    </details>
+  </details>
+  <details>
+    <summary>critical</summary>
+    <div>false</div>
+  </details>
+</div>
+
+You can search by the extension name or the OID for the extension (`2.5.29.15`, in this case).
+
+If you just want to see if the extension request exists you could do `getExtension() !== null` or you could call `hasExtension()`:
+
+```php
+echo $csr->hasExtension('id-ce-keyUsage') ? 't' : 'f';
+```
+`hasExtension()` works largely the same way that `getExtension()` does, except that it returns true or false depending on if the extension exists or not.
+
+### getDN() / getDNProps()
+
+A CSR has only has a subject distinguished name (DN for short). The methods for accessing that DN are as follows:
+
+- [`getDN()`](detail-dns.mdx#getdn) (alias: `getSubjectDN()`)
+- [`hasDNProp()`](detail-dns.mdx#hasdnprop) (alias: `hasSubjectDNProp()`)
+- [`getDNProps()`](detail-dns.mdx#getdnprops) (alias: `getSubjectDNProps()`)
+
+Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (DNs)](detail-dns.mdx).
+
+## Creating CSRs
+
+### Minimalistic CSR
+
+Consider the following:
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = new CSR();
+echo $csr;
+```
+The CSR that that would produce would look something like this:
+
+```
+-----BEGIN NEW CERTIFICATE REQUEST-----
+MBswEQIBADAAMAgwAwYBAAMBAKAAMAMGAQADAQA=
+-----END NEW CERTIFICATE REQUEST-----
+```
+This CSR requests no extensions, does not have a subject distinguished name, does not have a signature and it does not have a public key.
+
+If you saved this CSR as test.pem and then did `openssl req -in test.pem -inform PEM -text -noout` on that CSR you'd get this:
+
+```
+Certificate Request:
+    Data:
+        Version: 1 (0x0)
+        Subject:
+        Subject Public Key Info:
+            Public Key Algorithm: 0.0
+            Unable to load Public Key
+40575F9BA87F0000:error:03000072:digital envelope routines:X509_PUBKEY_get0:decode error:../crypto/x509/x_pubkey.c:458:
+        Attributes:
+            (none)
+            Requested Extensions:
+    Signature Algorithm: 0.0
+    Signature Value:
+```
+If you did `print_r($csr)` on that CSR you'd get this:
+
+<EmptyCSR />
+
+### Setting the Public Key
+
+Let's say you created your public key thusly:
+
+```php
+use phpseclib3\Crypt\EC;
+
+$private = EC::createKey('nistp256');
+$public = $private->getPublicKey();
+```
+At this point you could set the public key for the X.509 certificate using any number of techniques:
+
+```php
+$csr = new CSR($public);
+echo $csr;
+```
+
+```php
+$csr = new CSR();
+$csr->setPublicKey($public);
+echo $csr;
+```
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = new X509($public);
+$csr = new CSR($x509);
+echo $csr;
+```
+If you set the public key via a [X.509 certificate](x509.mdx) then, if the X.509 certificate also had a subject DN set and had extensions, those would also be auto set as well.
+
+You can also remove a public key be calling `$csr->removePublicKey()`.
+
+### Setting the DN
+
+A CSR has only has a subject distinguished name (DN for short). The methods for manipulating that DN are as follows:
+
+- [`setDN()`](detail-dns.mdx#setdn) (alias: `setSubjectDN()`)
+- [`resetDN()`](detail-dns.mdx#resetdn) (alias: `resetSubjectDN()`)
+- [`addDNProp()`](detail-dns.mdx#adddnprop) (alias: `addSubjectDNProp()`)
+- [`addDNProps()`](detail-dns.mdx#adddnprops) (alias: `addSubjectDNProps()`)
+- [`removeDNProps()`](detail-dns.mdx#removednprops) (alias: `removeSubjectDNProps()`)
+
+The subject DN can also be set by passing an instance of [`\phpseclib3\File\X509`](x509.mdx) to the CSR constructor. eg.
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = X509::load('...');
+$csr = new CSR($x509);
+echo $csr;
+```
+
+### Setting Attributes
+
+Some attributes have built in dedicated functions for manipulating them:
+
+- **pkcs-9-at-challengePassword**
+
+  `$csr->setChallengePassword()`. This function takes a single parameter - `$password` - which can be either a string or an instance of either `\phpseclib3\File\ASN1\Types\UTF8String` or `\phpseclib3\File\ASN1\Types\PrintableString`.
+
+- **pkcs-9-at-extensionRequest**
+
+  `$csr->setExtension()` and `$csr->removeExtension()`. See [Setting Extensions](#setting-extension) for more information.
+
+_Any_ attribute can be set by calling `$csr->setAttribute()`. `$x509->setAttribute()` has two required parameters - `$type` (a string) and `$value` (which can be any number of primitive types or object types).
+
+If an attribute is present multiple times then phpseclib will only modify the first occurance of that attribute.
+
+To remove _all_ occurances of an attribute one need simply call `$csr->removeAttribute('whatever')`.
+
+Here's an example of an attribute being set:
+
+```php
+$csr->setAttribute('pkcs-9-at-challengePassword', ['password']);
+```
+Sure, you can also set this particular attribute by calling `$csr->setChallengePassword('password')`, however, that's not the only way that that attribute could be set, as the above demonstrates.
+
+### Setting Extensions
+
+Any extension request can be set by calling `$csr->setExtension()`. `$csr->setExtension()` has two required parameters - `$name` (a string) and `$value` (which can be any number of primitive types or object types) - and one optional parameter - `$critical`. If `$critical` isn't explicitly set it'll be either bool(true) or bool(false) based on what [RFC5280](https://www.rfc-editor.org/rfc/rfc5280) says about it. Like some extensions are only ever supposed have critical set to either bool(false) or bool(true) and others can be set to one or the other depending on their specific situation. If you manually set an extension to bool(true) that RFC5280 says should only ever be bool(false) phpseclib will let you do so.
+
+If an extension is present multiple times (which really shouldn't ever happen) then phpseclib will only modify the first occurance of that extension.
+
+To remove _all_ occurances of an extension one need simply call `$x509->removeExtension('whatever')`.
+
+Here's an example of an extension being set:
+
+```php
+$csr->setExtension('id-pe-authorityInfoAccess', [
+    [
+        "accessMethod" => "id-ad-ocsp",
+        "accessLocation" => [
+            "uniformResourceIdentifier" => 'https://ocsp.test.ca/',
+        ]
+    ],
+    [
+        "accessMethod" => "id-ad-caIssuers",
+        "accessLocation" => [
+            "uniformResourceIdentifier" => 'https://crt.test.ca/test.crt',
+        ],
+    ],
+]);
+```
+Extensions can also be set from X.509 certificates. eg. maybe you submitted a CSR for signing in ages past, lost the original CSR and want to submit a new CSR for that same certificate.
+
+### Custom Extensions
+
+If you wanted to set a custom proprietary extension that phpseclib didn't have built in support for you can do this:
+
+```php
+$customExtensionName = 'cust';
+$customExtensionNumber = '2.16.840.1.101.3.4.2.99';
+
+ASN1::loadOIDs([
+    $customExtensionName => $customExtensionNumber,
+]);
+
+CSR::registerExtension($customExtensionName, [
+    'type' => ASN1::TYPE_SEQUENCE,
+    'children' => [
+        'toggle' => ['type' => ASN1::TYPE_BOOLEAN],
+        'num' => ['type' => ASN1::TYPE_INTEGER],
+        'name' => ['type' => ASN1::TYPE_OCTET_STRING],
+        'list' => [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 0,
+            'max' => -1,
+            'children' => ['type' => ASN1::TYPE_OCTET_STRING],
+        ],
+    ],
+]);
+
+$csr->setExtension($customExtensionName, [
+    'toggle' => true,
+    'num' => 5,
+    'name' => "\0\1\2test",
+    'list' => [
+        'hello',
+        'world',
+    ]
+]);
+```
+Once an extension is registered you can call `CSR::getRegisteredExtension($customExtensionName)` to see the definition for that extension.
+
+### Signing
+
+Let's say you created your public key thusly:
+
+```php
+use phpseclib3\Crypt\EC;
+
+$private = EC::createKey('nistp256');
+$public = $private->getPublicKey();
+```
+
+At that point you can sign your CSR like so:
+
+```php
+$csr = new CSR($public);
+// do stuff
+$private->sign($csr);
+echo $csr;
+```
+
+### Output Format
+
+By default, CSR objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CSR::enableBinaryOutput()`. To go back to PEMs calling `CSR::disableBinaryOutput()` is sufficient.
+
+## Validating Signatures
+
+CSR's are always self-signed and can be validated thusly:
+
+```php
+$csr = CSR::load('...');
+echo $csr->validateSignature() ? 'valid' : 'invalid';
+```

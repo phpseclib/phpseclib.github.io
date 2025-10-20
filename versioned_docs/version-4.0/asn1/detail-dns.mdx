@@ -28,13 +28,13 @@ print_r($x509->getDN());
 ```
 <sup>([download google.crt](pathname:///asn1/ca.crt.txt))</sup>
 
-### X509::DN_ARRAY
+### ASN1::DN_ARRAY
 
 The default value. Returns an array that basically mirrors the internal structure that phpseclib uses:
 
 <DNArray />
 
-### X509::DN_STRING
+### ASN1::DN_STRING
 
 Returns a string:
 ```
@@ -42,7 +42,7 @@ C = US, O = Internet Security Research Group, CN = ISRG Root X1
 ```
 The string is of the same format that you see when you do `openssl x509 -noout -text -in ca.crt` on the CLI for sufficiently new versions of OpenSSL. This string is similar but not the same as the "name" string that [`openssl_x509_parse()`](https://www.php.net/openssl-x509-parse) returns. [DN String Format Comparison](#dn-string-format-comparison) talks more about the reasons as to why.
 
-### X509::DN_OPENSSL
+### ASN1::DN_OPENSSL
 
 Returns an array:
 
@@ -54,11 +54,11 @@ If a DN property appears multiple times (eg. CN = ISRG Root X1 AND CN = phpsecli
 
 <DNOpenSSLArrayMulti />
 
-### X509::DN_ASN1
+### ASN1::DN_ASN1
 
 Returns a binary encoded string.
 
-If one does `echo base64_decode($x509->getDN(X509::DN_ASN1))` one would get this:
+If one does `echo base64_decode($x509->getDN(ASN1::DN_ASN1))` one would get this:
 
 ```
 ME8xCzAJBgNVBAYTAlVTMSkwJwYDVQQKEyBJbnRlcm5ldCBTZWN1cml0eSBSZXNlYXJjaCBHcm91cDEVMBMGA1UEAxMMSVNSRyBSb290IFgx
@@ -83,18 +83,18 @@ If you put that into a file named test.pem and then do `openssl asn1parse -in te
 
 Should be the same thing as `$x509['tbsCertificate']['subject']->getEncoded()`. Cannot be fed into `setDN()`.
 
-### X509::DN_CANON
+### ASN1::DN_CANON
 
 Returns a binary encoded string.
 
-This one is similar to `X509::DN_ASN1` with the following differences:
+This one is similar to `ASN1::DN_ASN1` with the following differences:
 
 - All the `\phpseclib3\File\ASN1\Types\BaseString`'s are normalized to `\phpseclib3\File\ASN1\Types\UTF8String`'s, if possible.
 - All the strings are ran through PHP's [`strtolower()`](https://www.php.net/strtolower)` function.
 - All sequences white space (`\s+` in [`preg_replace()`](https://www.php.net/preg-replace)) are replaced with a single space.
 - The various SET elements are not wrapped by a SEQUENCE tag
 
-To visualize the differences let's first do `echo base64_decode($x509->getDN(X509::DN_CANON))`:
+To visualize the differences let's first do `echo base64_decode($x509->getDN(ASN1::DN_CANON))`:
 
 ```
 MQswCQYDVQQGDAJ1czEpMCcGA1UECgwgaW50ZXJuZXQgc2VjdXJpdHkgcmVzZWFyY2ggZ3JvdXAxFTATBgNVBAMMDGlzcmcgcm9vdCB4MQ==
@@ -118,9 +118,9 @@ If you put that into a file named test.pem and then do `openssl asn1parse -in te
 ```
 Note how the it's not SEQUENCE / SET / SEQUENCE at the beginning but, instead, just SET / SEQUENCE.
 
-### X509::DN_HASH
+### ASN1::DN_HASH
 
-Returns a string. More specifically, `X509::DN_HASH` returns the first 32-bits of the sha1 hash of the X509::DN_CANON output.
+Returns a string. More specifically, `ASN1::DN_HASH` returns the first 32-bits of the sha1 hash of the ASN1::DN_CANON output.
 
 ## hasDNProp()
 
@@ -163,14 +163,14 @@ An exception is thrown if an unsupported name is passed to it. See [Valid DN Pro
 
 ### String input
 
-In-so-far as strings go, `$props` can can match the output of [X509::DN_STRING](#x509dn_string):
+In-so-far as strings go, `$props` can can match the output of [ASN1::DN_STRING](#x509dn_string):
 
 ```php
 $x509->setDN('C = US, O = Internet Security Research Group, CN = ISRG Root X1');
 ```
 The spaces on either side of the equal sign and the space after the comma are optional.
 
-As discussed in [DN String Format Comparison](#dn-string-format-comparison) there are several different standards for representing DNs as strings. The above (and indeed X509::DN_STRING) corresponds to the output that _OpenSSL 3.0 CLI_ gives, however, the output that _PHP's openssl_x509_parse() with OpenSSL 3.0_ gives is also supported:
+As discussed in [DN String Format Comparison](#dn-string-format-comparison) there are several different standards for representing DNs as strings. The above (and indeed ASN1::DN_STRING) corresponds to the output that _OpenSSL 3.0 CLI_ gives, however, the output that _PHP's openssl_x509_parse() with OpenSSL 3.0_ gives is also supported:
 
 ```php
 $x509->setDN('/C=US/O=Internet Security Research Group/CN=ISRG Root X1');
@@ -198,9 +198,9 @@ As opposed to this:
 
 ### Array input
 
-In-so-far as arrays go, `$props` can match [X509::DN_OPENSSL](#x509dn_openssl) or [X509::DN_ARRAY](#x509dn_array).
+In-so-far as arrays go, `$props` can match [ASN1::DN_OPENSSL](#x509dn_openssl) or [ASN1::DN_ARRAY](#x509dn_array).
 
-An example with X509::DN_OPENSSL:
+An example with ASN1::DN_OPENSSL:
 
 ```php
 $x509->setDN([
@@ -213,7 +213,7 @@ $x509->setDN([
 ]);
 ```
 
-An example with X509::DN_ARRAY:
+An example with ASN1::DN_ARRAY:
 
 ```php
 $x509->setDN(
@@ -255,7 +255,7 @@ $x509->setDN([
 
 ### Element input
 
-In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [X509::DN_ASN1](#x509dn_asn1).
+In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [ASN1::DN_ASN1](#x509dn_asn1).
 
 Example:
 

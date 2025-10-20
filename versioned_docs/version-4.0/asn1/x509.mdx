@@ -7,6 +7,8 @@ import ListExtensions from './inc/x509-list-extensions.md';
 import GetExtension from './inc/x509-get-extension.md';
 import EmptyX509 from './inc/x509-empty.md';
 
+[X.509 certificates](https://en.wikipedia.org/wiki/X.509) are basically wrappers around public keys with meta information that's intrepreted in application specific contexts.
+
 ## Reading Certificates
 
 ```php
@@ -45,6 +47,8 @@ LWmtwHos+tDaIBKY0wIDAQAB
 -----END PUBLIC KEY-----
 ```
 Note that if the key is in an unsupported format then `$x509->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$x509['tbsCertificate']['subjectPublicKeyInfo']`.
+
+Very rarely, X.509 certificates may not have a public key at all. You can test for this by doing `$x509->hasPublicKey()`, which returns a boolean based on whether or not the certificate in question has a public key or not.
 
 ### listExtensions()
 
@@ -99,19 +103,7 @@ Issuer DN Methods:
 - [`hasIssuerDNProps()`](detail-dns.mdx#hasdnprop)
 - [`getSubjectDNProps()`](detail-dns.mdx#getdnprops)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (DNs)](detail-dns.mdx).
 
 ## Creating Certificates
 
@@ -158,14 +150,25 @@ Certificate:
 ```
 If you did `print_r($x509)` on that certificate you'd get this:
 
-<EmptyX509/>
+<EmptyX509 />
 
 That said, even when doing this, there are 3x things that are (probably) going to be different every time:
 
-1. The serial number. It's set to be a random 160-bit positive number.
-2. The start date. It's set to the current time.
-3. The end date. It's set to one year from the current time.
+1. The serial number. It's set to be a random 160-bit positive number by default.
 
+   If you want to set your own serial number you can do so by calling `$x509->setSerialNumber()`. That function has one required parameter - `$serial` - and one optional parameter - `$base`. `$serial` can be a string or an instance of `phpseclib3\Math\BigInteger`. If it's a BigInteger then `$base` is ignored. If it's a string then that string will be intrepreted as a base-256 number by default unless you change the value of `$base`.
+
+2. The start date. It's set to the current time by default.
+
+   If you want to set your own start date you can do so by calling `$x509->setStartDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+
+3. The end date. It's set to one year from the current time by default.
+
+   If you want to set your own start date you can do so by calling `$x509->setEndDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string.  If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+
+   If `$date` is set to `lifetime` then the end date will be set to December 31, 9999 AD 23:59:59 UTC. Per [RFC5280 § 4.1.2.5 Validity](http://tools.ietf.org/html/rfc5280#section-4.1.2.5) that value indicates "_that a certificate has no well-defined expiration date_".
+
+   Note that the CA/Browser Forum [currently recommends server certificates](https://cabforum.org/working-groups/server/baseline-requirements/requirements/#71211-root-ca-validity) have an end date between 8 and 25 years out. 
 
 ### Setting the Public Key
 
@@ -197,7 +200,9 @@ $csr = new CSR($public);
 $x509 = new X509($csr);
 echo $x509;
 ```
-If you set the public key via a CSR then, if the CSR also had a subject DN set and extensions requested, those would also be auto set as well.
+If you set the public key via a [CSR](csr.mdx) then, if the CSR also had a subject DN set and extensions requested, those would also be auto set as well. The section [From a CSR](#from-a-csr) elaborates.
+
+You can also remove a public key be calling `$x509->removePublicKey()`.
 
 ### Setting DNs
 
@@ -221,7 +226,7 @@ Issuer DN Methods:
 - [`addIssuerDNProps()`](detail-dns.mdx#adddnprops)
 - [`removeIssuerDNProps()`](detail-dns.mdx#removednprops)
 
-The subject DN can also be set by passing an instance of `\phpseclib3\File\CSR` to the X509 constructor. eg.
+The subject DN can also be set by passing an instance of [`\phpseclib3\File\CSR`](csr.mdx) to the X509 constructor. eg.
 
 ```php
 use phpseclib3\File\CSR;
@@ -230,6 +235,122 @@ $csr = CSR::load('...');
 $x509 = new X509($csr);
 echo $x509;
 ```
+The section [From a CSR](#from-a-csr) elaborates.
+
+### Setting Extensions
+
+Some extensions have built in dedicated functions for manipulating them:
+
+- **id-ce-subjectAltName**
+
+  This extension can be modified by calling `$x509->addDomains()` and `$x509->addIPAddresses()`. Those functions can accept an arbitrary number of parameters. Each parameter is added as a new domain name or IP address, respectively.
+  
+  In the case of `$x509->addDomains()`, if the subject DN does not already have `id-at-commonName` set then `$x509->addDomains()` will set it to the first domain name that you passed to it.
+- **id-ce-authorityKeyIdentifier** and **id-ce-subjectKeyIdentifier**
+
+  These extensions can be modified by calling `$x509->setAuthorityKeyIdentifier()` and `$x509->setSubjectKeyIdentifier()`, respectively. Both functions have one parameter - `$value` - that can be either a string or an instance of `\phpseclib3\File\ASN1\Types\OctetString`.
+
+  [RFC5280 § 4.2.1.2. Subject Key Identifier](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.2) defines two methods for automatically generating `id-ce-subjectKeyIdentifier`. `$x509->createSubjectKeyIdentifier()`, by default, uses the first method, however, if you want the second method to be used, you can call `$x509->createSubjectKeyIdentifier(2)` instead.
+
+  [RFC5280 § 4.2.1.1. Authority Key Identifier](https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.1) explains the purpose behind these extensions. In particular, they're used when "_an issuer has multiple signing keys (either due to multiple concurrent key pairs or due to changeover)_".
+- **id-ce-keyUsage** and **id-ce-basicConstraints**
+
+  These extensions can be modified by calling `$x509->makeCA()` which, in turn, sets the cRLSign, keyCertSign and digitalSignature bits in the KeyUsage bitstring and sets the cA boolean of BasicConstraints to true.
+
+_Any_ extension can be set by calling `$x509->setExtension()`. `$x509->setExtension()` has two required parameters - `$name` (a string) and `$value` (which can be any number of primitive types or object types) - and one optional parameter - `$critical`. If `$critical` isn't explicitly set it'll be either bool(true) or bool(false) based on what [RFC5280](https://www.rfc-editor.org/rfc/rfc5280) says about it. Like some extensions are only ever supposed have critical set to either bool(false) or bool(true) and others can be set to one or the other depending on their specific situation. If you manually set an extension to bool(true) that RFC5280 says should only ever be bool(false) phpseclib will let you do so.
+
+If an extension is present multiple times (which really shouldn't ever happen) then phpseclib will only modify the first occurance of that extension.
+
+To remove _all_ occurances of an extension one need simply call `$x509->removeExtension('whatever')`.
+
+Here's an example of an extension being set:
+
+```php
+$x509->setExtension('id-pe-authorityInfoAccess', [
+    [
+        "accessMethod" => "id-ad-ocsp",
+        "accessLocation" => [
+            "uniformResourceIdentifier" => 'https://ocsp.test.ca/',
+        ]
+    ],
+    [
+        "accessMethod" => "id-ad-caIssuers",
+        "accessLocation" => [
+            "uniformResourceIdentifier" => 'https://crt.test.ca/test.crt',
+        ],
+    ],
+]);
+```
+Extensions can also be set from CSRs. The section [From a CSR](#from-a-csr) elaborates.
+
+### Custom Extensions
+
+If you wanted to set a custom proprietary extension that phpseclib didn't have built in support for you can do this:
+
+```php
+$customExtensionName = 'cust';
+$customExtensionNumber = '2.16.840.1.101.3.4.2.99';
+
+ASN1::loadOIDs([
+    $customExtensionName => $customExtensionNumber,
+]);
+
+X509::registerExtension($customExtensionName, [
+    'type' => ASN1::TYPE_SEQUENCE,
+    'children' => [
+        'toggle' => ['type' => ASN1::TYPE_BOOLEAN],
+        'num' => ['type' => ASN1::TYPE_INTEGER],
+        'name' => ['type' => ASN1::TYPE_OCTET_STRING],
+        'list' => [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 0,
+            'max' => -1,
+            'children' => ['type' => ASN1::TYPE_OCTET_STRING],
+        ],
+    ],
+]);
+
+$x509->setExtension($customExtensionName, [
+    'toggle' => true,
+    'num' => 5,
+    'name' => "\0\1\2test",
+    'list' => [
+        'hello',
+        'world',
+    ]
+]);
+```
+Once an extension is registered you can call `X509::getRegisteredExtension($customExtensionName)` to see the definition for that extension.
+
+### From a CSR
+
+When creating an X.509 certificate from a CSR the following things will be copied from the CSR to the X509 object:
+
+- the public key
+- the subject DN
+- any requested extensions
+
+Some of the things that are copied over, by default, shouldn't be copied over verbatim. Like if you're a CA you probably don't want to the `id-ce-subjectAltName` extension or the `id-at-commonName` to be for an unauthorized domain name.
+
+Example:
+
+```php
+use phpseclib3\File\CSR;
+
+$csr = CSR::load('...');
+$x509 = new X509($csr);
+$x509->removeSubjectDNProps('id-at-commonName');
+$x509->removeExtension('id-ce-subjectAltName');
+$x509->removeExtension('id-ca-basicConstraints');
+$x509->removeExtension('id-ce-keyUsage');
+$x509->removeExtension('id-ce-extKeyUsage');
+$x509->removeExtension('id-ce-cRLDistributionPoints');
+$x509->removeExtension('id-pe-authorityInfoAccess');
+$x509->setDomain($authorizedDomain);
+$pfx->sign($x509);
+echo $x509;
+```
+What the removed extensions ought to be replaced with - if they're to be replaced at all - depends on how the X.509 certificate is going to be used. `$pfx->sign($x509)` is discussed in the next section, [Signing](#signing).
 
 ### Signing
 
@@ -253,6 +374,9 @@ $CAprivate->sign($CAX509);
 Here's an example of how you'd create a CA signed cert with a PFX object that builds on the above:
 
 ```php
+use phpseclib3\File\PFX;
+
+$pfx = new PFX();
 $pfx->add($CAprivate);
 $pfx->add($CAX509);
 
@@ -266,6 +390,13 @@ $pfx->sign($x509);
 This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that are in the PFX.
 
 Signing the certifcate before the DNs or extensions or whatever have been set will result in the certificate having a bad signature. Like modifications done after the signature was added do not automatically result in the signature being updated to reflect those changes.
+
+### Output Format
+
+By default, X509 objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `X509::enableBinaryOutput()`. To go back to PEMs calling `X509::disableBinaryOutput()` is sufficient.
+
+
+
 
 
 
@@ -326,270 +457,3 @@ By default `validateDate` checks to see if the _current_ date is within the date
 Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509>getChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.
 
 If you want to retrieve the array contents of any cert in the chain you'll need to do `$x509->getCurrentCert()`.
-
-## Creating Certificates
-
-### The General Idea
-
-In a nutshell...
-
-```php
-$result = $x509->sign($issuer, $subject); 
-$x509->saveX509($result);
-```
-
-### Public / Private Keys
-
-`$issuer` and `$subject` are, themselves, X509 objects. They need private and public keys, respectively. Here's an example of how to create them from scratch for a brand new self-signed cert:
-
-```php
-$privKey = RSA::createKey();
-$pubKey = $privKey->getPublicKey();
-
-$issuer->setPrivateKey($privKey); 
-$subject->setPublicKey($pubKey);
-```
-
-The public key can also be set by `$subject->loadCSR('...')` or `$subject->loadX509('...')`. If you're using `$subject->loadX509()` you'll effectively be re-signing `$subject`. The issuer DN of `$subject` will be updated as will some of the other "transactional properties" (see below), if appropriate, but all (well, most) of the extensions will be preserved.
-
-Note that whereas in the 1.0 and 2.0 branches, the signature algorithm was set by using an additional parameter in the `sign` method (or `signCSR`, `signCRL`, etc) in this case it's set based on the key. So if you want to create an rsaEncryption X509 cert you'd need to do `$publicKey = $publicKey->withHashing(RSA::SIGNATURE_PKCS1)` since, by default, RSA keys use `RSA::SIGNATURE_PSS`.
-
-### Key Identifiers
-
-Sometimes an `$issuer` or a `$subject` will have multiple private keys. To disambiguate between them key identifiers are used. Quoting [RFC5280 § 4.2.1.1](https://tools.ietf.org/html/rfc5280#section-4.2.1.1), "_the value of the keyIdentifier field SHOULD be derived from the public key used to verify the certificate's signature or a method that generates unique values_". An example follows:
-
-```php
-$issuer->setKeyIdentifier($issuer->computeKeyIdentifier($pubKey));
-```
-
-Note that computeKeyIdentifier is already called by `saveX509()` unless you've specifically over-written the key identifier.
-
-### Distinguished Names
-
-`$issuer` and `$subject` also need to have their distinguished names set. That can be done in a number of ways. The following are all equivalent to one another:
-
-```php
-$subject->setDNProp('id-at-organizationName', 'phpseclib demo cert'); 
-$subject->setDN( 
-    array( 
-        'rdnSequence' => array( 
-            array( 
-                array( 
-                    'type' => 'id-at-organizationName', 
-                    'value'=> 'phpseclib demo cert' 
-                ) 
-            ) 
-        ) 
-    ) 
-); 
-$subject->setDN(array( 
-    'O' => 'phpseclib demo cert' 
-)); 
-$subject->setDN('/O=phpseclib demo cert');
-```
-DN properties can also be removed thusly:
-
-```php
-$subject->removeDNProp('id-at-organizationName');
-```
-DN properties can be set via `$subject->loadCSR('...')` and `$subject->loadX509('...')` as well.
-
-In the case of `$subject->setDN()`.. the value will be assumed to be utf8String unless you explicitely tell phpseclib to set it to another type by doing something like `'value'=> array('ia5String' => 'phpseclib demo cert')`.
-
-See also: [List of DN property names](dnprops.md)
-
-### Domain Names
-
-If your X.509 certificate is supposed to be valid for a single domain name that domain name can be set by either setting the id-at-commonName or CN distinguished name property. If your X.509 certificate is supposed to be valid for multiple domain names an X.509 extension - id-ce-subjectAltName - is required. `setDomain()` takes care of all of this for you. Here's an example of how to make your certificate valid for two domains:
-
-```php
-$subject->setDomain('www.google.com', 'www.yahoo.com');
-```
-
-### Transactional Properties
-
-Some properties belong neither to `$issuer` or `$subject`. Rather they belong to "transaction". The functions to set those properties are as follows:
-
-```php
-$x509->setSerialNumber(...);
-$x509->makeCA();
-$x509->setStartDate(...); 
-$x509->setEndDate(...);
-```
-
-`$subject->setDomain()` isn't considered a transactional property because, in theory, the issuing certificate could have at least one domain too since that's based on a particular distinguished name property.
-
-The start time is, by default, when the cert is created. The current time is converted to UTC time and the fact that it's UTC time is denoted in the cert. Other X.509 decoders (eg. browsers or email clients or whatever) should decode this to their timezone so there's no need to set it to do `$x509->setStartDate('-1 day')` or anything like that.
-
-The end date, by default, is one year from the current time.
-
-`setStartDate()` / `setEndDate()` can accept strings or DateTime objects. If you want the cert to last forever pass `'lifetime'` to it.
-
-### Function List
-
-Functions affecting properties common to both `$issuer` and `$subject` are as follows:
-
-- `setDNProp`
-- `removeDNProp`
-- `setDN`
-- `loadCSR`
-- `loadX509`
-- `setKeyIdentifier / computeKeyIdentifier`
-
-Functions affecting `$issuer` only properties:
-
-- `setPrivateKey`
-
-Functions affecting `$subject` only properties:
-
-- `setPublicKey`
-- `setDomain`
-
-Functions affecting `$x509` properties:
-
-- `setSerialNumber`
-- `makeCA`
-- `setStartDate`
-- `setEndDate`
-
-### Minimalistic Example
-
-```php
-$subject = new X509(); 
-$subject->setPublicKey($pubKey); // $pubKey is a PublicKey objet
-$subject->setDN('/O=phpseclib demo cert'); 
-
-$issuer = new X509(); 
-$issuer->setPrivateKey($privKey); // $privKey is a PrivateKey object
-$issuer->setDN('/O=phpseclib demo cert'); 
-
-$x509 = new X509(); 
-$result = $x509->sign($issuer, $subject); 
-echo $x509->saveX509($result);
-```
-For self-signed certs the DN of the subject and issuer will match and the issuer's private key will correspond to the subject's public key.
-
-### Example: Self-signed cert
-
-```php
-use phpseclib3\File\X509;
-use phpseclib3\Crypt\RSA;
-
-// create private key / x.509 cert for stunnel / website
-$CAPrivKey = RSA::createKey();
-$CAPubKey = $CAPrivKey->getPublicKey();
-
-$CASubject = new X509;
-$CASubject->setDNProp('id-at-organizationName', 'phpseclib CA cert');
-$CASubject->setPublicKey($CAPubKey);
-
-$CAIssuer = new X509;
-$CAIssuer->setPrivateKey($CAPrivKey);
-$CAIssuer->setDN($CASubject->getDN());
-
-$x509 = new X509;
-$x509->makeCA();
-$result = $x509->sign($CAIssuer, $CASubject);
-echo "private key for CA cert (can be discarded):\r\n\r\n";
-echo $CAPrivKey;
-echo "\r\n\r\nCA cert to be imported into browser:\r\n\r\n";
-echo $x509->saveX509($result);
-echo "\r\n";
-```
-The cert that this script creates is a CA cert. If you don't want it to be a CA cert you can comment out the `$x509->makeCA()` line.
-
-### Example: CA-signed cert
-
-The following code requires the previous code to work and should follow the code in the previous section.
-
-```php
-$privKey = RSA::createKey();
-$pubKey = $privKey->getPublicKey();
-
-$subject = new X509;
-$subject->setDNProp('id-at-organizationName', 'phpseclib demo cert');
-$subject->setPublicKey($pubKey);
-
-$x509 = new X509;
-$result = $x509->sign($CAIssuer, $subject);
-echo "\r\nthe stunnel.pem contents are as follows:\r\n\r\n";
-echo $privKey;
-echo "\r\n";
-echo $x509->saveX509($result);
-echo "\r\n";
-```
-
-### Example: Arbitrary and Custom Extensions
-
-phpseclib can be used to implement add arbitrary extensions as well.
-
-Building off of the previous example (using the [phpBB MOD Text Template](phpbb.md#actions)):
-
-```php
-#
-#-----[ FIND ]------------------------------------------
-#
-$result = $x509->sign($issuer, $subject);
-#
-#-----[ BEFORE, ADD ]-----------------------------------
-#
-$x509->setExtensionValue('id-pe-authorityInfoAccess', [
-    [
-        "accessMethod" => "id-ad-ocsp",
-        "accessLocation" => [
-            "uniformResourceIdentifier" => 'https://ocsp.test.ca/',
-        ]
-    ],
-    [
-        "accessMethod" => "id-ad-caIssuers",
-        "accessLocation" => [
-            "uniformResourceIdentifier" => 'https://crt.test.ca/test.crt',
-        ],
-    ],
-], true);
-```
-The first two parameters are pretty self explanatory. The third parameter is used to denote if the extension is critical or not. A fourth parameter - `$replace` - also exists if you want this extension to replace an existant extension with the same id as the one you're adding. This parameter defaults to `false` (don't replace) but can also be set to `true` (do replace).
-
-Now let's say you wanted to include not just an arbitrary extension but a custom one as well (eg. one that phpseclib doesn't have pre built-in support for). That can be done thusly:
-
-```php
-#
-#-----[ FIND ]------------------------------------------
-#
-use phpseclib3\File\X509;
-use phpseclib3\Crypt\RSA;
-#
-#-----[ AFTER, ADD ]------------------------------------
-#
-use phpseclib3\File\ASN1;
-
-$customExtensionName = 'cust';
-$customExtensionNumber = '2.16.840.1.101.3.4.2.99';
-
-ASN1::loadOIDs([
-    $customExtensionName => $customExtensionNumber,
-]);
-
-X509::registerExtension($customExtensionName, [
-    'type' => ASN1::TYPE_SEQUENCE,
-    'children' => [
-        'toggle' => ['type' => ASN1::TYPE_BOOLEAN],
-        'num' => ['type' => ASN1::TYPE_INTEGER],
-        'name' => ['type' => ASN1::TYPE_OCTET_STRING],
-        'list' => [
-            'type' => ASN1::TYPE_SEQUENCE,
-            'min' => 0,
-            'max' => -1,
-            'children' => ['type' => ASN1::TYPE_OCTET_STRING],
-        ],
-    ],
-]);
-#
-#-----[ FIND ]------------------------------------------
-#
-$result = $x509->sign($issuer, $subject);
-#
-#-----[ BEFORE, ADD ]-----------------------------------
-#
-$x509->setExtensionValue($customExtensionName, $customExtensionData);
-```

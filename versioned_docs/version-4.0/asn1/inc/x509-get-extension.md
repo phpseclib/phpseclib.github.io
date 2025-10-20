@@ -27,6 +27,6 @@
   </details>
   <details>
     <summary>critical</summary>
-    <div></div>
+    <div>false</div>
   </details>
 </div>
