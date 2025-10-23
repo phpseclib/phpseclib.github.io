@@ -116,7 +116,7 @@ If you put that into a file named test.pem and then do `openssl asn1parse -in te
  60:d=2  hl=2 l=   3 prim: OBJECT            :commonName
  65:d=2  hl=2 l=  12 prim: UTF8STRING        :isrg root x1
 ```
-Note how the it's not SEQUENCE / SET / SEQUENCE at the beginning but, instead, just SET / SEQUENCE.
+Note how the it's not SEQUENCE / SET / SEQUENCE at the beginning but, instead, just SET / SEQUENCE. Further notice how there are multiple entries with a depth of 0 (d=0) whereas in the previous example there was just one - the first entry.
 
 ### ASN1::DN_HASH
 
@@ -163,7 +163,7 @@ An exception is thrown if an unsupported name is passed to it. See [Valid DN Pro
 
 ### String input
 
-In-so-far as strings go, `$props` can can match the output of [ASN1::DN_STRING](#x509dn_string):
+In-so-far as strings go, `$props` can match the output of [ASN1::DN_STRING](#x509dn_string):
 
 ```php
 $x509->setDN('C = US, O = Internet Security Research Group, CN = ISRG Root X1');

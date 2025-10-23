@@ -57,7 +57,7 @@ The easiest way to validate a CSR signature would be to call [$csr->validateSign
 ```php
 use phpseclib3\File\CSR;
 
-$csr = CSR::load(file_get_contents('csr.csr'))
+$csr = CSR::load(file_get_contents('csr.csr'));
 
 $result = $csr->getPublicKey()->withHash('sha1')->verify(
     $csr['certificationRequestInfo']->getEncoded(),
@@ -66,13 +66,13 @@ $result = $csr->getPublicKey()->withHash('sha1')->verify(
 
 echo $result ? 'valid' : 'invalid';
 ```
-<sup>([download csr.csr](pathname:///asn1/csr.csr.txt))</sup>
+<sup>([download csr.csr](pathname:///asn1/csr.txt))</sup>
 
 The output of that is `valid`.
 
 In this example `CSR::load()` is being used instead of `ASN1` exclusive methods because it makes getting the public key easier and makes for a more succinct example.
 
-In theory, for CSR's, the specific hashes could be auto set from `$csr['signatureAlgorithm']['algorithm']`, however, that doesn't work as well for (for example) X.509 certificates. Like for those the signed cert would be the one that'd need to identify what algorithm the signing cert used - not the other way around. Plus, you should really be using `$x509->validateSignature()` instead, anyway.
+In theory, for CSR's, the specific hashes could be auto set from `$csr['signatureAlgorithm']['algorithm']`, however, that doesn't work as well for (for example) X.509 certificates. Like for those, the signed cert would be the one that'd need to identify what algorithm the signing cert used - not the other way around. Plus, you should really be using `$x509->validateSignature()` instead, anyway.
 
 `$csr['signature']` has the first byte dropped (vis-a-vis `substr()`) for this reason (from [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2):
 
@@ -80,41 +80,105 @@ In theory, for CSR's, the specific hashes could be auto set from `$csr['signatur
 
 `substr($csr['signature'], 1)` is an over simplification of that but (1) I have never seen a DER encoded string where the initial octet was anything other than 0 and (2) even if I had I'm trying to keep this example short and sweet.
 
+### Cache Invalidation
+
+At this point an inquiring mind might wonder what happens to `->getEncoded()` if you change the value of something that's within the scope of the encoded variable. The answer depends on how you load it.
+
+Revisiting our original X.509 example:
+
+```php
+use phpseclib3\File\ASN1;
+use phpseclib3\File\ASN1\Maps\Certificate;
+
+$x509 = ASN1::extractBER(file_get_contents('google.crt'));
+$x509 = ASN1::decodeBER($x509);
+$x509 = ASN1::map($x509, Certificate::MAP);
+
+echo strlen($x509->getEncoded()) . "\n";
+$x509['tbsCertificate']['serialNumber'] = new BigInteger('deadbeef', 16);
+echo strlen($x509->getEncoded()) . "\n";
+```
+<sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
+
+In this example, the first `strlen($x509->getEncoded())` returns 805 and the second `strlen($x509->getEncoded())` returns 0. The reason being that the encoded cache has been invalidated.
+
+Now let's switch things up:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = X509::load(file_get_contents('google.crt'));
+
+echo strlen($x509->getEncoded()) . "\n";
+$x509['tbsCertificate']['serialNumber'] = new BigInteger('deadbeef', 16);
+echo strlen($x509->getEncoded()) . "\n";
+```
+In this example, the first `strlen($x509->getEncoded())` returns 805 and the second `strlen($x509->getEncoded())` returns 794. This is because the X509 class recompiles the changed portions of the X.509 certificates everytime [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) is called.
+
 ## Lazy and Eager Loading
 
 By default `Constructed` objects are [lazy loaded](https://en.wikipedia.org/wiki/Lazy_loading). To eager load a `Constructed` object (or any class that thinly wraps around said objects) one need only do `->toArray()` on the object in question.
 
 Some of the consequences of choosing one approach over another are discussed below.
 
-### Memory Usage
+### Speed and Memory Usage
 
 The big advantage of lazy loading is lower memory usage.
 
-Consider the following code, employing lazy loading:
+To illustrate this we'll use [bigcrl.bin](pathname:///asn1/bigcrl.bin), a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present. `120cd8` is the 40,000'th revoked serial number.
+
+We'll use this function to do the searching:
+
+```php
+function findSN(CRL|array $crl, BigInteger $sn): ?int
+{
+    $list = $crl['tbsCertList']['revokedCertificates'];
+    $total = count($list);
+    for ($i = 0; $i < $total; $i++) {
+        if ($list[$i]['userCertificate']->equals($sn)) {
+            echo "found\n";
+            return $i;
+        }
+        //unset($list[$i]->decoded);
+    }
+    return null;
+}
+```
+Note the `unset()`. We'll revisit that.
+
+Now let's run `findSN()` with some eager loading:
 
 ```php
 use phpseclib3\File\CRL;
+
+$sn = new BigInteger('120cd8', 16);
 
 $crl = CRL::load(file_get_contents('bigcrl.bin'));
 
-$match = $crl->isRevoked(new BigInteger('120cd8', 16));
+// lazy load $crl
+$start = microtime(true);
+$crl = $crl->toArray();
+$elapsed = microtime(true) - $start;
+echo "eager loading took $elapsed seconds\n";
 
-echo 'memory usage = ' . memory_get_peak_usage() . "\n";
+// benchmark serial number search
+$start = microtime(true);
+findSN($crl, $sn);
+$elapsed = microtime(true) - $start;
+echo "searching took $elapsed seconds\n";
+echo 'peak memory usage was ' . memory_get_peak_usage() . "\n";
 ```
+On my computer, with PHP 8.3.14, eager loading via `->toArray()` took about **2s**. Searching took about **0.01s** and peak memory usage was **~323mb**, bringing the total script execution time to about **2.01s**.
 
-[bigcrl.bin](pathname:///asn1/bigcrl.bin) is a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present, and `120cd8` is the 40,000'th revoked serial number.
+Now let's consider the same code with suboptimal form of lazy loading. To do this all we need to do is comment out the `$crl = $crl->toArray()` line. When this is done searching, at least on my system, took **0.44s** and peak memory usage was **~151mb**. The total script execution time was **~1.57s faster**.
 
-On PHP 8.3.14 the peak memory usage is ~43mb, which isn't great, but it sure beats the peak memory usage of the same CRL being eagerly loaded:
+Superficially, one might conclude that subsequent searches would also take ~0.44s, however, that's not the case, because, unless you explictly delete the decoded results (the `unset()` I mentioned earlier), things, once decoded, remain decoded. So if you do `findSN($crl, $sn)` a second time that second time, on my system, only took **0.08s**. Not as good as the 0.01s from when we did `->toArray()` but still better than 0.44s. The peak memory usage remains _relatively_ constant.
 
-```php
-use phpseclib3\File\CRL;
+Now let's consider a more optimized form of lazy loading wherein we do the `unset()`. ie. after we test each entry in the CRL to see if it's a match we immediately delete the decoded results. If we do that `findSN($crl, $sn)` takes **0.44s**, as before, but peak memory usage drops to **~43mb**. Subsequent `findSN($crl, $sn)` calls take **0.38s**.
 
-$crl = CRL::load(file_get_contents('bigcrl.bin'))->toArray();
+So, if all you're going to be doing is looking for a single serial number, the most efficient way to do so would be to make use of the "more optimized" approach.  Indeed, this is what [`isRevoked()`, `getRevokedInfo()` and `getRevokedIndex()`](crl.mdx#isrevoked) all do.
 
-echo 'memory usage = ' . memory_get_peak_usage() . "\n";
-```
-
-On PHP 8.3.14 the peak memory usage of that is ~326mb.
+If, however, you're going to be searching for a whole bunch of serial numbers, it'd be faster to eager load the whole CRL.
 
 ### Error Concealment
 

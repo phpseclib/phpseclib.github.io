@@ -4,6 +4,7 @@ title: CRL
 
 import GoodCRL from './inc/crl-good.md';
 import CRLEntry from './inc/crl-revoked-entry.md';
+import CRLRevokedArray from './inc/crl-revoked-as-array.md';
 
 CRL is an acronym for [Certificate Revocation List](https://en.wikipedia.org/wiki/Certificate_revocation_list). CRLs are basically "_a list of_ [certificate serial numbers] _that have been revoked by the issuing certificate authority (CA) before their scheduled expiration date and should no longer be trusted_".
 
@@ -126,6 +127,8 @@ Of course, _seeing_ if a certificate was revoked won't tell you _when_ it was re
 
 If you wanted to get the _index_ of the revoked certificate serial number, so that you might access it directly on subsequent loads vs having to search for the serial number each time then one need simply call `getRevokedIndex()`, passing to it the serial number. If the index is out of bounds then null will be returned.
 
+### getRevokedAsArray()
+
 ## CRL Entry Extensions
 
 Just as each CRL can have optional extensions, each _entry_ in the CRL can also have extensions. [RFC5280 § 5.3. CRL Entry Extensions](https://www.rfc-editor.org/rfc/rfc5280#section-5.3) mentions 3x extensions that could appear for each entry:
@@ -140,6 +143,35 @@ Just as each CRL can have optional extensions, each _entry_ in the CRL can also 
 
 ## Using CRLs in Practice
 
-(cache on the local file system and look at the dates for when the cache should be next checked)
+Real world CRLs can be fairly large. For example, [Deep Dive: ASN1\Constructed Objects: Speed and Memory Usage](detail-constructed.mdx#speed-and-memory-usage) discusses a 2.2mb CRL, and who wants to download 2.2mb every time you're making an AJAX request for 10 bytes of data? This is why CRLs have thisUpdate and nextUpdate as fields (`$crl['tbsCertList']['thisUpdate']` and `$crl['tbsCertList']['nextUpdate']`, respectively).
+
+Of course, those fields are only of use if you _already_ have downloaded the CRL. So how do you store a CRL that's valid for ten days from the moment that you first downloaded it? That's where `X509::setInCRLFunction()` comes into play. Here's an example of its being used:
+
+```php
+$x509 = X509::load('google.crt');
+$CRLCache = [];
+$cacheHits = $cacheMisses = 0;
+X509::setInCRLFunction(function(string $url, BigInteger $serial) use (&$CRLCache, &$cacheHits, &$cacheMisses): bool {
+    if (isset($CRLCache[$url])) {
+        $cacheHits++;
+    } else {
+        $crl = CRL::load(file_get_contents($url));
+        $CRLCache[$url] = $crl->getRevokedAsArray();
+        $cacheMisses++;
+    }
+    return isset($CRLCache[$url][$serial->toHex()]);
+});
+echo $x509->validateNonRevokedStatus() ? 't' : 'f';
+```
+Whatever the function that's being passed to `X509::setInCRLFunction()` is, it needs to have two parameters - `$url` (a string) and `$serial` (an instance of \phpseclib3\Math\BigInteger). The output should be a boolean, true if the serial number is in the certificate, false if it isn't.
+
+Changes you'd want to make to that function before using it in the real world:
+
+- Update it to store stuff to and retrieve stuff from something like MySQL, MongoDB, the local filesystem, whatever.
+- Check `$crl['tbsCertList']['thisUpdate']` and `$crl['tbsCertList']['nextUpdate']` to make sure that the dates are valid. This has been omitted for brevity.
+- Validate the signature of the CRL. This, too, has been omitted for brevity.
+- Handle the case where `file_get_contents($url)`. Should an exception be thrown? Should it return false? Or true? That's entirely your perogrative.
+
+Also, it should be noted that `$x509->validateSignature()` calls `$x509->validateNonRevokedStatus()`. Rather than deal with loading CAs and all that jazz, however, this section opted to call `$x509->validateNonRevokedStatus()` for simplicities sake.
 
 ## Creating CRLs
