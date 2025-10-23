@@ -2,21 +2,144 @@
 title: CRL
 ---
 
+import GoodCRL from './inc/crl-good.md';
+import CRLEntry from './inc/crl-revoked-entry.md';
+
+CRL is an acronym for [Certificate Revocation List](https://en.wikipedia.org/wiki/Certificate_revocation_list). CRLs are basically "_a list of_ [certificate serial numbers] _that have been revoked by the issuing certificate authority (CA) before their scheduled expiration date and should no longer be trusted_".
+
 ## Reading CRLs
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib3\File\CRL;
 
-$x509 = new X509();
-$crl = $x509->loadCRL(file_get_contents('crl.bin'));
+$crl = CRL::load(file_get_contents('crl.bin'));
 
-var_dump($crl);
+print_r($crl);
 ```
 <sup>([download crl.bin](pathname:///asn1/crl.bin))</sup>
 
-Running the above will produce an array that looks something like this:
+`$crl`, in this case, is a CRL object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$crl` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
-import CRL from './crl-raw.md';
+<GoodCRL />
 
-<CRL />
+All elements and subelements of the above CRL object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php).
 
+To learn more about the capabilities afforded to the CRL class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+
+### listExtensions()
+
+Quoting [RFC5280 § 5.2. CRL Extensions](https://www.rfc-editor.org/rfc/rfc5280#section-5.2):
+
+> Conforming CRL issuers are REQUIRED to include the authority key identifier ([Section 5.2.1](https://www.rfc-editor.org/rfc/rfc5280#section-5.2.1)) and the CRL number ([Section 5.2.3](https://www.rfc-editor.org/rfc/rfc5280#section-5.2.3)) extensions in all CRLs issued.
+
+```php
+print_r($crl->listExtensions());
+```
+
+Running the above will produce an array with all the attributes that are in the CRL:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <div>id-ce-authorityKeyIdentifier</div>
+  </details>
+  <details>
+    <summary>1</summary>
+    <div>id-ce-cRLNumber</div>
+  </details>
+</div>
+
+`id-ce-authorityKeyIdentifier` "_is especially useful where an issuer has more than one signing key, either due to multiple concurrent key pairs or due to changeover_" ([RFC5280 § 5.2.1. Authority Key Identifier](https://www.rfc-editor.org/rfc/rfc5280#section-5.2.1))
+
+`id-ce-cRLNumber` "_allows users to easily determine when a particular CRL supersedes another CRL_" ([RFC5280 § 5.2.3. CRL Number](https://www.rfc-editor.org/rfc/rfc5280#section-5.2.3))
+
+### getExtension()
+
+Returns an array representing the first instance of an extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+
+If said extension isn't present then null is returned.
+
+```php
+print_r($crl->getExtension('id-ce-cRLNumber'));
+```
+
+Since `id-ce-cRLNumber` exists in `$crl`, running the above will produce an array with three elements:
+
+<div class="tree">
+  <details>
+    <summary>extnId</summary>
+    <div>id-ce-cRLNumber</div>
+  </details>
+  <details>
+    <summary>extnValue</summary>
+    <details open>
+      <summary>phpseclib3\File\ASN1\Types\Integer</summary>
+      <div>1409</div>
+    </details>
+  </details>
+  <details>
+    <summary>critical</summary>
+    <div>false</div>
+  </details>
+</div>
+
+You can search by the extension name or the OID for the extension (`2.5.29.20`, in this case).
+
+If you just want to see if the extension exists you could do `getExtension() !== null` or you could call `hasExtension()`:
+
+```php
+echo $crl->hasExtension('id-ce-cRLNumber') ? 't' : 'f';
+```
+`hasExtension()` works largely the same way that `getExtension()` does, except that it returns true or false depending on if the extension exists or not.
+
+### getDN() / getDNProps()
+
+A CRL has only has an issuer distinguished name (DN for short). The methods for accessing that DN are as follows:
+
+- [`getDN()`](detail-dns.mdx#getdn) (alias: `getIssuerDN()`)
+- [`hasDNProp()`](detail-dns.mdx#hasdnprop) (alias: `hasIssuerDNProp()`)
+- [`getDNProps()`](detail-dns.mdx#getdnprops) (alias: `getIssuerDNProps()`)
+
+Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (DNs)](detail-dns.mdx).
+
+## Checking for CRL Inclusion
+
+### numRevoked()
+
+The number of revoked certificate serial numbers contained within a CRL can be determined by doing `$crl->numRevoked()` or `count($this->crl['tbsCertList']['revokedCertificates'])`.
+
+So let's say the CRL in question has 100 revoked certificate serial numbers. You can get the `$n`'th revoked certificate serial number by doing either `$crl->getRevokedByIndex($n)` or `$this->crl['tbsCertList']['revokedCertificates'][$n]`. Doing `print_r()` on either will give you something like this:
+
+<CRLEntry />
+
+`userCertificate` and `revocationDate` will always be present - [`crlEntryExtensions`](#crl-entry-extensions) is not guaranteed to be present.
+
+### isRevoked()
+
+This function takes one parameter - either the serial number of the certificate in question, represented by a BigInteger (ie. `$x509['tbsCertificate']['serialNumber']`), or an [X509 object](x509.mdx), from which the the serial number can be extracted. For the rest of this section this parameter shall be called the serial number.
+
+Of course, _seeing_ if a certificate was revoked won't tell you _when_ it was revoked or _why_ it was revoked. If you want that information you'll need to call `getRevokedInfo()`, passing the serial number to it. If the certificate in question has _not_ been revoked then null will be returned. If it has been revoked then you'll get something like this:
+
+<CRLEntry />
+
+`userCertificate` and `revocationDate` will always be present - [`crlEntryExtensions`](#crl-entry-extensions) is not guaranteed to be present.
+
+If you wanted to get the _index_ of the revoked certificate serial number, so that you might access it directly on subsequent loads vs having to search for the serial number each time then one need simply call `getRevokedIndex()`, passing to it the serial number. If the index is out of bounds then null will be returned.
+
+## CRL Entry Extensions
+
+Just as each CRL can have optional extensions, each _entry_ in the CRL can also have extensions. [RFC5280 § 5.3. CRL Entry Extensions](https://www.rfc-editor.org/rfc/rfc5280#section-5.3) mentions 3x extensions that could appear for each entry:
+
+- [id-ce-cRLReasons](https://www.rfc-editor.org/rfc/rfc5280#section-5.3.1)
+
+  `CRL::listValidRevocationReasons()` returns an array with all the valid rejection reasons.
+- [id-ce-invalidityDate](https://www.rfc-editor.org/rfc/rfc5280#section-5.3.2)
+
+  The difference between the revocation date and the invalidty date is that the revocation date is when the CA _actually_ revoked the certificate whereas the invalidity date is when the certificate (or the private key corresponding to it) was compromised. Like a compromised certificate may not be discovered immediately and even after it is discovered it may take time for the CA to _actually_ revoke it.
+- [id-ce-certificateIssuer](https://www.rfc-editor.org/rfc/rfc5280#section-5.3.3)
+
+## Using CRLs in Practice
+
+(cache on the local file system and look at the dates for when the cache should be next checked)
+
+## Creating CRLs

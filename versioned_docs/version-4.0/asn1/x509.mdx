@@ -332,7 +332,7 @@ When creating an X.509 certificate from a CSR the following things will be copie
 
 Some of the things that are copied over, by default, shouldn't be copied over verbatim. Like if you're a CA you probably don't want to the `id-ce-subjectAltName` extension or the `id-at-commonName` to be for an unauthorized domain name.
 
-Example:
+Here's an example of how some of the questionable fields could be removed and, in one case, full on replaced:
 
 ```php
 use phpseclib3\File\CSR;
@@ -350,11 +350,13 @@ $x509->setDomain($authorizedDomain);
 $pfx->sign($x509);
 echo $x509;
 ```
-What the removed extensions ought to be replaced with - if they're to be replaced at all - depends on how the X.509 certificate is going to be used. `$pfx->sign($x509)` is discussed in the next section, [Signing](#signing).
+What the removed extensions ought to be replaced with - if they're to be replaced at all - depends on how the X.509 certificate is going to be used.
+
+`$pfx->sign($x509)` is discussed in the next section, [Signing](#signing).
 
 ### Signing
 
-Certificates can be signed with private key objects or PFX objects.
+Certificates can be signed with [private key objects](publickeys/overview.md) or PFX objects.
 
 Here's an example of how you'd create a self signed CA cert with a private key object:
 

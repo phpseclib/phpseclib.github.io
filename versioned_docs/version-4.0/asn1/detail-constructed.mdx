@@ -36,7 +36,7 @@ Superficially this looks identical to the [X509: Reading Certificates](x509#read
   None of the helper methods (eg. `getPublicKey()`, `listExtensions()`, `getExtension()`, `setExtension()`, etc) are present. `Constructed` classes are super generic and don't know enough about the underlying data structure to define helper methods.
 - **PublicKey is a BitString**
 
-  `$x509['tbsCertificate']['subjectPublicKeyInfo']` is _not_ an instance of `phpseclib3\Crypt\Common\PublicKey`. Indeed, `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString`. This is because `Constructed` is super generic and doesn't know how to further decode that.
+  `$x509['tbsCertificate']['subjectPublicKeyInfo']` is _not_ an instance of `phpseclib3\Crypt\Common\PublicKey` - it's an instance of `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString`. This is because `Constructed` is super generic and doesn't know how to further decode that.
 - **Extensions are OctetStrings**
 
   None of the extensions (`$x509['tbsCertificate']['extensions']`) are fleshed out. Like `$x509['tbsCertificate']['extensions'][1]['extnValue']` (id-ce-cRLDistributionPoints) is an instance of `\phpseclib3\File\ASN1\Types\OctetString`. As before, this is because `Constructed` is super generic and doesn't know how to further decode extensions.
@@ -52,7 +52,7 @@ $x509->getEncoded();
 ```
 That's not super useful, however, so let's consider how one might validate a CSR signature. CSR's are easier to deal with in this case because you don't have to look at extensions or the date or anything like that.
 
-The easiest way to validate a CSR signature would be to use the **validateSignature helper method**, however, one could also do this:
+The easiest way to validate a CSR signature would be to call [$csr->validateSignature()](csr.mdx#validating-signatures), however, one could also do this:
 
 ```php
 use phpseclib3\File\CSR;
@@ -99,7 +99,7 @@ $crl = CRL::load(file_get_contents('bigcrl.bin'));
 
 $match = $crl->isRevoked(new BigInteger('120cd8', 16));
 
-echo 'memory usage = ' . memory_get_peak_usage() . "\n"; exit;
+echo 'memory usage = ' . memory_get_peak_usage() . "\n";
 ```
 
 [bigcrl.bin](pathname:///asn1/bigcrl.bin) is a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present, and `120cd8` is the 40,000'th revoked serial number.
@@ -111,7 +111,7 @@ use phpseclib3\File\CRL;
 
 $crl = CRL::load(file_get_contents('bigcrl.bin'))->toArray();
 
-echo 'memory usage = ' . memory_get_peak_usage() . "\n"; exit;
+echo 'memory usage = ' . memory_get_peak_usage() . "\n";
 ```
 
 On PHP 8.3.14 the peak memory usage of that is ~326mb.
