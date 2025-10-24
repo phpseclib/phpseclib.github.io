@@ -5,6 +5,8 @@ title: CRL
 import GoodCRL from './inc/crl-good.md';
 import CRLEntry from './inc/crl-revoked-entry.md';
 import CRLRevokedArray from './inc/crl-revoked-as-array.md';
+import CRLDupes from './inc/crl-dupes.md';
+import EmptyCRL from './inc/crl-empty.md';
 
 CRL is an acronym for [Certificate Revocation List](https://en.wikipedia.org/wiki/Certificate_revocation_list). CRLs are basically "_a list of_ [certificate serial numbers] _that have been revoked by the issuing certificate authority (CA) before their scheduled expiration date and should no longer be trusted_".
 
@@ -129,6 +131,16 @@ If you wanted to get the _index_ of the revoked certificate serial number, so th
 
 ### getRevokedAsArray()
 
+`$crl->getRevokedAsArray()` returns an array whose keys are the hex encoded versions of the certificate serial numbers:
+
+<CRLRevokedArray />
+
+If a serial number had multiple entries in the CRL (which shouldn't ever happen but whatever) then you'd get this:
+
+<CRLDupes />
+
+This structure has several advantages over `->toArray()`. It's more easily serialized, you can check to see if a certificate is in the CRL by doing `isset($arr[$x509['tbsCertificate']['serialNumber']])`. This method is also much more performant than `->toArray()` due to employing some of the lazy loading discussed in [Deep Dive: ASN1\Constructed Objects: Speed and Memory Usage](detail-constructed.mdx#speed-and-memory-usage).
+
 ## CRL Entry Extensions
 
 Just as each CRL can have optional extensions, each _entry_ in the CRL can also have extensions. [RFC5280 § 5.3. CRL Entry Extensions](https://www.rfc-editor.org/rfc/rfc5280#section-5.3) mentions 3x extensions that could appear for each entry:
@@ -175,3 +187,73 @@ Changes you'd want to make to that function before using it in the real world:
 Also, it should be noted that `$x509->validateSignature()` calls `$x509->validateNonRevokedStatus()`. Rather than deal with loading CAs and all that jazz, however, this section opted to call `$x509->validateNonRevokedStatus()` for simplicities sake.
 
 ## Creating CRLs
+
+Consider the following:
+
+```php
+use phpseclib3\File\CRL;
+
+$crl = new CRL();
+echo $crl;
+```
+The certificate that that would produce would look something like this:
+
+```
+-----BEGIN X509 CRL-----
+MCMwGQIBATADBgEAMAAXDTcwMDEwMTAwMDAwMFowAwYBAAMBAA==
+-----END X509 CRL-----
+```
+This CRL has no extensions, does not have an issuer distinguished name, does not have a signature and it does not have any revoked serial numbers in it.
+
+If you saved this CRL as test.pem and then did `openssl crl -in test.pem -inform PEM -text -noout` on that CRL you'd get this:
+
+```
+Certificate Revocation List (CRL):
+        Version 2 (0x1)
+        Signature Algorithm: 0.0
+        Issuer:
+        Last Update: Jan  1 00:00:00 1970 GMT
+        Next Update: NONE
+No Revoked Certificates.
+    Signature Algorithm: 0.0
+    Signature Value:
+```
+If you did `print_r($x509)` on that certificate you'd get this:
+
+<EmptyCRL />
+
+That said, even when doing this, `$crl['tbsCertList']['thisUpdate']` will (probably) be different every time you create a new CRL. By default it's set to the current time in the systems timezone but you can change that by calling `$crl->setThisDate()` (or `$crl->setLastDate()`, which is an alias of `$crl->setThisDate()`).
+
+There's also `$crl['tbsCertList']['nextUpdate']`. [RFC5280 § 5.1.2.5. Next Update](https://www.rfc-editor.org/rfc/rfc5280#section-5.1.2.5) explains the purpose behind nextUpdate:
+
+> This field indicates the date by which the next CRL will be issued. The next CRL could be issued before the indicated date, but it will not be issued any later than the indicated date.
+
+That said, [RFC5280 § 5.1.2.5. Next Update](https://www.rfc-editor.org/rfc/rfc5280#section-5.1.2.5) is a little weird with regard to whether or not that field is required:
+
+> Conforming CRL issuers MUST include the nextUpdate field in all CRLs. Note that the ASN.1 syntax of TBSCertList describes this field as OPTIONAL, which is consistent with the ASN.1 structure defined in [[X.509]](https://www.itu.int/itu-t/recommendations/rec.aspx?rec=X.509).  The behavior of clients processing CRLs that omit nextUpdate is not specified by this profile.
+
+This field can be set by calling `$crl->setNextDate()`.
+
+Both `$crl->setThisDate()` and `$crl->setNextDate()` have one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll be passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+
+### Setting the DN
+
+A CRL has only has an issuer distinguished name (DN for short). The methods for manipulating that DN are as follows:
+
+- [`setDN()`](detail-dns.mdx#setdn) (alias: `setIssuerDN()`)
+- [`resetDN()`](detail-dns.mdx#resetdn) (alias: `resetIssuerDN()`)
+- [`addDNProp()`](detail-dns.mdx#adddnprop) (alias: `addIssuerDNProp()`)
+- [`addDNProps()`](detail-dns.mdx#adddnprops) (alias: `addIssuerDNProps()`)
+- [`removeDNProps()`](detail-dns.mdx#removednprops) (alias: `removeIssuerDNProps()`)
+
+Additionally, the issuer DN can be set by signing the CRL with a PFX. eg. `$pfx->sign($x509)`. The [Signing section](#signing) elaborates.
+
+### Revoking Certificates
+
+The following shows a few ways in which certificates can be revoked:
+
+```php
+$crl->revoke($x509, 'keyCompromise', new DateTime('1970-01-01', new DateTimeZone('UTC')));
+$crl->revoke($x509['tbsCertificate']['serialNumber']);
+$crl->revoke(new BigInteger('deadbeef', 16));
+```

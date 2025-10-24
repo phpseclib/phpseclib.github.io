@@ -164,7 +164,7 @@ That said, even when doing this, there are 3x things that are (probably) going t
 
 3. The end date. It's set to one year from the current time by default.
 
-   If you want to set your own start date you can do so by calling `$x509->setEndDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string.  If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+   If you want to set your own start date you can do so by calling `$x509->setEndDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string.  If it's a string it'll be passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
    If `$date` is set to `lifetime` then the end date will be set to December 31, 9999 AD 23:59:59 UTC. Per [RFC5280 § 4.1.2.5 Validity](http://tools.ietf.org/html/rfc5280#section-4.1.2.5) that value indicates "_that a certificate has no well-defined expiration date_".
 
@@ -226,7 +226,7 @@ Issuer DN Methods:
 - [`addIssuerDNProps()`](detail-dns.mdx#adddnprops)
 - [`removeIssuerDNProps()`](detail-dns.mdx#removednprops)
 
-The subject DN can also be set by passing an instance of [`\phpseclib3\File\CSR`](csr.mdx) to the X509 constructor. eg.
+Additionally, the subject DN can be set by passing an instance of [`\phpseclib3\File\CSR`](csr.mdx) to the X509 constructor.
 
 ```php
 use phpseclib3\File\CSR;
@@ -236,6 +236,8 @@ $x509 = new X509($csr);
 echo $x509;
 ```
 The section [From a CSR](#from-a-csr) elaborates.
+
+Likewise, the issuer DN can be set by signing the X.509 certicate with a PFX. eg. `$pfx->sign($x509)`. The [Signing section](#signing) elaborates.
 
 ### Setting Extensions
 
