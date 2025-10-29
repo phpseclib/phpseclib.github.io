@@ -391,27 +391,13 @@ $x509 = new X509($public);
 $ca->setDN('O=child organization');
 $pfx->sign($x509);
 ```
-This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that are in the PFX.
+This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that is in the PFX.
 
 Signing the certifcate before the DNs or extensions or whatever have been set will result in the certificate having a bad signature. Like modifications done after the signature was added do not automatically result in the signature being updated to reflect those changes.
 
 ### Output Format
 
 By default, X509 objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `X509::enableBinaryOutput()`. To go back to PEMs calling `X509::disableBinaryOutput()` is sufficient.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## Validating Certificates
 
@@ -426,15 +412,19 @@ echo $x509->validateSignature() ? 'valid' : 'invalid';
 
 Certificate authority certificates can be downloaded from [curl - SSL CA Certificates](https://curl.haxx.se/docs/caextract.html). Parsing that is left as an exercise to the reader.
 
-### Self-signed Signatures
+`validateSignature()` takes the date into consideration when validating the signature. If you want to change the date to some date other than the current date you can do so by calling `X509::setTargetValidationDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
-```php
-$x509 = new X509();
-$cert = $x509->loadX509('...');
-echo $x509->validateSignature(false) ?
-    'valid' :
-    'invalid';
-```
+To retrieve the date currently being used to perform said validation one can call `X509::getTargetValidationDate()`, which returns either an instance of `\DateTimeInterface` or a string
+
+When validating a signature it may be necessary to download intermediate certs from URI's. An intermediate certificate that linked to itself would result in an infinite loop so to prevent that we set a recursion limit. A negative number means that there is no recursion limit. That can be done by calling `X509::setRecurLimit($count)`, where `$count` is an integer that defaults to 5.
+
+If you want to disable the fetching of intermediate certificates via URI's altogether you can do so by calling `X509::disableURLFetch()`.  The fetching of said certificates can be re-enabled by calling `X509::enableURLFetch()`.
+
+To validate a certificate against certificate revocation lists one would need to pass a custom [anonymous function](https://www.php.net/manual/en/functions.anonymous.php) to [X509::setInCRLFunction()](crl.mdx#using-crls-in-practice).
+
+By default the key usage is checked when a signature is validated. Like is the issuer actually authorized to sign children certificates? To disable this check one need simply call `X509::ignoreKeyUsage()`. To re-enable this check one need simply call `X509::checkKeyUsage()`.
+
+By default the basic constraints are checked when a signature is validated, as well. To disable this check one need simply call `X509::ignoreBasicConstraints()`. To re-enable this check one need simply call `X509::checkBasicConstraints()`.
 
 ### URLs
 
@@ -446,18 +436,6 @@ echo $x509->validateURL('https://www.domain.tld/path/to/whatever.ext') ?
     'invalid';
 ```
 
-### Dates
-
-```php
-$x509 = new X509();
-$cert = $x509->loadX509('...');
-echo $x509->validateDate() ? 'valid' : 'invalid';
-```
-
-By default `validateDate` checks to see if the _current_ date is within the date range. If, however, you want to use a custom date you may do so by either passing a string (eg. `validateDate('January 1, 2001')`) or a DateTime object (eg. `validateDate(new DateTime('January 1, 2001'))`).
-
 ### Chains
 
-Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509>getChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.
-
-If you want to retrieve the array contents of any cert in the chain you'll need to do `$x509->getCurrentCert()`.
+Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509>getValidationChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.

@@ -125,7 +125,7 @@ Some of the consequences of choosing one approach over another are discussed bel
 
 The big advantage of lazy loading is lower memory usage.
 
-To illustrate this we'll use [bigcrl.bin](pathname:///asn1/bigcrl.bin), a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present. `120cd8` is the 40,000'th revoked serial number.
+To illustrate this we'll use [bigcrl.bin](pathname:///asn1/bigcrl.crl), a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present. `120cd8` is the 40,000'th revoked serial number.
 
 We'll use this function to do the searching:
 
@@ -144,7 +144,7 @@ function findSN(CRL|array $crl, BigInteger $sn): ?int
     return null;
 }
 ```
-Note the `unset()`. We'll revisit that.
+Note the commented out `unset()`. We'll revisit that.
 
 Now let's run `findSN()` with some eager loading:
 

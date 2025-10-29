@@ -117,18 +117,6 @@ So let's say the CRL in question has 100 revoked certificate serial numbers. You
 
 `userCertificate` and `revocationDate` will always be present - [`crlEntryExtensions`](#crl-entry-extensions) is not guaranteed to be present.
 
-### isRevoked()
-
-This function takes one parameter - either the serial number of the certificate in question, represented by a BigInteger (ie. `$x509['tbsCertificate']['serialNumber']`), or an [X509 object](x509.mdx), from which the the serial number can be extracted. For the rest of this section this parameter shall be called the serial number.
-
-Of course, _seeing_ if a certificate was revoked won't tell you _when_ it was revoked or _why_ it was revoked. If you want that information you'll need to call `getRevokedInfo()`, passing the serial number to it. If the certificate in question has _not_ been revoked then null will be returned. If it has been revoked then you'll get something like this:
-
-<CRLEntry />
-
-`userCertificate` and `revocationDate` will always be present - [`crlEntryExtensions`](#crl-entry-extensions) is not guaranteed to be present.
-
-If you wanted to get the _index_ of the revoked certificate serial number, so that you might access it directly on subsequent loads vs having to search for the serial number each time then one need simply call `getRevokedIndex()`, passing to it the serial number. If the index is out of bounds then null will be returned.
-
 ### getRevokedAsArray()
 
 `$crl->getRevokedAsArray()` returns an array whose keys are the hex encoded versions of the certificate serial numbers:
@@ -141,6 +129,24 @@ If a serial number had multiple entries in the CRL (which shouldn't ever happen 
 
 This structure has several advantages over `->toArray()`. It's more easily serialized, you can check to see if a certificate is in the CRL by doing `isset($arr[$x509['tbsCertificate']['serialNumber']])`. This method is also much more performant than `->toArray()` due to employing some of the lazy loading discussed in [Deep Dive: ASN1\Constructed Objects: Speed and Memory Usage](detail-constructed.mdx#speed-and-memory-usage).
 
+### isRevoked()
+
+This function takes one parameter - either the serial number of the certificate in question, represented by an instance of `\phpseclib3\Math\BigInteger` (ie. `$x509['tbsCertificate']['serialNumber']`), or an [X509 object](x509.mdx), from which the the serial number can be extracted.
+
+The output of this function is a boolean. True if the certificate in question is revoked, false if it isn't.
+
+### getRevokedInfo()
+
+This function takes one parameter - either the serial number of the certificate in question, represented by an instance of `\phpseclib3\Math\BigInteger` (ie. `$x509['tbsCertificate']['serialNumber']`), or an [X509 object](x509.mdx), from which the the serial number can be extracted. For the rest of this section this parameter shall be called the serial number.
+
+If the certificate in question has _not_ been revoked then null will be returned. If it has been revoked then you'll get something like this:
+
+<CRLEntry />
+
+`userCertificate` and `revocationDate` will always be present - [`crlEntryExtensions`](#crl-entry-extensions) is not guaranteed to be present.
+
+If you wanted to get the _index_ of the revoked certificate serial number, so that you might access it directly on subsequent loads vs having to search for the serial number each time then one need simply call `getRevokedIndex()`, passing to it the serial number. If the index is out of bounds then null will be returned.
+
 ## CRL Entry Extensions
 
 Just as each CRL can have optional extensions, each _entry_ in the CRL can also have extensions. [RFC5280 § 5.3. CRL Entry Extensions](https://www.rfc-editor.org/rfc/rfc5280#section-5.3) mentions 3x extensions that could appear for each entry:
@@ -152,6 +158,75 @@ Just as each CRL can have optional extensions, each _entry_ in the CRL can also 
 
   The difference between the revocation date and the invalidty date is that the revocation date is when the CA _actually_ revoked the certificate whereas the invalidity date is when the certificate (or the private key corresponding to it) was compromised. Like a compromised certificate may not be discovered immediately and even after it is discovered it may take time for the CA to _actually_ revoke it.
 - [id-ce-certificateIssuer](https://www.rfc-editor.org/rfc/rfc5280#section-5.3.3)
+
+### listRevokedExtensions()
+
+`listRevokedExtensions()` takes one parameter - either an instance of `\phpseclib3\Math\BigInteger` (ie. `$x509['tbsCertificate']['serialNumber']`) , or an [X509 object](x509.mdx), from which the the serial number can be extracted.
+
+If the serial number does _not_ exist in the CRL `null` will be returned. If the serial number _does_ exist you'll get something like this:
+
+<div class="tree">
+  <details>
+    <summary>0</summary>
+    <div>id-ce-cRLReasons</div>
+  </details>
+</div>
+
+### getRevokedExtension()
+
+`getRevokedExtension()` takes two parameters:
+
+- `$cert`, an instance of `\phpseclib3\Math\BigInteger` (ie. `$x509['tbsCertificate']['serialNumber']`) , or an [X509 object](x509.mdx), from which the the serial number can be extracted
+- `$name`, the name of the extension whose contents you're trying to get
+
+Returns an array representing the first instance of an extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+
+If said extension or if the certificate serial number isn't present then null is returned.
+
+Example:
+
+```php
+$r = $crl->getRevokedExtension(
+  new Biginteger('016d38d1fa474f65bf2c32588c82ef8c', 16),
+  'id-ce-cRLReasons'
+);
+print_r($r);
+```
+
+Since id-ce-cRLReasons exists in $crl, running the above will produce an array with three elements:
+
+<div class="tree">
+  <details>
+    <summary>extnId</summary>
+    <details open>
+      <summary>phpseclib3\File\ASN1\Types\OID</summary>
+      <div>id-ce-cRLReasons</div>
+    </details>
+  </details>
+  <details>
+    <summary>extnValue</summary>
+    <details open>
+      <summary>phpseclib3\File\ASN1\Types\Integer</summary>
+      <div>unspecified</div>
+    </details>
+  </details>
+  <details>
+    <summary>critical</summary>
+    <div></div>
+  </details>
+</div>
+
+You can search by the extension name or the OID for the extension (`2.5.29.21`, in this case).
+
+If you just want to see if the extension exists you could do `getRevokedExtension() !== null` or you could call `hasRevokedExtension()`:
+
+```php
+echo $crl->getRevokedExtension(
+  new Biginteger('016d38d1fa474f65bf2c32588c82ef8c', 16),
+  'id-ce-cRLReasons'
+) ? 't' : 'f';
+```
+`hasRevokedExtension()` works largely the same way that `getRevokedExtension()` does, except that it returns true or false depending on if the extension exists or not.
 
 ## Using CRLs in Practice
 
@@ -236,6 +311,64 @@ This field can be set by calling `$crl->setNextDate()`.
 
 Both `$crl->setThisDate()` and `$crl->setNextDate()` have one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll be passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
+### Revoking Certificates
+
+The following shows a few ways in which certificates can be revoked:
+
+```php
+$crl->revoke($x509, 'keyCompromise', new DateTime('1970-01-01', new DateTimeZone('UTC')));
+$crl->revoke($x509['tbsCertificate']['serialNumber']);
+$crl->revoke(new BigInteger('deadbeef', 16), reason: 'keyCompromise');
+```
+The parameters are as follows:
+
+- `$cert`
+
+  Can be either an instance of `\phpseclib3\File\X509` or `\phpseclib3\Math\BigInteger`. If it's a BigInteger it should be the serial number of the certificate in question
+- `$reason`
+
+  Can be a string or null.
+
+  Valid reasons (from [RFC5280 pp. 130](https://www.rfc-editor.org/rfc/rfc5280#page-130)) can be listed by doing `CRL::listValidRevocationReasons()` but, none-the-less, the supported reasons are as follows:
+
+  - unspecified
+  - keyCompromise
+  - cACompromise
+  - affiliationChanged
+  - superseded
+  - cessationOfOperation
+  - certificateHold
+  - removeFromCRL
+  - privilegeWithdrawn
+  - aACompromise
+
+  Defaults to null (ie. a `id-ce-cRLReasons` [CRL Entry Extension](#crl-entry-extensions) will not be present).
+
+- `$date`
+
+  Can be an instance of `\DateTimeInterface` or a string or null. If it's a string it'll be passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+
+  Default to null (ie. the current date).
+
+Certificates can be unrevoked by calling `$crl->unrevoke()`, which takes one parameter - `$cert` - an instance of `\phpseclib3\File\X509` or `\phpseclib3\Math\BigInteger`.
+
+### Setting Extensions
+
+CRLs have two different types of extensions that can be set - top level extensions and per-certificate extensions.
+
+Here's an example of a top-level extension being set:
+
+```php
+$crl->setExtension('id-ce-cRLNumber', 155);
+```
+
+Here's an example of a per-certificate extension being set:
+
+```php
+$crl->setRevokedExtension($x509, 'id-ce-invalidityDate', '1970-01-01 00:00:00');
+```
+Both `setExtension()` and `setRevokedExtension()` accept an optional extra parameter - `$critical`, as well which, if not explicitly set, will be set to either bool(true) or bool(false) based on what [RFC5280](https://www.rfc-editor.org/rfc/rfc5280) says about it. Like some extensions are only ever supposed have critical set to either bool(false) or bool(true) and others can be set to one or the other depending on their specific situation. If you manually set an extension to bool(true) that RFC5280 says should only ever be bool(false) phpseclib will let you do so.
+
 ### Setting the DN
 
 A CRL has only has an issuer distinguished name (DN for short). The methods for manipulating that DN are as follows:
@@ -248,12 +381,39 @@ A CRL has only has an issuer distinguished name (DN for short). The methods for 
 
 Additionally, the issuer DN can be set by signing the CRL with a PFX. eg. `$pfx->sign($x509)`. The [Signing section](#signing) elaborates.
 
-### Revoking Certificates
+### Signing
 
-The following shows a few ways in which certificates can be revoked:
+CRLs can be signed with [private key objects](publickeys/overview.md) or PFX objects.
+
+Here's an example of how you'd sign a CRL with a private key object:
 
 ```php
-$crl->revoke($x509, 'keyCompromise', new DateTime('1970-01-01', new DateTimeZone('UTC')));
-$crl->revoke($x509['tbsCertificate']['serialNumber']);
-$crl->revoke(new BigInteger('deadbeef', 16));
+use phpseclib3\Crypt\EC;
+use phpseclib3\File\CRL;
+
+$private = EC::createKey('nistp256');
+
+$crl = new CRL();
+// do stuff
+$private->sign($crl);
 ```
+
+Here's an example of how you'd create a CA signed cert with a PFX object that builds on the above:
+
+```php
+use phpseclib3\File\PFX;
+use phpseclib3\File\CSR;
+
+$pfx = PFX::load('...');
+
+$crl = new CRL();
+// do stuff
+$pfx->sign($crl);
+```
+This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that is in the PFX.
+
+Signing the CRL before the DNs or extensions or whatever have been set will result in the CRL having a bad signature. Like modifications done after the signature was added do not automatically result in the signature being updated to reflect those changes.
+
+### Output Format
+
+By default, CRL objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CRL::enableBinaryOutput()`. To go back to PEMs calling `CRL::disableBinaryOutput()` is sufficient.
