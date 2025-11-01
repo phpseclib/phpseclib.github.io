@@ -190,7 +190,7 @@ $key = $key
     ->withMGFHash('sha1');
 echo base64_encode($key->encrypt('test'));
 ```
-<sup>_(md5 is being used because the key is a 512-bit key from [Sample RSA Keys](/docs/rsa-keys); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](/docs/rsa#rsaencryption_oaep); sha1 would work but for the purposes of this demonstration it can't be sha1)_</sup>
+<sup>_(md5 is being used because the key is a 512-bit key from [Sample RSA Keys](publickeys/rsa-keys.md); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](publickeys/rsa.md#rsaencryption_oaep); sha1 would work but for the purposes of this demonstration it can't be sha1)_</sup>
 
 Now let's modify the Java code again:
 

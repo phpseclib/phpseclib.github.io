@@ -130,7 +130,7 @@ window.crypto.subtle.importKey(
     })
 });
 ```
-<sup>_(sha1 is being used because the key is a 512-bit key from [Sample RSA Keys](/docs/rsa-keys); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](/docs/rsa#rsaencryption_oaep))_</sup>
+<sup>_(sha1 is being used because the key is a 512-bit key from [Sample RSA Keys](publickeys/rsa-keys.md); 512-bits is used for brevity but because it's 512-bits sha256 can't be used per the max size formulas discussed at [RSA::ENCRYPTION_OAEP](publickeys/rsa.md#rsaencryption_oaep))_</sup>
 
 PKCS1 keys are not supported and neither is PKCS1 padding for encryption (PKCS1 signature padding, however, is supported).
 

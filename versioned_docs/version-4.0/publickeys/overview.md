@@ -39,7 +39,7 @@ All successfully loaded keys are an instance of `phpseclib3\Crypt\Common\Asymmet
 
 The format of a successfully loaded key can be determined by looking at `$key->getLoadedFormat()`. This will return a string. Note that keys embedded within X.509 certificates will not identify themselves as X.509 - rather, they'll identify themselves as PKCS8, due to various technical reasons.
 
-[^x509]: When an X.509 key is loaded _no_ validation is performed. A public key will be returned even if the certificate is expired and even if the signature is invalid. The _best_ way to get the public key in an X.509 cert is to use the explicit [X.509 functionality](file/x509.md) that phpseclib provides but PublicKeyLoader does work, as well, albeit suboptimally.
+[^x509]: When an X.509 key is loaded _no_ validation is performed. A public key will be returned even if the certificate is expired and even if the signature is invalid. The _best_ way to get the public key in an X.509 cert is to use the explicit [X.509 functionality](file/x509.mdx) that phpseclib provides but PublicKeyLoader does work, as well, albeit suboptimally.
 
 ## PublicKey vs. PrivateKey
 
