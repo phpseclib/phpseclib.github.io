@@ -42,7 +42,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'File Formats',
-      items: ['asn1/x509', 'asn1/csr', 'asn1/spkac', 'asn1/crl'],
+      items: ['file/x509', 'file/csr', 'file/spkac', 'file/crl'],
     },
     {
       type: 'category',

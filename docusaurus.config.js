@@ -160,7 +160,7 @@ const config = {
               },
               {
                 label: 'X509 / PFX / CMS / etc',
-                to: '/docs/asn1/x509',
+                to: '/docs/file/x509',
               },
               {
                 label: 'Interoperability',
