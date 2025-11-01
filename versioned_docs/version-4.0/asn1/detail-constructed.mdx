@@ -4,6 +4,8 @@ title: "Deep Dive: ASN1\\Constructed Objects"
 
 import SimpleX509 from './inc/x509-simple.md';
 import BadX509_1 from './inc/x509-bad-1.md';
+import SortableTable from '@site/src/components/SortableTable';
+import { data, columns } from '@site/src/data/asn1ConstructedTable';
 
 ## Overview
 
@@ -123,7 +125,7 @@ Some of the consequences of choosing one approach over another are discussed bel
 
 ### Speed and Memory Usage
 
-The big advantage of lazy loading is lower memory usage.
+The chief advantage of lazy loading is lower memory usage.
 
 To illustrate this we'll use [bigcrl.bin](pathname:///asn1/bigcrl.crl), a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present. `120cd8` is the 40,000'th revoked serial number.
 
@@ -179,6 +181,18 @@ Now let's consider a more optimized form of lazy loading wherein we do the `unse
 So, if all you're going to be doing is looking for a single serial number, the most efficient way to do so would be to make use of the "more optimized" approach.  Indeed, this is what [`isRevoked()`, `getRevokedInfo()` and `getRevokedIndex()`](crl.mdx#isrevoked) all do.
 
 If, however, you're going to be searching for a whole bunch of serial numbers, it'd be faster to eager load the whole CRL.
+
+### Comparison Table
+
+<SortableTable
+  columns={columns}
+  data={data}
+  stickyHeader
+  rowHeight={44}
+  nowrapCells={false}
+  getRowId={(r) => r.name}
+  onRowSelect={(row, id) => console.log('selected', id, row)}
+/>
 
 ### Error Concealment
 
