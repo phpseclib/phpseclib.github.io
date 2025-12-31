@@ -104,7 +104,7 @@ The yellow highlighted portion is the signature subject and the blue highlighted
 
 The CMS in this example excludes certificates, has a detached signature, uses sha1 as the message digest and nistp192 as the curve, for brevity.
 
-Hex encoded is employed instead of the more standard base64 encoding because base64 encodes data in fixed 3-byte groups, producing 4 encoded characters per group. If a byte sequence begins or ends in the middle of such a group, the corresponding base64 characters will necessarily include bits from adjacent bytes, making exact substring matching impossible. Hex encoding preserves a one-to-one mapping between bytes and text, allowing reliable byte-level substring searches.
+Hex encoding is employed instead of the more standard base64 encoding because base64 encodes data in fixed 3-byte groups, producing 4 encoded characters per group. If a byte sequence begins or ends in the middle of such a group, the corresponding base64 characters will necessarily include bits from adjacent bytes, making exact substring matching impossible. Hex encoding preserves a one-to-one mapping between bytes and text, allowing reliable byte-level substring searches.
 
 ## Immutability
 

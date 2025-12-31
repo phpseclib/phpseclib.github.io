@@ -379,11 +379,11 @@ A CRL has only has an issuer distinguished name (DN for short). The methods for 
 - [`addDNProps()`](detail-dns.mdx#adddnprops) (alias: `addIssuerDNProps()`)
 - [`removeDNProps()`](detail-dns.mdx#removednprops) (alias: `removeIssuerDNProps()`)
 
-Additionally, the issuer DN can be set by signing the CRL with a PFX. eg. `$pfx->sign($x509)`. The [Signing section](#signing) elaborates.
+Additionally, the issuer DN can be set by signing the CRL with a [PFX](pfx.mdx). eg. `$pfx->sign($x509)`. The [Signing section](#signing) elaborates.
 
 ### Signing
 
-CRLs can be signed with [private key objects](publickeys/overview.mdx) or PFX objects.
+CRLs can be signed with [private key objects](publickeys/overview.mdx) or [PFX objects](pfx.mdx).
 
 Here's an example of how you'd sign a CRL with a private key object:
 

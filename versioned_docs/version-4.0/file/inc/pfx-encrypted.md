@@ -45,7 +45,7 @@
   <summary>bagValue</summary>
   <details open>
 <summary>phpseclib4\Crypt\RSA\PrivateKey</summary>
-<div>-----BEGIN ENCRYPTED PRIVATE KEY-----
+<div><pre>-----BEGIN ENCRYPTED PRIVATE KEY-----
 MIIFLTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQIopDCssdOZfMCAggA
 MAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAECBBD729euUHXakGszQ221YkFnBIIE
 0KyIIde2XfAPXwcDbRpODXQdUfN/jYhgVRPr7Chr1+od1B1/asBv08uoQd110oQk
@@ -74,7 +74,7 @@ li4AunXhQcyXwctkrXkMQWugEztv3hAtGIYEAPbzCKjfTOhQnkpP9lq7oJyXk07m
 TdvU4pX4jBidl7EpU0hQt3KhmH3bWaAO2e19c+kywpqCw5R7ogXlqe6392O5gn1v
 8Usf2xoS2mL3t9DJ65pEjBO+zZTDfY9p1TzaElFNXWpbKNQAaCXKLaQD61DaqRfu
 E4822jl03MFpD8RNfpEB345v6v4TaaG8qHZTDjm0zZy8
------END ENCRYPTED PRIVATE KEY-----</div>
+-----END ENCRYPTED PRIVATE KEY-----</pre></div>
 </details>
 
 </details>
@@ -117,7 +117,7 @@ E4822jl03MFpD8RNfpEB345v6v4TaaG8qHZTDjm0zZy8
   <summary>certValue</summary>
   <details open>
 <summary>phpseclib4\File\X509</summary>
-<div>-----BEGIN CERTIFICATE-----
+<div><pre>-----BEGIN CERTIFICATE-----
 MIICpDCCAYygAwIBAgIUW0q6DA7BwTq4pAGlsLIBl3AAxaowDQYJKoZIhvcNAQEL
 BQAwDDEKMAgGA1UEAwwBYTAeFw0yNTA2MTQxOTUzMDhaFw0yNjA2MTQxOTUzMDha
 MAwxCjAIBgNVBAMMAWEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDc
@@ -133,7 +133,7 @@ u738iaah6W3WPR08hizfgzRH3n7ypcZ/rOREeUbMWcawR2C3eeEf9JelpGNlYOWI
 2vE7jCk9eEy3Ov8aF8Tosod+3JDqeYO6SigyG5qsSxtuygIYt8sjWY9rBbSOsDMP
 EvRg6P8U2fhIbseSJ7kAxqonLuB0i5o4ddDiwPoQb6NRwS1MosQ1KIyss7kf879i
 tsH0sNSpwgI=
------END CERTIFICATE-----</div>
+-----END CERTIFICATE-----</pre></div>
 </details>
 
 </details>
