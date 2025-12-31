@@ -17,7 +17,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
   - Private keys start with `-----BEGIN OPENSSH PRIVATE KEY-----`
 - **XML**
 
-A more in-depth discussion of the common formats can be found in [Common Key Formats](overview.md#common-key-formats). See [Sample DSA Keys](dsa-keys.md) for actual samples.
+A more in-depth discussion of the common formats can be found in [Common Key Formats](overview.mdx#common-key-formats). See [Sample DSA Keys](dsa-keys.md) for actual samples.
 
 [^ssh]: The only keys supported by this format are those with an N (length of group order Q) of 160 because [that's all SSH2 supports](https://tools.ietf.org/html/rfc4253#page-15).
 

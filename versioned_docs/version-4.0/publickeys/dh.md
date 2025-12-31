@@ -2,7 +2,7 @@
 title: (EC)DH
 ---
 
-Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
+Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
 
 ## Supported Formats
 
@@ -15,7 +15,7 @@ Regular DH keys can be of the following formats:
 - **PKCS8**
   - Keys start with `-----BEGIN PRIVATE KEY-----` or `-----BEGIN ENCRYPTED PRIVATE KEY-----` or `-----BEGIN PUBLIC KEY-----`
 
-A more in-depth discussion of these two formats can be found in [Common Key Formats](overview.md#common-key-formats).
+A more in-depth discussion of these two formats can be found in [Common Key Formats](overview.mdx#common-key-formats).
 
 DH Public / Private keys will not be instances of `\phpseclib3\Crypt\Common\PublicKey` or `\phpseclib3\Crypt\Common\PrivateKey` but rather of `phpseclib3\Crypt\DH\PublicKey` and `phpseclib3\Crypt\DH\PrivateKey`.
 

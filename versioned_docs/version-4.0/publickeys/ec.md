@@ -3,7 +3,7 @@ title: Elliptic Curves
 sidebar_position: 6
 ---
 
-Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
+Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
 
 ## Supported Formats
 
@@ -18,7 +18,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
 - **JWK** [^jwk]
 - **XML** [^xml]
 
-A more in-depth discussion of the common formats can be found in [Common Key Formats](overview.md#common-key-formats). See [Sample EC Keys](ec-keys.md) for actual samples.
+A more in-depth discussion of the common formats can be found in [Common Key Formats](overview.mdx#common-key-formats). See [Sample EC Keys](ec-keys.md) for actual samples.
 
 [^namedSpecified]: Supports both named and specified curves.
 

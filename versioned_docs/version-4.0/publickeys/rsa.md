@@ -3,7 +3,7 @@ title: RSA
 sidebar_position: 2
 ---
 
-Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
+Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
 
 ## Supported Formats
 
@@ -27,7 +27,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
   - Public keys correspond to the format described in [Public Key BLOBs](https://docs.microsoft.com/en-us/windows/win32/seccrypto/base-provider-key-blobs#public-key-blobs)
   - Format is unique to RSA.
 
-  A more in-depth discussion of the common formats (ie. those that aren't noted as being unique to RSA) can be found in [Common Key Formats](overview.md#common-key-formats). See [Sample RSA Keys](rsa-keys.md) for actual samples.
+  A more in-depth discussion of the common formats (ie. those that aren't noted as being unique to RSA) can be found in [Common Key Formats](overview.mdx#common-key-formats). See [Sample RSA Keys](rsa-keys.md) for actual samples.
 
   [^multiprime]: These are the only formats that support [multi-prime RSA](https://tools.ietf.org/html/rfc8017#section-3).
 
