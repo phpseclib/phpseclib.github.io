@@ -9,7 +9,7 @@ import { data, columns } from '@site/src/data/asn1ConstructedTable';
 
 ## Overview
 
-A `\phpseclib3\File\ASN1\Constructed` object (hereinafter referred to as `Constructed`) most typically corresponds to either an [ASN.1 SEQUENCE](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/sequence.html) or an [ASN.1 SET](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/set.html) and contains one or more child elements. They're essentially [trees](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) whose leaf nodes are non-`Constructed` instances of `\phpseclib3\File\ASN1\Types\BaseTypes`.
+A `\phpseclib3\File\ASN1\Constructed` object (hereinafter referred to as `Constructed`) most typically corresponds to either an [ASN.1 SEQUENCE](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/sequence.html) or an [ASN.1 SET](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/set.html) and contains one or more child elements. They're essentially [trees](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) whose leaf nodes are non-`Constructed` instances of `\phpseclib3\File\ASN1\Types\BaseType`.
 
 The following code sample shows how to load an X.509 certificate as a `Constructed` object:
 
@@ -42,6 +42,9 @@ Superficially this looks identical to the [X509: Reading Certificates](x509#read
 - **Extensions are OctetStrings**
 
   None of the extensions (`$x509['tbsCertificate']['extensions']`) are fleshed out. Like `$x509['tbsCertificate']['extensions'][1]['extnValue']` (id-ce-cRLDistributionPoints) is an instance of `\phpseclib3\File\ASN1\Types\OctetString`. As before, this is because `Constructed` is super generic and doesn't know how to further decode extensions.
+- **getEncoded() returns empty string when changes are made**
+
+  [getEncoded()](#getencoded) and it's subsection, [Cache Invalidation](#cache-invalidation), talk about this more, at length.
 
 In spite of that `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. What that means is that both `X509` (or any class that's a "thin wrapper" around `Constructed`) has the following features:
 
@@ -116,6 +119,23 @@ $x509['tbsCertificate']['serialNumber'] = new BigInteger('deadbeef', 16);
 echo strlen($x509->getEncoded()) . "\n";
 ```
 In this example, the first `strlen($x509->getEncoded())` returns 805 and the second `strlen($x509->getEncoded())` returns 794. This is because the X509 class recompiles the changed portions of the X.509 certificates everytime [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) is called.
+
+Now let's switch things up yet again:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = X509::load(file_get_contents('google.crt'));
+
+$cert = &$x509['tbsCertificate'];
+echo strlen($cert->getEncoded()) . "\n";                   // outputs 654
+$cert['serialNumber'] = new BigInteger('deadbeef', 16);
+echo strlen($cert->getEncoded()) . "\n";                   // outputs 0
+echo strlen($x509['tbsCertificate']->getEncoded()) . "\n"; // outputs 643
+$cert = &$x509['tbsCertificate'];
+echo strlen($cert->getEncoded()) . "\n";                   // outputs 643
+```
+In this example the first `strlen($cert->getEncoded())` returns 654 and the second `strlen($cert->getEncoded())` returns 0. This is because it's the `X509` class doing the recompiling - not the `Constructed` class. `$x509['tbsCertificate']` is calling [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) on the `X509` class but `$cert` isn't an instance of `X509` - it's an instance of `Constructed`. `Constructed` doesn't know how to reencode things so it doesn't - it just deletes the cached encoding information after it's been invalidated with a change.
 
 ## Lazy and Eager Loading
 

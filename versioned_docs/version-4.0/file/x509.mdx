@@ -404,9 +404,8 @@ By default, X509 objects, when cast to a string, are converted to base64-encoded
 ### Signatures
 
 ```php
-$x509 = new X509();
-$x509->loadCA('...');
-$cert = $x509->loadX509('...');
+X509::loadCA('...');
+$x509 = X509::load('...');
 echo $x509->validateSignature() ? 'valid' : 'invalid';
 ```
 
@@ -429,8 +428,7 @@ By default the basic constraints are checked when a signature is validated, as w
 ### URLs
 
 ```php
-$x509 = new File_X509();
-$cert = $x509->loadX509('...');
+$x509 = X509::load('...');
 echo $x509->validateURL('https://www.domain.tld/path/to/whatever.ext') ?
     'valid' :
     'invalid';

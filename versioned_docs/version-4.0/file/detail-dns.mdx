@@ -28,19 +28,19 @@ print_r($x509->getDN());
 ```
 <sup>([download google.crt](pathname:///asn1/ca.crt.txt))</sup>
 
-### ASN1::DN_ARRAY
-
-The default value. Returns an array that basically mirrors the internal structure that phpseclib uses:
-
-<DNArray />
-
 ### ASN1::DN_STRING
 
-Returns a string:
+The default value. Returns a string:
 ```
 C = US, O = Internet Security Research Group, CN = ISRG Root X1
 ```
 The string is of the same format that you see when you do `openssl x509 -noout -text -in ca.crt` on the CLI for sufficiently new versions of OpenSSL. This string is similar but not the same as the "name" string that [`openssl_x509_parse()`](https://www.php.net/openssl-x509-parse) returns. [DN String Format Comparison](#dn-string-format-comparison) talks more about the reasons as to why.
+
+### ASN1::DN_ARRAY
+
+Returns an array that basically mirrors the internal structure that phpseclib uses:
+
+<DNArray />
 
 ### ASN1::DN_OPENSSL
 
