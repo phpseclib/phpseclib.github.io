@@ -1,0 +1,193 @@
+---
+title: PFX
+---
+
+import PFXUnencrypted from './inc/pfx-unencrypted.md';
+import PFXEncrypted from './inc/pfx-encrypted.md';
+import PFXEmpty from './inc/pfx-empty.md';
+
+PFX, also known as [PKCS12](https://en.wikipedia.org/wiki/PKCS_12), is a container format that can contain multiple X509 certificates and private keys.
+
+So let's say you wanted to sign an X.509 certificate. You have `$CAprivate`, `$CAX509` and `$pfx` as existent variables.
+
+If you didn't use the `$pfx` variable you would have to do this:
+
+```php
+$x509->setIssuerDN($CAX509->getSubjectDN());
+$x509->setAuthorityKeyIdentifier(
+    $CAX509->getExtension('id-ce-subjectKeyIdentifier')['extnValue']
+);
+$CAprivate->sign($x509);
+```
+Or you could just do this:
+
+```php
+$pfx->sign($x509);
+```
+
+## Reading PFXs
+
+```php
+use phpseclib3\File\PFX;
+
+$pfx = PFX::load(file_get_contents('pfx.der'), 'password');
+
+print_r($pfx);
+```
+<sup>([download pfx.der](pathname:///asn1/pfx.der))</sup>
+
+`password` is optional and is only needed if the PFX is encrypted.
+
+`$pfx`, in this case, is a PFX object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$pfx` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+
+<PFXEncrypted />
+
+An unencrypted PFX (eg. [pfx2.der](pathname:///asn1/pfx2.der)) looks like this:
+
+<PFXUnencrypted />
+
+If an encrypted PFX is loaded without a password then `\phpseclib4\Exception\NoPasswordProvidedException` will be thrown.
+
+All elements and subelements of the above PFX objects can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php).
+
+To learn more about the capabilities afforded to the PFX class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+
+### getAll()
+
+Returns an array containing all private key and X509 objects that are contained within the PFX.
+
+This method is slightly more complicated than one might think because the X.509 certificates and private keys don't live next to one another. Here are the respective locations of the private key and the certificate for both the encrypted and unencrypted PFX:
+
+- `$pfx['authSafe']['content'][0]['content'][0]['bagValue']`
+- `$pfx['authSafe']['content'][1]['content'][0]['bagValue']['certValue']`
+
+### getX509()
+
+Returns an array containing all the X.509 objects that are contained within the PFX.
+
+### getPrivateKey()
+
+Returns an array containing all the private objects that are contained within the PFX.
+
+### getFriendlyNames()
+
+Returns an array containing all private key and X509 `pkcs-9-at-friendlyName` values.
+
+### getLocalKeyIDs()
+
+Returns an array containing all private key and X509 `pkcs-9-at-localKeyId` values.
+
+### pluckByFriendlyName()
+
+Has one parameter - `$value`.
+
+Returns an array containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-friendlyName` matching `$value`.
+
+### pluckByLocalKeyID()
+
+Has one parameter - `$value`.
+
+Returns an array containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-localKeyId` matching `$value`.
+
+### pfxFromFriendlyName()
+
+Has one parameter - `$value`.
+
+Returns a PFX object containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-friendlyName` matching `$value`.
+
+### pfxFromLocalKeyID()
+
+Has one parameter - `$value`.
+
+Returns a PFX object containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-localKeyId` matching `$value`.
+
+## Creating PFXs
+
+### Minimalistic PFX
+
+Consider the following:
+
+```php
+use phpseclib3\File\PFX;
+
+$pfx = new PFX();
+echo $pfx;
+```
+Since PFXs are only available in binary format their output is not being included here.
+
+This PFX has no X509 certificate, no private key, no MAC code and no password.
+
+If you did `print_r($pfx)` on that PFX you'd get this:
+
+<PFXEmpty />
+
+### Making Additions
+
+Here's how you'd add an X.509 certificate and a private key:
+
+```php
+$pfx->add($x509);
+$pfx->add($privKey);
+```
+
+If you wanted them to be added with a `pkcs-9-at-friendlyName` attribute you could do this:
+
+```php
+$pfx->add($x509, friendlyName: 'whatever');
+$pfx->add($privKey, friendlyName: 'whatever');
+```
+
+If you wanted them to be added with a `pkcs-9-at-localKeyId` attribute you could do this:
+
+```php
+$pfx->add($x509, localKeyID: 'whatever');
+$pfx->add($privKey, localKeyID: 'whatever');
+```
+
+### Setting Password
+
+Passwords can be set (or changed) on a PFX by calling `$pfx->setPassword('password')`.
+
+Passwords can be removed from a PFX by calling `$pfx->removePassword()`.
+
+### Setting MAC Parameters
+
+MAC Parameters can be set globally thusly:
+
+```php
+PFX::setHashAlgorithm('sha256');
+PFX::setIterationCount(1024);
+PFX::setSaltLength(32);
+```
+Or they can be set on a per key basis thusly:
+
+```php
+echo $key
+    ->withPassword('demo')
+    ->toString('PKCS8', [
+        'hashAlgorithm' => 'sha256',
+        'iterationCount' => 1024,
+        'saltLength' => 32
+    ]);
+```
+
+Valid hash algorithms are:
+
+- md2
+- md5
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512/224
+- sha512/256
+
+## Creating signatures
+
+Signatures can be created from strings or from objects implementing the `phpseclib3\File\Common\Signable` interface.
+
+Example:
+
+```php
+$pfx->sign($x509);
+```

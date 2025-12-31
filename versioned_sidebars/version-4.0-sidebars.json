@@ -45,9 +45,10 @@
       "label": "Files",
       "items": [
         "file/x509",
+        "file/pfx",
         "file/csr",
-        "file/spkac",
         "file/crl",
+        "file/spkac",
         "file/detail-constructed",
         "file/detail-dns"
       ]
