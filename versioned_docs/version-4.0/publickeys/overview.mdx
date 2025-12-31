@@ -3,6 +3,8 @@ title: Overview
 sidebar_position: 1
 ---
 
+import PemRangeHighlight from '@site/src/components/PemRangeHighlight';
+
 ## Best Practices
 
 Elliptic Curves are the best practices solution for both signature creation / verification and for diffie-hellman key exchange. The specific curves that you ought to be using for signing are Ed25519 (for 128-bit comparable security) or Ed448 (for 256-bit comparable security). For diffie-hellman key exchange the curves that you ought to be using are Curve25519 (for 128-bit comparable security) or Curve448 (for 256-bit comparable security).
@@ -70,6 +72,39 @@ RSA PrivateKey objects also implement `decrypt($ciphertext)` but because EC and 
 RSA PublicKey objects also implement `encrypt($plaintext)` but because EC and DSA PrivateKey objects do not support encryption / decryption the interface itself does not define it.
 
 All of these methods are discussed elsewhere, either on this page or on the algorithm specific pages.
+
+## Signable interface
+
+Consider this hex encoded twice signed CMS:
+
+export const cmsPem = `308201f806092a864886f70d010702a08201e9308201e50201013109300706052b0e03021a30
+0b06092a864886f70d010701318201c63081e0020101302e301631143012060355040a0c0b70
+68707365636c6962204102146c592ab48fbe48882da86ba35bb845453039d831300706052b0e
+03021aa05d301806092a864886f70d010903310b06092a864886f70d010701301c06092a8648
+86f70d010905310f170d3235313233313032313334355a302306092a864886f70d0109043116
+0414d2161692d6caa763960c1311ccc7eb4348301efe300906072a8648ce3d04010438303602
+1900864df7bfc8d53cfe06331bc95881e70b575b5059adc82121021900f4a9f208295aa59d1d
+3f85dc6ebf69928cef60033d188f293081e0020101302e301631143012060355040a0c0b7068
+707365636c6962204202145bdb7a041b4de21f101664419ee7d9c8e316e58a300706052b0e03
+021aa05d301806092a864886f70d010903310b06092a864886f70d010701301c06092a864886
+f70d010905310f170d3235313233313032313334355a302306092a864886f70d010904311604
+14d2161692d6caa763960c1311ccc7eb4348301efe300906072a8648ce3d0401043830360219
+00f7e0c901cae567148e126635021efe72289cde60b60d82630219008fbc18ea218fb1470cc6
+d1dcce77ecc95e9fc8453fd2f07d`;
+
+<PemRangeHighlight
+  pem={cmsPem}
+  ranges={[
+    { from: 237, to: 429, className: "pemRangeHighlightA" },
+    { from: 451, to: 569, className: "pemRangeHighlightB" },
+  ]}
+/>
+
+The yellow highlighted portion is the signature subject and the blue highlighted portion is the signature, itself. Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib3\File\Common\Signable` interface.
+
+The CMS in this example excludes certificates, has a detached signature, uses sha1 as the message digest and nistp192 as the curve, for brevity.
+
+Hex encoded is employed instead of the more standard base64 encoding because base64 encodes data in fixed 3-byte groups, producing 4 encoded characters per group. If a byte sequence begins or ends in the middle of such a group, the corresponding base64 characters will necessarily include bits from adjacent bytes, making exact substring matching impossible. Hex encoding preserves a one-to-one mapping between bytes and text, allowing reliable byte-level substring searches.
 
 ## Immutability
 

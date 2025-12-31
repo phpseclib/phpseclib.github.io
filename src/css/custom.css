@@ -658,3 +658,23 @@ html[data-theme='dark'] {
     .red_ff { background: #200000; }
   }
 }
+
+/* Preserve whitespace/newlines inside the CodeBlock content */
+code.pemCodePreserve {
+  white-space: pre; /* exact preservation; use pre-wrap if you want wrapping */
+}
+
+/* Highlight base styling */
+.pemRangeHighlight {
+  padding: 0;
+  border-radius: 2px;
+}
+
+/* Two different highlight colors */
+.pemRangeHighlightA {
+  background: rgba(255, 230, 120, 0.65);
+}
+
+.pemRangeHighlightB {
+  background: rgba(140, 210, 255, 0.55);
+}
