@@ -11,6 +11,8 @@ Elliptic Curves are the best practices solution for both signature creation / ve
 
 Also, doing anything with public / private keys from randos on the internet is ill advisable. For example, loading keys and performing cryptographic operations on a [16384-bit RSA key](https://stackoverflow.com/a/39069182/569976) may be suitably performant on a system with the latest Intel i9 processor and the [GMP extension](https://www.php.net/gmp) installed but what about a Raspberry Pi without either OpenSSL or GMP? phpseclib is designed to be able to operate on both, after all. Maybe dynamic guardrails could be put in place to scale the maximum supported key based on your system specs but, then again, what if you're using phpseclib to connect to an SSH server with an RSA key from behind a password protected admin control panel? Maybe authentication takes 20s because of your system specs and the key you're using and maybe you're okay with waiting that long. That's a perfectly valid use case. On the flip side, if a rando on the internet can send an HTTP request that'll eat up 20 seconds of compute time then that makes it a lot easier for an attacker to perform a [DOS attack](https://en.wikipedia.org/wiki/Denial-of-service_attack) if they were to flood your server with a bunch of said HTTP requests over the span of, say, 30 seconds. Ultimately, phpseclib has no control over how it's used and phpseclib isn't going to neuter valid use cases to safeguard against invalid use cases.
 
+See [Introduction - Speed § Security Tradeoffs](intro/speed.md#security-tradeoffs) for a more in depth discussion.
+
 ## Loading Keys
 
 The recommended way to load public keys is to do so thusly:
@@ -75,7 +77,7 @@ All of these methods are discussed elsewhere, either on this page or on the algo
 
 ## Signable interface
 
-Consider this hex encoded twice signed CMS:
+Consider this hex encoded [twice signed CMS](/cms/signed.mdx):
 
 export const cmsPem = `308201f806092a864886f70d010702a08201e9308201e50201013109300706052b0e03021a30
 0b06092a864886f70d010701318201c63081e0020101302e301631143012060355040a0c0b70
@@ -100,7 +102,9 @@ d1dcce77ecc95e9fc8453fd2f07d`;
   ]}
 />
 
-The yellow highlighted portion is the signature subject and the blue highlighted portion is the signature, itself. Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib3\File\Common\Signable` interface.
+The yellow highlighted portion is the signature subject and the blue highlighted portion is the signature, itself.
+
+Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib3\File\Common\Signable` interface.
 
 The CMS in this example excludes certificates, has a detached signature, uses sha1 as the message digest and nistp192 as the curve, for brevity.
 

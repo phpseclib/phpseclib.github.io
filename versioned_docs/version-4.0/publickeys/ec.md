@@ -97,13 +97,17 @@ $$
 
 For prime field Weierstrass Curves $a_1$, $a_3$ and $a_2$ are always 0. For binary field Weierstrass Curves $a_3$ and $a_2$ are always 0 and a1 is always 1.
 
-The remaining variables can be specified either explicitly, using a **Specified Curve** or implictly by invoking a **Named Curve**. phpseclib supports both.
+The remaining variables can be specified either explicitly, using a **Specified Curve** or implictly by invoking a **Named Curve**. phpseclib nominally supports both.
 
 Montgomery and Twisted Edwards Curves do not have user-definable coefficients and therefore the concept of a "specified curve" is inapplicable.
 
-Named curves are the default. Specified curves can be enabled by doing `PKCS1::useSpecifiedCurve()` or `PKCS8::useSpecifiedCurve()`. Named curves can be specified by doing `PKCS1::useNamedCurve()` or `PKCS8::useSpecifiedCurve()`.
+Specified curves can be loaded and used and named curves can be saved _as_ specified curves so long as you're saving the curve in either the PKCS1 or PKCS8 formats.
 
-Specified curves can also be enabled by doing `$key->toString('PKCS8', ['namedCurve' => false])` or `$key->toString('PKCS1', ['namedCurve' => false])`.
+A named curve can be saved as a specified curve by doing `PKCS1::useSpecifiedCurve()` or `PKCS8::useSpecifiedCurve()`. One can switch back to saving named curves as named curves by doing  `PKCS1::useNamedCurve()` or `PKCS8::useSpecifiedCurve()`.
+
+A named curve can also be saved as a specified curve by doing `$key->toString('PKCS8', ['namedCurve' => false])` or `$key->toString('PKCS1', ['namedCurve' => false])`.
+
+`EC::createKey()` only supports the creation of named curves.
 
 ## Creating Keys
 

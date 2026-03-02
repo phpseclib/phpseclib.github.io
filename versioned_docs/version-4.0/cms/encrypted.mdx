@@ -1,0 +1,229 @@
+---
+title: EncryptedData
+---
+
+import KeyAgreeRecipient from './inc/enveloped-keyagreerecipient.md';
+import EncryptedData from './inc/encrypteddata.md';
+
+One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax) provides is to act as a wrapper format for encrypted files.
+
+The key used to encrypt the content (the __content encryption key__) can be provided directly or it can be _derived_ on a __per recipient__ basis through any number of mechanisms, be it [password based key derivation](https://en.wikipedia.org/wiki/PBKDF2), ephemeral [diffie-hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange), a [key encapsulation mechanism](https://en.wikipedia.org/wiki/Key_encapsulation_mechanism), [key wrapping](https://en.wikipedia.org/wiki/Key_wrap), etc. So like maybe one recipient will choose to derive the content encryption key with a password that both parties know and another recipient will choose to decrypt the content encryption key with their private key, assuming the sender encrypted it with their public key.
+
+Any number of recipients, each with their own key derivation mechanisms, can be added to a CMS message. If no recipients are present you'll need to share the actual key instead of letting the recipient of the encrypted data derive the key.
+
+Also, technically, this class combines the [EnvelopedData](https://datatracker.ietf.org/doc/html/rfc5652#section-6) and [EncryptedData](https://datatracker.ietf.org/doc/html/rfc5652#section-8) content types of CMS into one class. See [Relationship to RFC5652](#relationship-to-rfc5652) for more information.
+
+## Comparison to OpenSSL in PHP
+
+[openssl_cms_encrypt()](https://www.php.net/openssl-cms-encrypt) only does not support EncryptedData and, in-so-far as EnvelopedData is concerned, only supports KeyAgreeRecipient and KeyTransRecipient types. phpseclib, on the other hand, supports those and KEKRecipient and PasswordRecipient. Furthermore, `openssl_cms_encrypt` does not support multiple recipients whereas phpseclib's EncryptedData does.
+
+[openssl_cms_decrypt()](https://www.php.net/openssl-cms-decrypt) has all the same limitations.
+
+## Reading EncryptedData
+
+The method for loading an applicable CMS is the same as loading any other CMS type type:
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = CMS::load(file_get_contents('enveloped-keyagreerecipient.pem'));
+
+print_r($cms);
+```
+<sup>([download enveloped-keyagreerecipient.pem](pathname:///asn1/enveloped-keyagreerecipient.pem.txt))</sup>
+
+`$cms`, in this case, is a `CMS\EncryptedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+
+<KeyAgreeRecipient />
+This particular example is using the KeyAgreeRecipient type.
+
+### Decrypting Content
+
+If you know the content encryption key you can decrypt the underlying data as follows:
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = CMS::load(file_get_contents('sample.p7m'));
+
+$message = $cms->withKey('...')->decrypt();
+```
+
+If you don't know the content encryption key but are able to derive it with password you can do so thusly:
+
+```php
+$message = $cms->deriveWithPassword('...')->decrypt();
+```
+If you don't know the content encryption key but are able to derive it with another key, be it a symmetric key or a private key (an instance of `\phpseclib3\Crypt\Common\PrivateKey`), you can do so thusly:
+
+```php
+$message = $cms->deriveWithKey($key)->decrypt();
+```
+
+### getRecipients()
+
+Calling `getRecipients()` will return an array containing all recipients in the EncryptedData object. Example: 
+
+```php
+$message = $cms->getRecipients()[0]?->withKey('...')->decrypt();
+```
+
+### findRecipients()
+
+Most recipients can be searched for with a key identifier. For some recipient types that key identifier is a string - for others, it's an [X.509 certificate](/file/x509.mdx). In either case you can search for recipients as follows:
+
+```php
+$message = $cms->findRecipients($keyIdentifier)[0]?->withKey('...')->decrypt();
+```
+If you call `findRecipient` (singular vs plural) you'll get the _first_ recipient that matches (or a null) instead of an array of matching recipients.
+
+### Extracting X509 certs
+
+Certificates embedded within the CMS can be extracted thusly:
+
+```php
+$cms->getCertificates();
+```
+
+Likewise CRLs embedded within the CMS can be extracted as follows:
+
+```php
+$cms->getCRLs();
+```
+Certificates can be added by calling `$cms->addCertificate($x509)`. There is currently no mechanism to add CRLs.
+
+Also, note that certificates and CRLs are only present if recipients are present (ie. if the contentType is EnvelopedData vs EncryptedData)
+
+## Creating EncryptedData
+
+### Minimalistic Example
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = new CMS\EncryptedData('hello, world!');
+echo $cms;
+````
+The CMS that that would produce would look something like this:
+
+```
+-----BEGIN CMS-----
+MFAGCSqGSIb3DQEHBqBDMEECAQAwPAYJKoZIhvcNAQcBMB0GCWCGSAFlAwQBAgQQ
+ajbu3rT5IGJ00G604yJz2YAQ0jqY1FfL0aiGT8D2MYoODw==
+-----END CMS-----
+```
+This CMS has no recipients, uses `aes128-CBC-PAD` as the encryption algorithm and uses a randomly generated content encryption key that can be retrieved with `$cms->getKey()`.
+
+If you saved this CMS as test.pem and then did `openssl cms -in test.p7m -inform PEM -cmsout -print -noout` on that CMS you'd get this:
+
+```
+CMS_ContentInfo:
+  contentType: pkcs7-encryptedData (1.2.840.113549.1.7.6)
+  d.encryptedData:
+    version: 0
+    encryptedContentInfo:
+      contentType: pkcs7-data (1.2.840.113549.1.7.1)
+      contentEncryptionAlgorithm:
+        algorithm: aes-128-cbc (2.16.840.1.101.3.4.1.2)
+        parameter: OCTET STRING:
+          0000 - 6a 36 ee de b4 f9 20 62-74 d0 6e b4 e3 22 73   j6.... bt.n.."s
+          000f - d9                                             .
+      encryptedContent:
+        0000 - d2 3a 98 d4 57 cb d1 a8-86 4f c0 f6 31 8a 0e   .:..W....O..1..
+        000f - 0f                                             .
+    unprotectedAttrs:
+      <ABSENT>
+```
+
+If you did `print_r($cms)` on that CMS you'd get this:
+
+<EncryptedData />
+
+Note that the moment you add a recpient the contentType switches from `id-encryptedData` to `id-envelopedData` (or `pkcs7-encryptedData` to `pkcs7-envelopedData` if we're using OpenSSL's verbiage).
+
+That said, the encryption key and the algorithm can both be set manually as well. Here's an example of how to do that:
+
+```php
+$key = random_bytes(32);
+$cms = new CMS\EncryptedData('hello, world!', 'aes256-CBC-PAD', $key);
+```
+
+### Output Format
+
+By default, CMS objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CMS::enableBinaryOutput()`. To go back to PEMs calling `CMS::disableBinaryOutput()` is sufficient.
+
+You can also convert a CMS object to binary by doing `$cms->toString(['binary' => true])`.
+
+## Adding Recipients
+
+### From an X.509 cert
+
+To create a recipient from an [X509 object](/file/x509.mdx) one need simply do the following:
+
+```php
+$recipient = $cms->createNewRecipientFromX509($x509)
+```
+If the public key in the X.509 certificate is an RSA public then OAEP padding will be used by default with sha256 as the hash and the MGF hash and a blank label. If you want to change the OAEP parameters one need simply do this:
+
+```php
+$x509->setHash('sha1');
+$x509->setMGFHash('sha1');
+$x509->setLabel('whatever');
+$recipient = $cms->createNewRecipientFromX509($x509);
+```
+Here's how one would change it from using OAEP padding to PKCS1 padding:
+
+```php
+$x509->setPadding(RSA::ENCRYPTION_PKCS1);
+```
+Trying to call `$x509->setPadding()` on an X.509 certificate with an EC PublicKey will result in a PHP Exception being thrown.
+
+Also, note that OpenSSL, in particular, won't use the key for _any_ encryption if it's a PSS RSA key. Consequently, if you had an existing X.509 certificate with an RSA PSS public key that you wanted to use you'd need to re-attach the public key to it as a RSA PKCS1 key. Doing this would also require the key be re-signed.
+
+```php
+$x509->setPublicKey($public->withPadding(RSA::SIGNATURE_PKCS1));
+$private->sign($x509);
+```
+
+### From a password
+
+If you wanted to include a key that could be derived from a password (using [PBKDF2](https://en.wikipedia.org/wiki/PBKDF2)) one could do this:
+
+```php
+$recipient = $cms->createNewRecipientFromPassword('correct horse battery staple'); // see https://xkcd.com/936/
+```
+An optional second parameter exists wherein the encryption algorithm can be set. It defaults to `aes128-CBC-PAD` and is case sensitive.
+
+### From a symmetric key
+
+If you wanted to use your own symmetric key you can do so thusly:
+
+```php
+$key = random_bytes(16);
+$recipient = $cms->createNewRecipientFromKeyWithIdentifier($key, 'phpseclib-demo');
+```
+In this case `phpseclib-demo` is the key identifier.
+
+This method uses the [AES Key Wrap Algorithm](https://datatracker.ietf.org/doc/html/rfc3394) and whether or not it uses id-aes128-wrap, id-aes192-wrap or id-aes256-wrap depends on the size of the key you use. If the key isn't of any of any of those lengths an exception will be thrown.
+
+An optional third parameter exists, which let's you set the date. This parameter must either be `null` or an instance of `\DateTimeInterface`.
+
+## Relationship to RFC5652
+
+Readers familiar with [RFC5652](https://datatracker.ietf.org/doc/html/rfc5652) may find it surprising that phpseclib's `EncryptedData` class can serialize to either `EncryptedData` _or_ `EnvelopedData`.
+
+This is intentional and reflects how the CMS structures relate in practice rather than how they are named in the RFC.
+
+Structurally, the only hard requirement that distinguishes `EnvelopedData` from `EncryptedData` is that `EnvelopedData` requires at least one `RecipientInfo`:
+
+```
+recipientInfos ::= SET SIZE (1..MAX) OF RecipientInfo
+```
+If the lower bound had been 0 (or the field OPTIONAL), `EncryptedData` would effectively be a degenerate case of `EnvelopedData` with no recipients.
+
+Recipient handling further complicates the picture. Most recipient types contain exactly one encrypted content encryption key, but `KeyAgreeRecipientInfo` can contain any number of `RecipientEncryptedKey` values, including none at all. This means there is no strict one-to-one mapping between "recipient objects" in phpseclib's implementation and the RFC's structures.
+
+Because CMS defines a _file format_, not an OOP API, phpseclib models the shared structure once and lets the presence or absence of recipients determine which CMS type is ultimately used. The EncryptedData class therefore represents the common encrypted-content container, while serialization decides whether the output is EncryptedData or EnvelopedData.
+
+This design keeps the API simpler while still producing standards-compliant CMS structures.
+

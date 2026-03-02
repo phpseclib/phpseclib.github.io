@@ -1,0 +1,358 @@
+---
+title: Constructed - A Case Study
+---
+
+import CMS from './inc/cms.md';
+import SignedCMS from './inc/cms-signed.md';
+
+To better understand how `Constructed` works, let's try using it to build a simplified class for [CMS\SignedData](/cms/signed). Let's start off with this as a base:
+
+```php
+class SignedData implements \ArrayAccess, \Countable, \Iterator
+{
+    private array|Constructed $cms;
+
+    public function __debugInfo(): array
+    {
+        $this->compile();
+        return $this->cms->__debugInfo();
+    }
+
+    public function toArray(): array
+    {
+        $this->compile();
+        return $this->cms->toArray();
+    }
+
+    public function &offsetGet(mixed $offset): mixed
+    {
+        return $this->cms[$offset];
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->cms[$offset]);
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->cms[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->cms[$offset]);
+    }
+
+    public function count(): int
+    {
+        return is_array($this->cms) ? count($this->cms) : $this->cms->count();
+    }
+
+    public function rewind(): void
+    {
+        $this->compile();
+        $this->cms->rewind();
+    }
+
+    public function current(): mixed
+    {
+        $this->compile();
+        return $this->cms->current();
+    }
+
+    public function key(): mixed
+    {
+        $this->compile();
+        return $this->cms->key();
+    }
+
+    public function next(): void
+    {
+        $this->compile();
+        $this->cms->next();
+    }
+
+    public function valid(): bool
+    {
+        $this->compile();
+        return $this->cms->valid();
+    }
+
+    public function getEncoded(): string
+    {
+        $this->compile();
+        return $this->cms->getEncoded();
+    }
+
+    public function hasEncoded(): bool
+    {
+        $this->compile();
+        return $this->cms->hasEncoded();
+    }
+
+    private function compile(): void
+    {
+        // currently does nothing
+    }
+}
+```
+An observant reader might wonder why we're defining `compile()` as a function that does nothing. We'll get to that.
+
+## Reading a CMS
+
+The first step to reading a SignedData CMS is parse it using the appropriate map:
+
+```php
+    public static function load(string $cms): self
+    {
+        $result = new self();
+        $decoded = ASN1::decodeBER(ASN1::extractBER($cms));
+        $result->cms = ASN1::map($decoded, Maps\ContentInfo::MAP);
+        return $result;
+    }
+```
+`ASN1::extractBER()` removes the PEM "superstructure" (if it's present at all), `ASN1::decodeBER()` does a preliminary pass and then `ASN1::map()` applies the map.
+
+The problem with this is that it's insufficient. If you do `print_r(CMS::load(file_get_contents('signed.p7m')))` ([download signed.p7m](pathname:///asn1/signed.p7m)) you'll get this:
+
+<CMS />
+The problem is that in `Maps\ContentInfo::MAP`, `content` is defined as `ASN1::TYPE_ANY` so it doesn't know how to decode it. So let's do that decoding:
+
+```php
+    public static function load(string $cms): self
+    {
+        $result = new self();
+        $decoded = ASN1::decodeBER(ASN1::extractBER($cms));
+        $result->cms = ASN1::map($decoded, Maps\ContentInfo::MAP);
+        $decoded = ASN1::decodeBER($result->cms['content']);
+        $result->cms['content'] = ASN1::map($decoded, Maps\SignedData::MAP);
+        return $result;
+    }
+```
+`print_r(CMS::load(file_get_contents('signed.p7m')))` now gives us this:
+
+<SignedCMS />
+That looks a lot better. Because this class is basically a thin wrapper around `Constructed` this already gives us a lot of functionality. But it's not without it's issues. With our old `load()` method `strlen($cms->getEncoded())` returned 14223. With this new one it returns 0. The reason being that when we set `$result->cms['content']` we invalidated the cache. So we need a way to set that without invalidating the cache.
+
+Here's how we fix that:
+
+```php
+    public static function load(string $cms): self
+    {
+        $result = new self();
+        $decoded = ASN1::decodeBER(ASN1::extractBER($cms));
+        $result->cms = ASN1::map($decoded, Maps\ContentInfo::MAP);
+        $decoded = ASN1::decodeBER($result->cms['content']);
+        ASN1::disableCacheInvalidation();
+        $result->cms['content'] = ASN1::map($decoded, Maps\SignedData::MAP);
+        ASN1::enableCacheInvalidation();
+        return $result;
+    }
+```
+With this, `strlen($cms->getEncoded())` once again returns 14223. But even this isn't without issue. Let's try to change something:
+
+```php
+$cms = SignedData::load(file_get_contents('signed.p7m'));
+echo strlen($cms->getEncoded()) . "\n";
+unset($cms['content']['signerInfos']);
+echo strlen($cms->getEncoded()) . "\n";
+```
+When we do that we get 14223 twice. How could that be when we just deleted signerInfos? The problem is that when `Constructed` is traversing up the tree to invalidate the cache of each ancestor node it stops at `$cms['content']` because that never had a parent set. So we'll need to update the code once more to do this:
+
+```php
+    public static function load(string $cms): self
+    {
+        $result = new self();
+        $decoded = ASN1::decodeBER(ASN1::extractBER($cms));
+        $result->cms = ASN1::map($decoded, Maps\ContentInfo::MAP);
+        $decoded = ASN1::decodeBER($result->cms['content']);
+        ASN1::disableCacheInvalidation();
+        $result->cms['content'] = ASN1::map($decoded, Maps\SignedData::MAP);
+        $result->cms['content']->parent = $result->cms;
+        $result->cms['content']->key = 'parent';
+        $result->cms['content']->depth = $result->cms->depth;
+        ASN1::enableCacheInvalidation();
+        return $result;
+    }
+```
+And that does the trick. Technically the `$result->cms['content']->key` and `$result->cms['content']->depth` bits aren't necessary for this example but might as well just set them anyway.
+
+## Creating a new CMS
+
+```php
+    public function __construct(string $data)
+    {
+        $this->cms = [
+            'contentType' => 'id-signedData',
+            'content' => [
+                'version' => 'v1',
+                'digestAlgorithms' => [],
+                'encapContentInfo' => [
+                    'eContentType' => 'id-data',
+                    'eContent' => $data
+                ],
+                'signerInfos' => []
+            ]
+        ];
+    }
+```
+At this point you might notice two things.
+
+First, we're now introducing a required parameter to the constructor. In our earlier `load()` method we were calling the constructor without any parameters. In _this_ particular case we could just modify the load method to do `$result = new self('')`, however, that might not always work. Consequently, it winds up being more reliable to do this:
+
+```php
+        $r = new \ReflectionClass(__CLASS__);
+        $result = $r->newInstanceWithoutConstructor();
+```
+
+The second thing you might have noticed is that we're using arrays and not `Constructed` instances. The fact that arrays allow for a more succinct syntax notwithstanding, you also can't directly instantiate `Constructed` objects like that - `Constructed` objects correlate to strings that may or may not have been ran through an ASN1 parser yet.
+
+As a consequence of this, you'll get an error if you do this:
+
+```php
+$cms = new SignedData('hello, world!');
+print_r($cms);
+```
+One _could_ modify `__debugInfo()` thusly:
+
+```php
+    public function __debugInfo(): array
+    {
+        return is_array($this->cms) ? $this->cms : $this->cms->__debugInfo();
+    }
+```
+However, doing that means that you'll get different output based on whether or not you loaded the CMS vs created a new one. Furthermore, that doesn't help with functions like `$cms->getEncoded()`.
+
+To remedy this we'll modify the `compile()` method:
+
+```php
+    private function compile(): void
+    {
+        if (!$this->cms instanceof Constructed) {
+            $temp = [
+                'contentType' => $this->cms['contentType'],
+                'content' => new Element(ASN1::encodeDER($this->cms['content'], Maps\SignedData::MAP)),
+            ];
+            $cms = ASN1::encodeDER($temp, Maps\ContentInfo::MAP);
+            $this->cms = self::load($cms)->cms;
+            return;
+        }
+        if (!$this->cms->hasEncoded()) {
+            ASN1::encodeDER($this->cms['content'], Maps\SignedData::MAP);
+            $cms = ASN1::encodeDER($this->cms, Maps\ContentInfo::MAP);
+            $temp = self::load($cms);
+            $this->cms = $temp->cms;
+        }
+    }
+```
+If you do `strlen($cms->getEncoded())`, now, you'll get 54. And `print_r($cms)` will show the same detailed structure that it showed for a loaded CMS.
+
+## Replacing Constructed
+
+In the case of `$cms['constructed']` we replaced one `Constructed` object with another. But what if we wanted to replace it with a non-`Constructed` object. Like what if we wanted to be able to access `$cms['content']['signerInfos'][0]` and call `validateSignature()` on that? `validateSignature()` isn't a method `Constructed` implements, so how would we go about doing that?
+
+So with what we've done thus far doing `$cms['content']['signerInfos'][0]::class` will return `Constructed`. ie. it's an object without any bells and whistles. In order for `$cms['content']['signerInfos'][0]` to have bells and whistles we need to change it from a `Constructed` object to a, say, `Signer` object.
+
+To do this we'll use the same `SignedData` base class except that instead of `$this->cms` it'll be `$this->signer` and instead of being private let's make it public so that we can modify it from `SignedData`. And instead of `SignedData` the class name will be `Signer`.
+
+At this point we _could_ just pass the `Constructed` object for that signer straight into the constructor of `Signer` class but then how would we create _new_ Signer objects? So with that in mind here's the `load()` method for `Signer`:
+
+```php
+    public static function load(string $encoded): self
+    {
+        $r = new \ReflectionClass(__CLASS__);
+        $result = $r->newInstanceWithoutConstructor();
+        $decoded = ASN1::decodeBER($encoded);
+        $result->signer = ASN1::map($decoded, Maps\SignerInfo::MAP);
+        return $result;
+    }
+```
+We'll then need to update the `load()` method of `SignedData`:
+
+```php
+    public static function load(string $cms): self
+    {
+        $r = new \ReflectionClass(__CLASS__);
+        $result = $r->newInstanceWithoutConstructor();
+        $decoded = ASN1::decodeBER(ASN1::extractBER($cms));
+        $result->cms = ASN1::map($decoded, Maps\ContentInfo::MAP);
+        $decoded = ASN1::decodeBER($result->cms['content']);
+        ASN1::disableCacheInvalidation();
+        // start of new code additions =============================
+        // =========================================================
+        // =========================================================
+        $rules = [];
+        $rules['signerInfos'] = [self::class, 'mapInSigners'];
+        $result->cms['content'] = ASN1::map($decoded, Maps\SignedData::MAP, $rules);
+        // end of new code additions ===============================
+        // =========================================================
+        // =========================================================
+        $result->cms['content']->parent = $result->cms;
+        $result->cms['content']->key = 'parent';
+        $result->cms['content']->depth = $result->cms->depth;
+        ASN1::enableCacheInvalidation();
+        return $result;
+    }
+ ```
+Most notably, we've now added a third parameter to `ASN1::map()` - `$rules`. For that to work we'll need to add a new `mapInSigners` method to `SignedData`:
+
+```php
+    public static function mapInSigners(Constructed $signers): void
+    {
+        ASN1::disableCacheInvalidation();
+        for ($i = 0; $i < count($signers); $i++) {
+            $signers[$i] = Signer::load((string) $signers[$i]->getEncoded());
+            $signers[$i]->signer->parent = $signers;
+            $signers[$i]->signer->depth = $signers->depth + 1;
+            $signers[$i]->signer->key = $i;
+        }
+        ASN1::enableCacheInvalidation();
+    }
+```
+We'll now need to modify File\ASN1.php. In particular:
+
+```php
+#
+#-----[ FIND ]------------------------------------------
+# in the encode_der() method
+#
+        if ($source instanceof X509 || $source instanceof CRL || $source instanceof Signer || $source instanceof Recipient || $source instanceof EncryptedKey) {
+            return $source->getEncoded();
+        }
+#
+#-----[ REPLACE WITH ]----------------------------------
+#
+        if ($source instanceof X509 || $source instanceof CRL || $source instanceof Signer || $source instanceof Recipient || $source instanceof EncryptedKey || $source instanceof \Signer) {
+            return $source->getEncoded();
+        }
+```
+_(this is an area where phpseclib could use improvement)_
+
+Now when we call `$cms['content']['signerInfos'][0]::class` we get `Signer` instead of `Constructed`. So let's now throw another test at it:
+
+```php
+$cms = SignedData::load(file_get_contents('signed.p7m'));
+$signer = &$cms['content']['signerInfos'][0];
+$signer['sid']['issuerAndSerialNumber']['issuer']['rdnSequence'][0][0]['value'] = 'US';
+echo $cms['content']['signerInfos'][0]['sid']['issuerAndSerialNumber']['issuer']['rdnSequence'][0][0]['value'] . "\n";
+$cms = SignedData::load($cms->getEncoded());
+echo $cms['content']['signerInfos'][0]['sid']['issuerAndSerialNumber']['issuer']['rdnSequence'][0][0]['value'];
+```
+When we try to run that we get an error. It might be worthwhile to leave this as an exercise for the reader, however, in the interest of providing ever more examples, the answer is that the `Signer` class needs to implement the `compile()` method:
+
+Here's a `compile()` method we'll also need for that class:
+
+```php
+    private function compile(): void
+    {
+        if (!$this->signer instanceof Constructed || !$this->signer->hasEncoded()) {
+            $encoded = ASN1::encodeDER($this->signer, Maps\SignerInfo::MAP);
+            $temp = self::load($encoded);
+            $this->signer = $temp->signer;
+        }
+    }
+```
+Note that this `compile()` method is simpler than the one for `SignedData`, notably because we're not nesting multiple Constructed objects.
+
+This is just scratching the surface, however, sufficient to say, adding bells and whistles can get quite complicated quite fast. It's delicate, errors can be difficult to track down and (currently) there is excessive boiler plate.

@@ -55,6 +55,17 @@
     },
     {
       "type": "category",
+      "label": "CMS",
+      "items": [
+        "cms/overview",
+        "cms/signed",
+        "cms/encrypted",
+        "cms/compressed",
+        "cms/digested"
+      ]
+    },
+    {
+      "type": "category",
       "label": "Interoperability",
       "items": [
         "interop/overview",

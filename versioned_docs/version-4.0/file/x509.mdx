@@ -399,6 +399,8 @@ Signing the certifcate before the DNs or extensions or whatever have been set wi
 
 By default, X509 objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `X509::enableBinaryOutput()`. To go back to PEMs calling `X509::disableBinaryOutput()` is sufficient.
 
+You can also convert an X509 object to binary by doing `$x509->toString(['binary' => true])`.
+
 ## Validating Certificates
 
 ### Signatures
@@ -436,4 +438,4 @@ echo $x509->validateURL('https://www.domain.tld/path/to/whatever.ext') ?
 
 ### Chains
 
-Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509>getValidationChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.
+Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509->getValidationChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.

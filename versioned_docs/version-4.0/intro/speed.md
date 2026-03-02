@@ -359,3 +359,13 @@ On 64-bit systems phpseclib uses base-2**31 to reduce the number of digits of ea
 ## OpenSSL Enhancements
 
 Only used for powMod(). Converts the exponent and the modulo to an appropriately formatted RSA public key and performs unpadded RSA encryption with that.
+
+## Security Tradeoffs
+
+phpseclib prioritizes portability and practical performance over universal [constant-time](https://en.wikipedia.org/wiki/Timing_attack) guarantees. The real-world severity of timing attacks depends heavily on threat model. If secret operations are not performed on attacker-controlled input (eg. when an administrator uploads a private key for outbound SSH use) there is no meaningful timing oracle. Conversely, if untrusted users can repeatedly submit ciphertext that is decrypted with a long-lived server key, constant-time behavior becomes materially important. Security decisions should be driven by deployment context, not theoretical worst cases in isolation.
+
+Because phpseclib is designed to run anywhere PHP runs, including environments without OpenSSL, it must sometimes rely on pure-PHP arithmetic or extensions like GMP, neither of which guarantees constant-time behavior. A fully constant-time BigInteger implementation in PHP would require fixed-width arithmetic, elimination of data-dependent branches, and uniform memory access patterns, resulting in severe performance penalties. For very large keys (eg. a 16K RSA key), such an approach would likely be impractically slow. Similarly, constant-time AES without hardware acceleration is dramatically slower than table-based implementations, and PHP cannot access [AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set) instructions directly.
+
+Where constant-time protections are inexpensive and practical - such as fixed-time string comparison, blinding during modular exponentiation, or careful padding checks - phpseclib applies them. However, imposing a 5x slowdown across all cryptographic operations in pursuit of absolute constant-time purity would render the library unusable in many of the constrained environments it targets. In practice, a widely deployable library with context-aware risk trade-offs is often more valuable than one that is theoretically ideal but operationally impractical.
+
+See [Public Keys - Overview § Best Practices](publickeys/overview.mdx#best-practices) for a more in depth discussion.

@@ -1,0 +1,48 @@
+---
+title: DigestedData
+---
+
+import DigestedData from './inc/digesteddata.md';
+
+One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax) provides is to act as a wrapper format for digested files.
+
+## Reading DigestedData CMS
+
+The method for loading a SignedData CMS is the same as loading any other CMS type:
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = CMS::load(file_get_contents('digested.pem'));
+
+print_r($cms);
+```
+<sup>([download digested.pem](pathname:///asn1/digested.pem.txt))</sup>
+
+`$cms`, in this case, is a `CMS\DigestedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+
+<DigestedData />
+
+### Confirming digests
+
+The digested content can be validaed by calling `$cms->validate()`.
+
+## Creating DigestedData
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = new CMS\DigestedData(file_get_contents('...'));
+echo $cms;
+```
+The hash defaults to sha256 but can be set via a second parameter. eg.
+
+```php
+$cms = new CMS\DigestedData(file_get_contents('...'), 'sha512');
+```
+
+### Output Format
+
+By default, CMS objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CMS::enableBinaryOutput()`. To go back to PEMs calling `CMS::disableBinaryOutput()` is sufficient.
+
+You can also convert a CMS object to binary by doing `$cms->toString(['binary' => true])`.

@@ -419,6 +419,8 @@ echo $csr;
 
 By default, CSR objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CSR::enableBinaryOutput()`. To go back to PEMs calling `CSR::disableBinaryOutput()` is sufficient.
 
+You can also convert a CSR object to binary by doing `$csr->toString(['binary' => true])`.
+
 ## Validating Signatures
 
 CSR's are always self-signed and can be validated thusly:

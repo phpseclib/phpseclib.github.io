@@ -1,0 +1,307 @@
+---
+title: SignedData
+---
+
+import SignedData from './inc/signeddata.md';
+import ListAttributes from './inc/signeddata-listattributes.md';
+import EmptySignedData from './inc/signeddata-empty.md';
+
+One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax) provides is to act as a wrapper format that bundles files and [digital sigantures](https://en.wikipedia.org/wiki/Digital_signature) of those files together.
+
+If a CMS contains a signatures but no file then those signatures are known as detached signatures.
+
+Signatures can be verified and multiple signatures can be present.
+
+## Comparison to OpenSSL in PHP
+
+[openssl_cms_sign()](https://www.php.net/openssl-cms-sign) doesn't do [CAdES-B](https://en.wikipedia.org/wiki/CAdES_(computing)) / [ESS](https://datatracker.ietf.org/doc/html/rfc5035) compliant signatures, it only does one signature and you can't add additional SignedAttr's. phpseclib can and does do CAdES-B / ESS compliant signatures, it can do multiple signatures and you can add all the SignedAttr's you want.
+
+[openssl_cms_verify()](https://www.php.net/openssl-cms-verify) verifies all signatures and that's it. With phpseclib you can see how many signers exist, you can see which of those signers have valid signatures and which ones don't and, when phpseclib is validating signatures, it takes CAdES-B / ESS into consideration.
+
+## Reading SignedData CMS
+
+The method for loading a SignedData CMS is the same as loading any other CMS type:
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = CMS::load(file_get_contents('sample.p7m'));
+
+print_r($cms);
+```
+<sup>([download sample.p7m](pathname:///asn1/signed.p7m))</sup>
+
+`$cms`, in this case, is a `CMS\SignedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+
+<SignedData />
+
+### Extracting file contents
+
+If the signed file is embedded it can be extracted thusly:
+
+```php
+file_put_contents(
+    'filename.ext',
+    (string) $cms['content']['encapContentInfo']['eContent']
+);
+```
+
+### Extracting Signers
+
+Signers can be extracted thusly:
+
+```php
+$signers = $cms->getSigners();
+foreach ($signers as $signer) {
+    // do stuff
+}
+```
+You can also find the signer that corresponds to an [X.509 certificate](/file/x509.mdx) by doing the following:
+
+```php
+$signer = $cms->findSigner($x509);
+```
+Note that even if the distinguished names match, if the key usage extension isn't set appropriately (eg. if neither `digitalSignature` or `nonRepudiation` are set), `findSigner()` will fail. This key usage check can be disabled by doing calling `X509::ignoreKeyUsage()`.
+
+Additionally, if an [Enhanced Security Service (ESS)](https://datatracker.ietf.org/doc/html/rfc5035) attribute is present then both that AND the [SignerIdentifier](https://www.rfc-editor.org/rfc/rfc5652#section-5.3) will need to match the certificate.
+
+`getSigners()` returns an array of Signer objects and `findSigner()` returns either a single Signer object or null. The full namespace for the Signer object is `\phpseclib3\File\CMS\SignedData\Signer`.
+
+### Extracting X509 certs
+
+Certificates embedded within the CMS can be extracted thusly:
+
+```php
+$cms->getCertificates();
+```
+
+Likewise CRLs embedded within the CMS can be extracted as follows:
+
+```php
+$cms->getCRLs();
+```
+
+To see the certificate associated with a Signer one need simply do the following:
+
+```php
+$signer->getCertificate();
+```
+That method returns an [X.509 certificate](/file/x509.mdx) object or a null if no matching certificates are found.
+
+The same stipulations [discussed above](#extracting-signers) for `$cms->findSigner()` also apply to `$signer->getCertificate()`.
+
+Whereas `$cms->findSigner()` can take in an externally loaded X.509 certificate, `$signer->getCertificate()` looks _exclusively_ at certificates embedded within the CMS itself. <strong>If no corresponding certificate can be found then the signature will fail validation.</strong> If you have the certificate but it just does not happen to be embedded within the CMS you can add it to the CMS thusly:
+
+```php
+$x509 = \phpseclib3\File\X509::load('...');
+$cms->addCertificate($x509);
+```
+
+### Signer Attributes
+
+Signed or unsigned attributes can be listed by calling `$signer->listSignedAttrs()` and `$signer->listUnsignedAttrs()`, respectively.
+
+Example:
+
+<ListAttributes />
+
+Individual attributes can be accessed by calling `$signer->getSignedAttr('whatever')` or `$signer->getUnsignedAttr('whatever')`. If an attribute appears multiple times the first one will be the one that's returned.
+
+Example:
+
+<div class="tree">
+<details>
+  <summary>0</summary>
+  <details open>
+<summary>phpseclib4\File\ASN1\Types\OID</summary>
+<div>id-data</div>
+</details>
+
+</details>
+</div>
+
+The existance of an attribute can be tested for by doing `$signer->hasSignedAttr('whatever')` or `$signer->hasUnsignedAttr('whatever')`.
+
+## Creating SignedData
+
+### Minimalistic Example
+
+```php
+use phpseclib3\File\CMS;
+
+$cms = new CMS\SignedData('');
+echo $cms;
+```
+
+That'll produce the following:
+
+```
+-----BEGIN CMS-----
+MCcGCSqGSIb3DQEHAqAaMBgCAQExADAPBgkqhkiG9w0BBwGgAgQAMQA=
+-----END CMS-----
+```
+There are no signers present and no certificates.
+
+If you saved this CMS as test.p7m and then did `openssl cms -in test.p7m -inform PEM -cmsout -print -noout` you'd get this:
+
+```
+CMS_ContentInfo:
+  contentType: pkcs7-signedData (1.2.840.113549.1.7.2)
+  d.signedData:
+    version: 1
+    digestAlgorithms:
+      <EMPTY>
+    encapContentInfo:
+      eContentType: pkcs7-data (1.2.840.113549.1.7.1)
+      eContent:
+    certificates:
+      <ABSENT>
+    crls:
+      <ABSENT>
+    signerInfos:
+      <EMPTY>
+```
+If you did `print_r($cms)` on that CMS you'd get this:
+
+<EmptySignedData />
+
+### Detached Signatures
+
+To create a detached signature the first thing that needs to be done is that a [resource](https://www.php.net/manual/en/language.types.resource.php) needs to be passed to the `CMS\SignedData` constructor:
+
+```php
+$fp = fopen('filename.pdf', 'r');
+$cms = new CMS\SignedData($fp);
+```
+Technically, one could pass a string to the constructor and then do this:
+
+```php
+unset($cms['content']['encapContentInfo']['eContent']);
+```
+That, however, doesn't scale, well. Like what if you wanted to sign a 1GB file? Passing a resource to the constructor is _significantly_ more performant than loading a string of that size. Although I suppose one could use `unset` in this manner to turn an _attached_ signature into a _detached_ signature. Due to the way SignedData works resigning wouldn't be necessary if one removed the file in that manner.
+
+### Adding Signers
+
+The simplest way to create a signer - and to add a signature - is to do this:
+
+```php
+$pfx->sign($cms);
+```
+`$pfx`, in this case, is an instance of [\phpseclib3\File\PFX](/file/pfx.mdx).
+
+Doing that is _exactly_ the same thing as doing this:
+
+```php
+$signer = $cms->addESSSigner($x509);
+$private->sign($signer);
+```
+Where `$x509` and `$private` could correspond to `$pfx->getCertificates()[0]` and `$pfx->getPrivateKeys()[0]`, respectively, or just indepentendly loaded / generated certificates and keys (well, independent of a PFX - not of each other).
+
+ESS signatures have an extra signed attribute - id-aa-signingCertificateV2 - that non-ESS signatures do not have. This attribute "_allows for a verifier to check that the certificate used in the verification process was the same certificate the signer intended_" ([RFC5035 § 4](https://datatracker.ietf.org/doc/html/rfc5035#section-4))
+
+Non-ESS signatures can be added by doing `$cms->addSigner($x509)`. Those still make use of signed attributes - just not id-aa-signingCertificateV2. A third type of signature - one that doesn't make use of signed attributes at all - can be added by doing `$cms->addNakedSigner($x509)`.
+
+To set the message digest you need to update the private key to use that digest. So like by default phpseclib uses sha256 for most everything but if you wanted to use sha512 you'd need to do this:
+
+```php
+$private->withHash('sha512')->sign($signer)
+```
+Also note that Ed25519 / Ed448 signed CMSs are not well supported. [RFC8419](https://datatracker.ietf.org/doc/html/rfc8419) talks about them but OpenSSL doesn't support them.
+
+Another way to add a signer:
+
+```php
+$private->sign($cms);
+```
+Where `$private` is an instance of `\phpseclib3\Crypt\Common\PrivateKey`.
+
+Doing that is basically the same thing as doing this:
+
+```php
+$x509 = new X509($private->getPublicKey());
+$x509->setExtension('id-ce-keyUsage', ['digitalSignature']);
+$private->sign($x509);
+$signer = $this->addESSSigner($x509);
+$private->sign($signer);
+```
+ie. it's signed by a self signed X509 with an empty DN.
+
+Additionally, individual signers can be re-signed with PFXs and private keys. eg.
+
+```php
+$pfx->sign($signer);
+```
+
+### Adding Signer Attributes
+
+Signer attributes can be added by calling either `$signer->setSignedAttr($type, $value)` or `$signer->setUnsignedAttr($type, $value)`.
+
+Here's an example:
+
+```php
+$signer->setSignedAttr('2.9999', 'blah blah');
+```
+
+That is equivalent to doing this:
+
+```php
+$signer['signedAttrs'][] = [
+    'type' => '2.9999',
+    'value' => ['blah blah']
+];
+```
+One quirky thing about adding signers and signer attributes is that they're not necessarily going to show up where you expect them to. Like an ESS signer comes with four signed attributes out of the box:
+
+- id-contentType (required if signedAttrs is going to be present)
+- id-messageDigest (required if signedAttrs is going to be present)
+- id-aa-signingCertificateV2 (required for ESS signers)
+- id-signingTime (which isn't required but, none-the-less, phpseclib adds it)
+
+Consequently, you might think that, once you've added a signer, you'd access it by doing `$signer['signedAttrs'][4]`, but that isn't necessarily going to be the case - it could wind up being added at `$signer['signedAttrs'][0]` because of this blurb from [ITU-T Recommendation X.690 § 11.6 Set-of components](https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf#page=27):
+
+> The encodings of the component values of a set-of value shall appear in ascending order, the encodings being compared as octet strings with the shorter components being padded at their trailing end with 0-octets. NOTE - The padding octets are for comparison purposes only and do not appear in the encodings.
+
+Note that adding signed attributes after a signer has been signed will require the signer resign.
+
+### Signatures in Parallel
+
+Let's say you have a file that you wanted multiple people to sign but that they have to do it separately. You could email the file to be signed to one party after another party has signed it, however, the time that it would take for all signatures to be received in that manner would be `array_sum($timesToSign)`, where `$timesToSign` is an array containing the time to sign for each signer.
+
+What would be much faster is if you sent the file to each of the parties at the same time and let each party sign it independent of the other. Using that approach the amount of time that it'd take for the file to be signed by all parties would be `max($timesToSign)`.
+
+If everyone signed the file independently you could take the CMS that each of them generated and then copy their signature to a master list of signatures. eg.
+
+```php
+$cms1 = CMS::load('signer1.p7m');
+$cms2 = CMS::load('signer2.p7m');
+$master = CMS::load('master.p7m');
+$master->addSignature($cms1->getSigners()[0]);
+$master->addSignature($cms2->getSigners()[0]);
+```
+
+### Output Format
+
+By default, CMS objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CMS::enableBinaryOutput()`. To go back to PEMs calling `CMS::disableBinaryOutput()` is sufficient.
+
+You can also convert a CMS object to binary by doing `$cms->toString(['binary' => true])`.
+
+## Validating Signatures
+
+To validate the signature of a signer one need simply do this:
+
+```php
+$signer->validateSignature();
+```
+If you want to validate _all_ signatures at once you can do this:
+
+```php
+$cms->validateSignature();
+```
+`validateSignature()` will return false if the [certificate chain](/file/x509.mdx#chains) doesn't ultimately trace back to a CA cert. The CA requirement can be removed by passing `bool(false)` to the `validateSignature()` method:
+
+```php
+$signer->validateSignature(false);
+```
+`validateSignature()` will also return false if the key usage extension isn't set appropriately (eg. if neither `digitalSignature` or `nonRepudiation` are set), `findSigner()` will fail. This key usage check can be disabled by doing calling `X509::ignoreKeyUsage()`.
+
+Note that although there are multiple methods to add signers there's only one method to verify signatures. phpseclib's `validateSignature()` method is ESS aware whereas `openssl_cms_verify()` isn't. What that means is that if an ESS signature is detected and the ESS signature isn't valid whereas the regular signature is then phpseclib's `validateSignature()` will fail whereas `openssl_cms_verify()` won't. The reason for this failure, in this scenario, isn't because the signature is actually invalid but because the signing certificate wouldn't be locatable. eg. `$signer->getCertificate()` would return nothing because it's looking for a certificate that matches the ESS criteria and it wouldn't be able to find such a certificate.

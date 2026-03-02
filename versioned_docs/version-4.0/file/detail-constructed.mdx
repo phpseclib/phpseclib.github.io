@@ -45,6 +45,9 @@ Superficially this looks identical to the [X509: Reading Certificates](x509#read
 - **getEncoded() returns empty string when changes are made**
 
   [getEncoded()](#getencoded) and it's subsection, [Cache Invalidation](#cache-invalidation), talk about this more, at length.
+- **ASN1::TYPE_ANY types are Elements**
+
+  This isn't a big issue in X.509 certificates (altho it may be for certain extensions) but in CMS's it's a much bigger issue from the get go. Like if a constructed TLV is encountered it can't be decoded any further without knowing what map to apply. Consequently, it'll be saved as an instance of `Constructed`.
 
 In spite of that `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. What that means is that both `X509` (or any class that's a "thin wrapper" around `Constructed`) has the following features:
 
@@ -136,6 +139,16 @@ $cert = &$x509['tbsCertificate'];
 echo strlen($cert->getEncoded()) . "\n";                   // outputs 643
 ```
 In this example the first `strlen($cert->getEncoded())` returns 654 and the second `strlen($cert->getEncoded())` returns 0. This is because it's the `X509` class doing the recompiling - not the `Constructed` class. `$x509['tbsCertificate']` is calling [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) on the `X509` class but `$cert` isn't an instance of `X509` - it's an instance of `Constructed`. `Constructed` doesn't know how to reencode things so it doesn't - it just deletes the cached encoding information after it's been invalidated with a change.
+
+At this point one might wonder what the benefit of having a cache even is. [Constructed: A Case Study](file/constructed-example.mdx) shows how it can introduce gotchas. The fact that it prevents gratuitous re-encoding notwithstanding it's also needed for signature validation. Like the definition for [CRLs](/file/crl.mdx) ([RFC 5280 pp. 56](https://www.rfc-editor.org/rfc/rfc5280#page-56)) says this of the version number:
+
+```
+   TBSCertList  ::=  SEQUENCE  {
+        version                 Version OPTIONAL,
+                                     -- if present, MUST be v2
+```
+
+So even if we're using the distinguished encoding rules (DER) the presence of that field is still up to the discretion of the software that created the CRL and just because phpseclib encodes it one way doesn't mean that OpenSSL would encode it the same way. Like it's valid ASN.1 encoding in either case but if you reconstruct the signature subject incorrectly then a signature that would have otherwise successfully validated all of a sudden might not.
 
 ## Lazy and Eager Loading
 
@@ -279,3 +292,7 @@ Because `Constructed` objects implement the [`Countable`](https://www.php.net/ma
 There are some things that PHP can do with arrays that don't make a lot of sense in the context `Constructed`. For example, it's unclear why one would want to [`sort()`](https://www.php.net/sort) a `Constructed` object. It is actually for that reason that `Constructed` objects do NOT implement the [`ArrayObject`](https://www.php.net/manual/en/class.arrayobject.php).
 
 That said, there are other things that PHP can do with arrays that _would_ make sense for `Constructed` objects to support but for which no mechanism exists in PHP. The most notable example of this is probably [`array_keys()`](https://www.php.net/array-keys), however, one can get similar functionality by doing `->keys()`.
+
+## Wrapping Constructed
+
+As has already been observed, `Constructed` objects don't have any bells and whistles. If you wanted to build out a new class with bells and whistles one can find a limited tutorial at [Constructed: A Case Study](constructed-example.mdx).

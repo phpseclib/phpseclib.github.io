@@ -3,7 +3,7 @@ title: DSA
 sidebar_position: 4
 ---
 
-Loading and saving keys is discussed in [Public Keys: Overview](overview.md).
+Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
 
 ## Supported Formats
 

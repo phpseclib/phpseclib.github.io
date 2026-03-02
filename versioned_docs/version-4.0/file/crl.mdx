@@ -257,7 +257,7 @@ Changes you'd want to make to that function before using it in the real world:
 - Update it to store stuff to and retrieve stuff from something like MySQL, MongoDB, the local filesystem, whatever.
 - Check `$crl['tbsCertList']['thisUpdate']` and `$crl['tbsCertList']['nextUpdate']` to make sure that the dates are valid. This has been omitted for brevity.
 - Validate the signature of the CRL. This, too, has been omitted for brevity.
-- Handle the case where `file_get_contents($url)`. Should an exception be thrown? Should it return false? Or true? That's entirely your perogrative.
+- Handle the case where `file_get_contents($url)` fails. Should an exception be thrown? Should it return false? Or true? That's entirely your perogrative.
 
 Also, it should be noted that `$x509->validateSignature()` calls `$x509->validateNonRevokedStatus()`. Rather than deal with loading CAs and all that jazz, however, this section opted to call `$x509->validateNonRevokedStatus()` for simplicities sake.
 
@@ -271,7 +271,7 @@ use phpseclib3\File\CRL;
 $crl = new CRL();
 echo $crl;
 ```
-The certificate that that would produce would look something like this:
+The CRL that that would produce would look something like this:
 
 ```
 -----BEGIN X509 CRL-----
@@ -417,3 +417,5 @@ Signing the CRL before the DNs or extensions or whatever have been set will resu
 ### Output Format
 
 By default, CRL objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CRL::enableBinaryOutput()`. To go back to PEMs calling `CRL::disableBinaryOutput()` is sufficient.
+
+You can also convert a CMS object to binary by doing `$crl->toString(['binary' => true])`.
