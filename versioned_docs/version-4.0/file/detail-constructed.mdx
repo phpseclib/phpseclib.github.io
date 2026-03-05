@@ -281,7 +281,7 @@ If it weren't for the `ASN1::enableBlobsOnBadDecodes()` call, the above code wou
 
 <BadX509_1 />
 
-From that we can see that `$x509['tbsCertificate']['issue']` is set to an instance of `phpseclib3\File\ASN1\MalformedData`. This is where the issue is.
+From that we can see that `$x509['tbsCertificate']['issuer']` is set to an instance of `phpseclib3\File\ASN1\MalformedData`. This is where the issue is.
 
 ## Array-Like Interface
 

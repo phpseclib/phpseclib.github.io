@@ -214,7 +214,7 @@ Readers familiar with [RFC5652](https://datatracker.ietf.org/doc/html/rfc5652) m
 
 This is intentional and reflects how the CMS structures relate in practice rather than how they are named in the RFC.
 
-Structurally, the only hard requirement that distinguishes `EnvelopedData` from `EncryptedData` is that `EnvelopedData` requires at least one `RecipientInfo`:
+Structurally, the only thing that differentiates `EnvelopedData` from `EncryptedData` is that `EnvelopedData` requires at least one `RecipientInfo`. Quoting from RFC5652:
 
 ```
 recipientInfos ::= SET SIZE (1..MAX) OF RecipientInfo
