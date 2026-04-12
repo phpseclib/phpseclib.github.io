@@ -47,6 +47,8 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
   echo $key;
   ```
   The key that was output would be a PKCS8 key. `$key->getLoadedFormat()` would return `Raw`.
+
+  To convert an RSA key object to a "Raw" array key one would need to call `$key->toArray()`.
   
   ## Creating Keys
   
@@ -137,7 +139,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
          whether the signature is valid with respect to the specification
          given in this document.
   
-  DER in this case refers to the [Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding) (BER). Anything encoding using DER is valid BER but not everything encoded in BER is valid DER. Signatures phpseclib creates are valid DER regardless of whether or not PKCS1 or RELAXED_PKCS1 modes are used but when it comes to signature verification RELAXED_PKCS1 actually decodes the BER instead of just matching strings of fixed length.
+  DER in this case refers to the [Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding) (BER). Anything encoded using DER is valid BER but not everything encoded in BER is valid DER. Signatures phpseclib creates are valid DER regardless of whether or not PKCS1 or RELAXED_PKCS1 modes are used but when it comes to signature verification RELAXED_PKCS1 actually decodes the BER instead of just matching strings of fixed length.
   
   ## Encryption / Decryption
   

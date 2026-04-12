@@ -15,7 +15,7 @@ Also, technically, this class combines the [EnvelopedData](https://datatracker.i
 
 ## Comparison to OpenSSL in PHP
 
-[openssl_cms_encrypt()](https://www.php.net/openssl-cms-encrypt) only does not support EncryptedData and, in-so-far as EnvelopedData is concerned, only supports KeyAgreeRecipient and KeyTransRecipient types. phpseclib, on the other hand, supports those and KEKRecipient and PasswordRecipient. Furthermore, `openssl_cms_encrypt` does not support multiple recipients whereas phpseclib's EncryptedData does.
+[openssl_cms_encrypt()](https://www.php.net/openssl-cms-encrypt) does not support EncryptedData and, in-so-far as EnvelopedData is concerned, only supports KeyAgreeRecipient and KeyTransRecipient types. phpseclib, on the other hand, supports those and KEKRecipient and PasswordRecipient. Furthermore, `openssl_cms_encrypt` does not support multiple recipients whereas phpseclib's EncryptedData does.
 
 [openssl_cms_decrypt()](https://www.php.net/openssl-cms-decrypt) has all the same limitations.
 

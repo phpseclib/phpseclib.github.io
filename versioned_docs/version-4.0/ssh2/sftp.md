@@ -343,18 +343,26 @@ print_r($sftp->rawlist()); // == $sftp->rawlist('.')
 </details>
 </div>
 
-The `type` index corresponds to one of the following named constants:
+The `type` index corresponds to one of the following class constants (that live in the `phpseclib4\Net\SFTP\FileType` class):
 
 |Name|Value|
 |---|---|
-|`NET_SFTP_TYPE_REGULAR`|1|
-|`NET_SFTP_TYPE_DIRECTORY`|2|
-|`NET_SFTP_TYPE_SYMLINK`|3|
-|`NET_SFTP_TYPE_SPECIAL`|4|
-|`NET_SFTP_TYPE_UNKNOWN`|5|
-|`NET_SFTP_TYPE_SOCKET`|6|
-|`NET_SFTP_TYPE_CHAR_DEVICE`|7|
-|`NET_SFTP_TYPE_FIFO`|8|
+|`REGULAR`|1|
+|`DIRECTORY`|2|
+|`SYMLINK`|3|
+|`SPECIAL`|4|
+|`UNKNOWN`|5|
+|`SOCKET`|6|
+|`CHAR_DEVICE`|7|
+|`TYPE_FIFO`|8|
+
+eg. if you want to reference one of these constants you'd need to do this:
+
+```php
+use phpseclib4\Net\SFTP\FileType;
+
+FileType::DIRECTORY;
+```
 
 Both `nlist` and `rawlist` accept an optional second parameter - `$recursive` - that, if set to `bool(true)`, will return a list of all the files in the specified directory _and_ all subdirectories contained therein (and all subdirectories contained within those subdirectories, etc).
 

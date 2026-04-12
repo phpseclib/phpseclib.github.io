@@ -3,32 +3,6 @@ title: Diagnosing Issues
 sidebar_position: 4
 ---
 
-## Exceptions
-
-Exceptions are thrown whenever a `bool(true)` or a `bool(false)` is insufficient to capture the error.
-
-Consider `login()` for example. If `bool(true)` means that the login was successful then it stands to reason that `bool(false)` would mean that the login was _not_ successful. But what if there was a connection error in the login process? `bool(false)` _could_ be returned but then you couldn't distinguish between bad passwords (which is a bit of an oversimplification) or connection errors.
-
-phpseclib throws exceptions for various errors:
-
-- Connection Errors:
-  - `\phpseclib3\Exception\UnableToConnectException`
-  - `\phpseclib3\Exception\ConnectionClosedException`
-  - `\UnexpectedValueException`
-
-- Key Exchange Errors:
-  - `\phpseclib3\Exception\NoSupportedAlgorithmsException`
-
-- Authentication Errors:
-  - `\phpseclib3\Exception\UnsupportedCurveException`
-  - `\phpseclib3\Exception\UnsupportedAlgorithmException`
-
-- Misc Errors:
-  - `\RuntimeException`
-  - `\phpseclib3\Exception\InsufficientSetupException`: thrown when you try to perform certain operations prior to being logged in
-
-Depending on the situation an exception may or may not result in the SSH2 session being closed.
-
 ## isConnected(), isAuthenticated()
 
 SSH2.php doesn't connect to a server after the constructor has been called - it makes the connection after one of the following methods is called:
@@ -41,7 +15,7 @@ SSH2.php doesn't connect to a server after the constructor has been called - it 
 
 Calling `isConnected()` prior to any of these methods will return `bool(false)`. Premature closure of the session will also result in `isConnected()` returning `bool(false)`.
 
-As of phpseclib 3.0.36 `isConnected()` optionally takes a `$level` parameter that can be used to select the method used to test if the connection is still opened or not. The various levels are:
+`isConnected()` optionally takes a `$level` parameter that can be used to select the method used to test if the connection is still opened or not. The various levels are:
 
 - `isConnected(0)`. The default method.  Calls `feof()` on the socket object, which often means that the [server has closed the connection](https://stackoverflow.com/a/1321716/569976)
 - `isConnected(1)`. Sends a SSH_MSG_IGNORE packet to the server.
@@ -49,11 +23,37 @@ As of phpseclib 3.0.36 `isConnected()` optionally takes a `$level` parameter tha
 
 `isAuthenticated()` returns `bool(true)` only after you've been successfully logged in.
 
-## getErrors(), getLastError()
+## SFTP::getErrors()
 
-`getErrors()` returns an array of all errors or messages that have been reported by the server at the SSH layer. `getLastError()` returns the most recent of these errors / messages.
+Whenever an error is encountered an exception is thrown. The only exception to this is the SFTP class, which logs errors on (most) functions operating in recursive mode.
 
-`getSFTPErrors()` and `getLastSFTPError()` work similarily for the SFTP layer.
+So let's say you had a directory (directory A) with one file (file B) and one directory (directory C) that you did not have permission to access. If you try to delete file B or directory C (or to do `nlist()`, `rawlist()`, etc) and _weren't_ in recursive mode, you'd get an Exception. If, however, you _were_ in recursive mode then it'll silently fail. Silent failures aren't so useful if trying to delete file B or directory C, however, if trying to delete directory A then what'll happen is that it'll try to delete every _other_ directory and file contained therein.
+
+`getErrors()` let's you see which files failed and how. Here's the output of `print_r($sftp->getErrors())` after trying to do `$sftp->delete('A')` on a directory with the previously mentioned layout:
+
+```php
+Array
+(
+    [0] => REMOVE /home/test/A (FAILURE): Failure
+    [1] => REMOVE /home/test/A/B (PERMISSION_DENIED): Permission denied
+    [2] => OPENDIR /home/test/A/C (PERMISSION_DENIED): Permission denied
+    [3] => RMDIR /home/test/A/C (FAILURE): Failure
+    [4] => RMDIR /home/test/A (FAILURE): Failure
+)
+```
+Here's a more in-depth explanation of what's going on:
+
+1. Not knowing that A is a directory, phpseclib first tries to delete it as a file (REMOVE) and it fails. phpseclib then assumes that A is a directory and directory A's contents (OPENDIR) without issue.
+2. phpseclib tries to delete file B (REMOVE) and fails. It doesn't try to do OPENDIR on B as a directory because it learned via OPENDIR that it _wasn't_ a directory
+3. phpseclib tries to open directory C (OPENDIR) and fails.
+4. phpseclib tries to delete directory C and fails (RMDIR).
+5. phpseclib tries to delete directory A and fails (RMDIR).
+
+The lone function that continues to throw exceptions on errors, even in recursive mode, is `mkdir()`. To understand the reason for that one, say you're trying to create `/home/test/new`. It first tries to create `/home` and fails, either because the directory already exists or because you don't have the appropriate permission to create a directory in root. Then it tries to create `/home/test` and that fails because that directory already exists. Once it gets around to creating the final directory - `/home/test/new` - there's zero possibility of it creating any additional directories, hence phpseclib throwing an Exception, despite being in recursive mode.
+
+Note that `getErrors()` will continue to build up its list of errors until you call it. So like if you delete two directories recursively and then do `getErrors()` then you'll see errors from _both_ directory deletions.
+
+Also note that if you call `getErrors()` twice, in succession, that the second `getErrors()` call will return an empty array because the error "buffer" has been cleared.
 
 ## getServerIdentification()
 
