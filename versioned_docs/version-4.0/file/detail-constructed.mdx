@@ -205,7 +205,7 @@ echo 'peak memory usage was ' . memory_get_peak_usage() . "\n";
 ```
 On my computer, with PHP 8.3.14, eager loading via `->toArray()` took about **2s**. Searching took about **0.01s** and peak memory usage was **~323mb**, bringing the total script execution time to about **2.01s**.
 
-Now let's consider the same code with suboptimal form of lazy loading. To do this all we need to do is comment out the `$crl = $crl->toArray()` line. When this is done searching, at least on my system, took **0.44s** and peak memory usage was **~151mb**. The total script execution time was **~1.57s faster**.
+Now let's consider the same code with a suboptimal form of lazy loading. To do this all we need to do is comment out the `$crl = $crl->toArray()` line. When this is done searching, at least on my system, took **0.44s** and peak memory usage was **~151mb**. The total script execution time was **~1.57s faster**.
 
 Superficially, one might conclude that subsequent searches would also take ~0.44s, however, that's not the case, because, unless you explictly delete the decoded results (the `unset()` I mentioned earlier), things, once decoded, remain decoded. So if you do `findSN($crl, $sn)` a second time that second time, on my system, only took **0.08s**. Not as good as the 0.01s from when we did `->toArray()` but still better than 0.44s. The peak memory usage remains _relatively_ constant.
 
@@ -261,6 +261,62 @@ That throws an Exception.
 Lazy loading only results in exceptions being thrown if you try to access the malformed part of the X.509 certificate. So like `$x509['tbsCertificate']['extensions'][1]->toArray()` doesn't result in an error but `$x509['tbsCertificate']->toArray()` does.
 
 But where exactly is the error? That brings us to our next topic of discussion.
+
+### Security Implications
+
+phpseclib v1 - v3 utilize a two-step parsing process for ASN.1 structures. First, they **fully decodes** the entire ASN.1 blob into a nested PHP array. Only after the entire structure is in memory does it attempt to map that data to a specific schema (such as an X.509 Certificate, CRL, or CMS).
+
+This creates a potential denial-of-service vector. An attacker can craft a technically "valid" ASN.1 blob that is packed with high-complexity elements-like many large Object Identifiers (OIDs)—but is ultimately invalid as a certificate.
+
+#### Example Attack Payload
+```php
+use phpseclib3\File\ASN1;
+use phpseclib3\Math\BigInteger;
+
+$map = [
+    'type' => ASN1::TYPE_SEQUENCE,
+    'min' => 1,
+    'max' => -1,
+    'children' => ['type' => ASN1::TYPE_OBJECT_IDENTIFIER]
+];
+
+$raw = [];
+for ($i = 0; $i < 50; $i++) {
+    // floor(3583 * 8 / 7) + 2 == 4096
+    $oid = '2.25.' . BigInteger::random(3583 << 3);
+    $raw[] = $oid;
+}
+
+$encoded = ASN1::encodeDER($raw, $map);
+```
+Prior to the security patches in **3.0.52, 2.0.54, and 1.0.29**, attempting to load this payload via `$x509->loadX509($encoded)` could hang the CPU for **30 seconds or more**. Even though the structure isn't a valid certificate, the "eager" parser decodes every malicious OID before the mapping phase fails.
+
+The fix, for those versions of phpseclib, was to reduce the maximum allowed size for a single OID from 4096 bytes to **128 bytes**, which is more than sufficient for any legitimate OID while preventing the bitwise shifting overhead from becoming a DoS vector.
+
+In contrast, **phpseclib v4** is immune to this class of issue by design because it decodes **on demand**.
+
+When you call `X509::load($encoded)`, the library does not decode the interior elements immediately. Instead, it creates a "map" of the structure's offsets. An OID is only decoded if the application explicitly attempts to access that specific field (e.g., fetching the signature algorithm).
+
+With the above example payload, which does not match the structural template of an X509 certificate, an exception is thrown **instantly** before it ever reaches the OID decoding logic. This "fail-fast" behavior provides a massive security boost, as malicious interior data is never even processed.
+
+:::caution Why OID parsing is expensive
+In an OID like `1.2.840.10045.3.1.7`, each number is called an **arc**.
+
+Unlike a fixed-width integer, arc length is arbitrary. Using a **Variable Length Quantity (Base 128)** encoding, the parser must inspect the 8th bit of every byte:
+* If it's **1**, the arc continues to the next byte.
+* If it's **0**, the arc ends.
+
+To calculate the final value, the parser must strip those 8th bits and "stitch" the remaining 7-bit chunks together. For massive, attacker-crafted OIDs, this requires intensive bit-shifting and BigInteger math, which can consume significant CPU cycles before the parser even realizes the OID is invalid.
+:::
+
+#### Comparison Summary
+
+| Feature | phpseclib v1 - v3 | phpseclib v4 |
+| :--- | :--- | :--- |
+| **Parsing Model** | Eager (Full Decode first) | Lazy (Decode on-demand) |
+| **Memory Profile** | Spikes with input size | Constant (Stream-based) |
+| **Vulnerability Fix** | Hard-coded size limits | Architectural isolation |
+| **Performance** | Blocked by complex children | Instant failure on invalid maps |
 
 ## Error Pinpointing
 
