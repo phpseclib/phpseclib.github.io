@@ -163,7 +163,7 @@ An exception is thrown if an unsupported name is passed to it. See [Valid DN Pro
 
 ### String input
 
-In-so-far as strings go, `$props` can match the output of [ASN1::DN_STRING](#x509dn_string):
+In-so-far as strings go, `$props` can match the output of [ASN1::DN_STRING](#asn1dn_string):
 
 ```php
 $x509->setDN('C = US, O = Internet Security Research Group, CN = ISRG Root X1');
@@ -198,7 +198,7 @@ As opposed to this:
 
 ### Array input
 
-In-so-far as arrays go, `$props` can match [ASN1::DN_OPENSSL](#x509dn_openssl) or [ASN1::DN_ARRAY](#x509dn_array).
+In-so-far as arrays go, `$props` can match [ASN1::DN_OPENSSL](#asn1dn_openssl) or [ASN1::DN_ARRAY](#asn1dn_array).
 
 An example with ASN1::DN_OPENSSL:
 
@@ -255,7 +255,7 @@ $x509->setDN([
 
 ### Element input
 
-In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [ASN1::DN_ASN1](#x509dn_asn1).
+In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [ASN1::DN_ASN1](#asn1dn_asn1).
 
 Example:
 

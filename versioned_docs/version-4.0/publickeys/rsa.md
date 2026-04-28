@@ -116,31 +116,6 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
   
   Does _not_ employee randomized padding so signing the same message twice _will_ yield the same signature twice.
   
-  ### RSA::SIGNATURE_RELAXED_PKCS1
-  
-  This is basically the same as PKCS1 with the caveat that the "DigestInfo" no longer has a fixed length.
-  
-  [PKCS#1 § 9.2. EMSA-PKCS1-v1_5](https://tools.ietf.org/html/rfc8017#page-46) says the following:
-  
-         In version 1.5 of this document, T was defined as the BER
-         encoding, rather than the DER encoding, of the DigestInfo value.
-         In particular, it is possible -- at least in theory -- that the
-         verification operation defined in this document (as well as in
-         version 2.0) rejects a signature that is valid with respect to
-         the specification given in PKCS #1 v1.5.  This occurs if other
-         rules than DER are applied to DigestInfo (e.g., an indefinite
-         length encoding of the underlying SEQUENCE type).  While this is
-         unlikely to be a concern in practice, a cautious implementor may
-         choose to employ a verification operation based on a BER decoding
-         operation as specified in PKCS #1 v1.5.  In this manner,
-         compatibility with any valid implementation based on PKCS #1 v1.5
-         is obtained.  Such a verification operation should indicate
-         whether the underlying BER encoding is a DER encoding and hence
-         whether the signature is valid with respect to the specification
-         given in this document.
-  
-  DER in this case refers to the [Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding) (BER). Anything encoded using DER is valid BER but not everything encoded in BER is valid DER. Signatures phpseclib creates are valid DER regardless of whether or not PKCS1 or RELAXED_PKCS1 modes are used but when it comes to signature verification RELAXED_PKCS1 actually decodes the BER instead of just matching strings of fixed length.
-  
   ## Encryption / Decryption
   
   Encryption / decryption can be done thusly:
