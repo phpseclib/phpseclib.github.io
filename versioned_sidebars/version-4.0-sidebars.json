@@ -79,6 +79,13 @@
         "interop/c",
         "interop/php"
       ]
+    },
+    {
+      "type": "category",
+      "label": "Exceptions",
+      "items": [
+        "exceptions/overview"
+      ]
     }
   ]
 }

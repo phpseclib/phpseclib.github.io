@@ -264,7 +264,7 @@ But where exactly is the error? That brings us to our next topic of discussion.
 
 ### Security Implications
 
-phpseclib v1 - v3 utilize a two-step parsing process for ASN.1 structures. First, they **fully decodes** the entire ASN.1 blob into a nested PHP array. Only after the entire structure is in memory does it attempt to map that data to a specific schema (such as an X.509 Certificate, CRL, or CMS).
+phpseclib v1 - v3 utilize a two-step parsing process for ASN.1 structures. First, they **fully decode** the entire ASN.1 blob into a nested PHP array. Only after the entire structure is in memory does it attempt to map that data to a specific schema (such as an X.509 Certificate, CRL, or CMS).
 
 This creates a potential denial-of-service vector. An attacker can craft a technically "valid" ASN.1 blob that is packed with high-complexity elements-like many large Object Identifiers (OIDs)—but is ultimately invalid as a certificate.
 

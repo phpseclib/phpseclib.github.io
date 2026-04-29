@@ -22,7 +22,7 @@ The password is optional.
 
 So let's say you have a key that looks like `-----BEGIN PRIVATE KEY-----`. Is that an RSA key, a DSA key, an EC key, or what? With this approach you don't need to know what type the key is - it'll be automatically determined for you. Even passing in an X.509 certificate will work - you'll get back the public key portion of that certificate [^x509]
 
-If a key can't be load a `phpseclib3\Exception\NoKeyLoadedException` exception will be thrown.
+If a key can't be loaded a `phpseclib3\Exception\NoKeyLoadedException` exception will be thrown.
 
 If you know whether or not a key is a public or private but just don't know the type (eg. RSA, DSA, EC, etc) you can do `PublicKeyLoader::loadPublicKey()` or `PublicKeyLoader::loadPrivateKey()`.
 
