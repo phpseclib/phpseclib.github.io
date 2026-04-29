@@ -266,7 +266,7 @@ But where exactly is the error? That brings us to our next topic of discussion.
 
 phpseclib v1 - v3 utilize a two-step parsing process for ASN.1 structures. First, they **fully decode** the entire ASN.1 blob into a nested PHP array. Only after the entire structure is in memory does it attempt to map that data to a specific schema (such as an X.509 Certificate, CRL, or CMS).
 
-This creates a potential denial-of-service vector. An attacker can craft a technically "valid" ASN.1 blob that is packed with high-complexity elements-like many large Object Identifiers (OIDs)—but is ultimately invalid as a certificate.
+This creates a potential denial-of-service vector. An attacker can craft a technically "valid" ASN.1 blob that is packed with high-complexity elements - like many large Object Identifiers (OIDs) - but is ultimately invalid as a certificate.
 
 #### Example Attack Payload
 ```php
@@ -302,11 +302,11 @@ With the above example payload, which does not match the structural template of 
 :::caution Why OID parsing is expensive
 In an OID like `1.2.840.10045.3.1.7`, each number is called an **arc**.
 
-Unlike a fixed-width integer, arc length is arbitrary. Using a **Variable Length Quantity (Base 128)** encoding, the parser must inspect the 8th bit of every byte:
+Unlike a fixed-width integer, arc length is arbitrary. Using a [Variable Length Quantity (Base 128)](https://en.wikipedia.org/wiki/Variable-length_quantity) encoding, the parser must inspect the 8th bit of every byte:
 * If it's **1**, the arc continues to the next byte.
 * If it's **0**, the arc ends.
 
-To calculate the final value, the parser must strip those 8th bits and "stitch" the remaining 7-bit chunks together. For massive, attacker-crafted OIDs, this requires intensive bit-shifting and BigInteger math, which can consume significant CPU cycles before the parser even realizes the OID is invalid.
+To calculate the final value, the parser must strip those 8th bits and "stitch" the remaining 7-bit chunks together. For massive, attacker-crafted OIDs, this requires intensive bit-shifting and BigInteger math. While most common arcs are small, the parser must be prepared for much larger values, like [128-bit UUIDs encoded under the 2.25 arc](https://healthcaresecprivacy.blogspot.com/2011/02/creating-and-using-unique-id-uuid-oid.html). Because these values exceed the 64-bit limit of native PHP integers, phpseclib uses BigInteger to ensure standards compliance and prevent overflow errors.
 :::
 
 #### Comparison Summary
