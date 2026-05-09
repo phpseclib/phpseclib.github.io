@@ -7,7 +7,7 @@ title: Java
 Encrypting a string using AES-128-CBC with phpseclib:
 
 ```php
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 $cipher = new AES('cbc');
 $cipher->setKey(str_repeat('a', 16));
@@ -52,7 +52,7 @@ public class Test
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -178,7 +178,7 @@ Normally, com.sun.crypto.provider.SunJCE and org.bouncycastle.jce.provider.Bounc
 Here's the phpseclib code to encrypt something with OAEP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -250,7 +250,7 @@ import javax.crypto.spec.PSource.PSpecified;
 Signature creation with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PRIVATE KEY-----
 MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu

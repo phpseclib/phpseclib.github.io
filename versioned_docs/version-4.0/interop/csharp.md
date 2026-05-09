@@ -7,7 +7,7 @@ title: C#
 Encrypting a string using AES-128-CBC with phpseclib:
 
 ```php
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 $cipher = new AES('cbc');
 $cipher->setKey(str_repeat('a', 16));
@@ -61,7 +61,7 @@ class Test
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -167,7 +167,7 @@ v/Ow5T0q5gIJAiEAyS4RaI9YG8EWx/2w0T67ZUVAw8eOMB6BIUg0Xcu+3okCIBOs
 Now let us consider OAEP decryption. Here's the phpseclib to generate OAEP encrypted strings:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -208,7 +208,7 @@ If you want or need to use non-matching MGFHash and Hash algorithms in OAEP then
 Signature creation with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PRIVATE KEY-----
 MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu

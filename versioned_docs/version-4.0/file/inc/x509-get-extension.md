@@ -16,7 +16,7 @@
             <details>
               <summary>uniformResourceIdentifier</summary>
               <details open>
-                <summary>phpseclib3\File\ASN1\Types\IA5String</summary>
+                <summary>phpseclib4\File\ASN1\Types\IA5String</summary>
                 <div>http://crl.thawte.com/ThawteSGCCA.crl</div>
               </details>
             </details>

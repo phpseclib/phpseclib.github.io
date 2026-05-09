@@ -10,7 +10,7 @@ CSR is an acronym for [Certificate Signing Request](https://en.wikipedia.org/wik
 ## Reading CSRs
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = CSR::load(file_get_contents('csr.big'));
 
@@ -18,17 +18,17 @@ print_r($csr);
 ```
 <sup>([download csr.big](pathname:///asn1/csr.big.txt))</sup>
 
-`$csr`, in this case, is a CSR object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$csr` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$csr`, in this case, is a CSR object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$csr` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <GoodCSR />
 
-All elements and subelements of the above CSR object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$csr['certificationRequestInfo']['subjectPKInfo']` or you could do `$csr->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib3\File\ASN1\Constructed.
+All elements and subelements of the above CSR object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$csr['certificationRequestInfo']['subjectPKInfo']` or you could do `$csr->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib4\File\ASN1\Constructed.
 
-To learn more about the capabilities afforded to the CSR class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+To learn more about the capabilities afforded to the CSR class by virtue of it being a thin wrapper around \phpseclib4\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
 ### getPublicKey()
 
-Returns an instance of [\phpseclib3\Crypt\Common\PublicKey](publickeys/overview.mdx#publickey-vs-privatekey).
+Returns an instance of [\phpseclib4\Crypt\Common\PublicKey](publickeys/overview.mdx#publickey-vs-privatekey).
 
 ```php
 echo $csr->getPublicKey();
@@ -97,7 +97,7 @@ Since `1.3.6.1.4.1.311.13.2.3` exists in `$csr`, running the above will produce 
   <details>
     <summary>0</summary>
     <details open>
-      <summary>phpseclib3\File\ASN1\Types\IA5String</summary>
+      <summary>phpseclib4\File\ASN1\Types\IA5String</summary>
       <div>6.3.9600.2.</div>
     </details>
   </details>
@@ -152,7 +152,7 @@ Running the above will produce an array with all the extensions that the CSR is 
 
 ### getExtension()
 
-Returns an array representing the first instance of a requested extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+Returns an array representing the first instance of a requested extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib4\File\ASN1\Types\BaseType`.
 
 If said extension request isn't present then null is returned.
 
@@ -214,7 +214,7 @@ Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (D
 Consider the following:
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = new CSR();
 echo $csr;
@@ -254,7 +254,7 @@ If you did `print_r($csr)` on that CSR you'd get this:
 Let's say you created your public key thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();
@@ -273,7 +273,7 @@ echo $csr;
 ```
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = new X509($public);
 $csr = new CSR($x509);
@@ -293,10 +293,10 @@ A CSR has only has a subject distinguished name (DN for short). The methods for 
 - [`addDNProps()`](detail-dns.mdx#adddnprops) (alias: `addSubjectDNProps()`)
 - [`removeDNProps()`](detail-dns.mdx#removednprops) (alias: `removeSubjectDNProps()`)
 
-The subject DN can also be set by passing an instance of [`\phpseclib3\File\X509`](x509.mdx) to the CSR constructor. eg.
+The subject DN can also be set by passing an instance of [`\phpseclib4\File\X509`](x509.mdx) to the CSR constructor. eg.
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = X509::load('...');
 $csr = new CSR($x509);
@@ -309,7 +309,7 @@ Some attributes have built in dedicated functions for manipulating them:
 
 - **pkcs-9-at-challengePassword**
 
-  `$csr->setChallengePassword()`. This function takes a single parameter - `$password` - which can be either a string or an instance of either `\phpseclib3\File\ASN1\Types\UTF8String` or `\phpseclib3\File\ASN1\Types\PrintableString`.
+  `$csr->setChallengePassword()`. This function takes a single parameter - `$password` - which can be either a string or an instance of either `\phpseclib4\File\ASN1\Types\UTF8String` or `\phpseclib4\File\ASN1\Types\PrintableString`.
 
 - **pkcs-9-at-extensionRequest**
 
@@ -400,7 +400,7 @@ Once an extension is registered you can call `CSR::getRegisteredExtension($custo
 Let's say you created your public key thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();

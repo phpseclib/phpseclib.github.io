@@ -20,7 +20,7 @@ import DNPostalAddress from './inc/dn-postaladdress.md';
 `getDN()` (and `getSubjectDN()` / `getIssuerDN()`, when appropriate) takes one parameter - `$format` (an integer) - and returns either an array or string, depending on what the parameter passed to it was.
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = X509::load(file_get_contents('ca.crt'));
 
@@ -89,7 +89,7 @@ Returns a binary encoded string.
 
 This one is similar to `ASN1::DN_ASN1` with the following differences:
 
-- All the `\phpseclib3\File\ASN1\Types\BaseString`'s are normalized to `\phpseclib3\File\ASN1\Types\UTF8String`'s, if possible.
+- All the `\phpseclib4\File\ASN1\Types\BaseString`'s are normalized to `\phpseclib4\File\ASN1\Types\UTF8String`'s, if possible.
 - All the strings are ran through PHP's [`strtolower()`](https://www.php.net/strtolower)` function.
 - All sequences white space (`\s+` in [`preg_replace()`](https://www.php.net/preg-replace)) are replaced with a single space.
 - The various SET elements are not wrapped by a SEQUENCE tag
@@ -149,7 +149,7 @@ Output:
   <details>
     <summary>0</summary>
     <details open>
-      <summary>phpseclib3\File\ASN1\Types\TeletexString</summary>
+      <summary>phpseclib4\File\ASN1\Types\TeletexString</summary>
       <div>Google Inc</div>
     </details>
   </details>
@@ -159,7 +159,7 @@ An exception is thrown if an unsupported name is passed to it. See [Valid DN Pro
 
 ## setDN()
 
-`setDN()` (and `setSubjectDN()` / `setIssuerDN()`, when appropriate) takes one parameter - `$props` (either a string, an array or an instance of `phpseclib3\File\ASN1\Element`).
+`setDN()` (and `setSubjectDN()` / `setIssuerDN()`, when appropriate) takes one parameter - `$props` (either a string, an array or an instance of `phpseclib4\File\ASN1\Element`).
 
 ### String input
 
@@ -244,7 +244,7 @@ $x509->setDN(
 An advantage of using arrays over strings is that you can more precicisely control the type. By default, phpseclib assumes all strings are UTF8String's, but what if you wanted to do PrintableString's? At that point you could do this:
 
 ```php
-use phpseclib3\File\ASN1\Types\PrintableString;
+use phpseclib4\File\ASN1\Types\PrintableString;
 
 $x509->setDN([
     'C' => new PrintableString('US'),
@@ -255,12 +255,12 @@ $x509->setDN([
 
 ### Element input
 
-In-so-far as `phpseclib3\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [ASN1::DN_ASN1](#asn1dn_asn1).
+In-so-far as `phpseclib4\File\ASN1\Element`'s go, `$props` can be anything (esp. if you're trying to create a malformed certificate for research purposes), however, a syntacticly valid `Element` instance should match [ASN1::DN_ASN1](#asn1dn_asn1).
 
 Example:
 
 ```php
-use phpseclib3\File\ASN1\Element;
+use phpseclib4\File\ASN1\Element;
 
 $raw = 'ME8xCzAJBgNVBAYTAlVTMSkwJwYDVQQKEyBJbnRlcm5ldCBTZWN1cml0eSBSZXNlYXJjaCBHcm91cDEVMBMGA1UEAxMMSVNSRyBSb290IFgx';
 $x509->setDN(new Element(base64_decode($raw)));
@@ -320,7 +320,7 @@ An exception is thrown if the property name is unsupported. See [Valid DN Proper
 
 `id-at-postalAddress` is is a strange DN property. Literally every other DN property that phpseclib supports is a primitive, but `id-at-postalAddress` is a [Constructed](detail-constructed.mdx) type.
 
-There's no syntactic sugar for decoding it (it decodes as an instance of `\phpseclib3\File\ASN1\Constructed`), however, there is some syntactic sugar for encoding it:
+There's no syntactic sugar for decoding it (it decodes as an instance of `\phpseclib4\File\ASN1\Constructed`), however, there is some syntactic sugar for encoding it:
 
 ```php
 $x509->addDNProp('id-at-postalAddress', [
@@ -345,14 +345,14 @@ print_r($x509->getDNProps('id-at-organizationName')[0]);
 The output of that is this:
 
 <details open>
-  <summary>phpseclib3\File\ASN1\Types\UTF8String</summary>
+  <summary>phpseclib4\File\ASN1\Types\UTF8String</summary>
   <div>phpseclib organization</div>
 </details>
 
 Alternative ways that `id-at-postalAddress` can be saved are:
 
 ```php
-use phpseclib3\File\ASN1\Types\UTF8String;
+use phpseclib4\File\ASN1\Types\UTF8String;
 
 $x509->addDNProp('postalAddress', ['xxx']);
 $x509->addDNProp('postalAddress', [['utf8String' => 'xxx']]);
@@ -436,11 +436,11 @@ MAUMA3h4eDAeFw0yNTEwMTQwMjQ2MDNaFw0yNjEwMTQwMjQ2MDNaMBExDzANBgSE
 4q1PMAUMA3h4eDAIMAMGAQADAQAwAwYBAAMBAA==
 -----END CERTIFICATE-----
 
-phpseclib3\File\ASN1\Types\UTF8String Object
+phpseclib4\File\ASN1\Types\UTF8String Object
 (
     [value] => 0\x05\x0C\x03xxx
 )
-phpseclib3\File\ASN1\Element Object
+phpseclib4\File\ASN1\Element Object
 (
     [value] => 30050c03787878
 )
@@ -486,7 +486,7 @@ print_r($cert->getDNProps('2.9999999')[0]);
 The output of that is this:
 
 ```
-phpseclib3\File\ASN1\Element Object
+phpseclib4\File\ASN1\Element Object
 (
     [value] => 30050c03787878
 )
@@ -501,7 +501,7 @@ print_r($cert->getDNProps('2.9999999')[0]);
 The output of that is this:
 
 ```
-phpseclib3\File\ASN1\Types\UTF8String Object
+phpseclib4\File\ASN1\Types\UTF8String Object
 (
     [value] => 0
                 xxx

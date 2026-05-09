@@ -7,7 +7,7 @@ title: JavaScript
 Encrypting a string using AES-128-CBC with phpseclib:
 
 ```php
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 $cipher = new AES('cbc');
 $cipher->setKey(str_repeat('a', 16));
@@ -61,7 +61,7 @@ See it in action at https://jsfiddle.net/ewaysj3b/
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx

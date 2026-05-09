@@ -4,7 +4,7 @@
     <details>
       <summary>version</summary>
       <details open>
-        <summary>phpseclib3\File\ASN1\Types\Integer</summary>
+        <summary>phpseclib4\File\ASN1\Types\Integer</summary>
         <div>v1</div>
       </details>
     </details>
@@ -21,7 +21,7 @@
         <details>
           <summary>algorithm</summary>
           <details open>
-            <summary>phpseclib3\File\ASN1\Types\OID</summary>
+            <summary>phpseclib4\File\ASN1\Types\OID</summary>
             <div>0.0</div>
           </details>
         </details>
@@ -29,7 +29,7 @@
       <details>
         <summary>subjectPublicKey</summary>
         <details open>
-          <summary>phpseclib3\File\ASN1\Types\BitString</summary>
+          <summary>phpseclib4\File\ASN1\Types\BitString</summary>
           <div>00</div>
         </details>
       </details>
@@ -43,7 +43,7 @@
     <details>
       <summary>algorithm</summary>
       <details open>
-        <summary>phpseclib3\File\ASN1\Types\OID</summary>
+        <summary>phpseclib4\File\ASN1\Types\OID</summary>
         <div>0.0</div>
       </details>
     </details>
@@ -51,7 +51,7 @@
   <details>
     <summary>signature</summary>
     <details open>
-      <summary>phpseclib3\File\ASN1\Types\BitString</summary>
+      <summary>phpseclib4\File\ASN1\Types\BitString</summary>
       <div>00</div>
     </details>
   </details>

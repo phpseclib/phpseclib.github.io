@@ -6,7 +6,7 @@ sidebar_position: 3
 To use SFTP you'll need to use the SFTP class instead of the SSH2 class. eg.
 
 ```php
-use phpseclib3\Net\SFTP;
+use phpseclib4\Net\SFTP;
 
 $sftp = new SFTP('localhost');
 $sftp->login('username', 'password');
@@ -581,8 +581,8 @@ If only one version of SFTP is supported then the extensions key will most likel
 Files can alternatively be accessed with a stream wrapper:
 
 ```php
-use phpseclib3\Net\SFTP\Stream;
-use phpseclib3\Net\SFTP;
+use phpseclib4\Net\SFTP\Stream;
+use phpseclib4\Net\SFTP;
 
 Stream::register();
 

@@ -36,8 +36,8 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
   Let's say you had the public key exponent and the public key modulo as distinct string values. Let's further say that they were hex-encoded. At that point you could load the key thusly:
   
   ```php
-  use phpseclib3\Crypt\PublicKeyLoader;
-  use phpseclib3\Math\BigInteger;
+  use phpseclib4\Crypt\PublicKeyLoader;
+  use phpseclib4\Math\BigInteger;
   
   $key = PublicKeyLoader::load([
       'e' => new BigInteger($e, 16),
@@ -55,7 +55,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
   Keys can be created thusly:
   
   ```php
-  use phpseclib3\Crypt\RSA;
+  use phpseclib4\Crypt\RSA;
   
   $private = RSA::createKey();
   $public = $private->getPublicKey();

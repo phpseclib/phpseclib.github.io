@@ -28,7 +28,7 @@ $pfx->sign($x509);
 ## Reading PFXs
 
 ```php
-use phpseclib3\File\PFX;
+use phpseclib4\File\PFX;
 
 $pfx = PFX::load(file_get_contents('pfx.der'), 'password');
 
@@ -38,7 +38,7 @@ print_r($pfx);
 
 `password` is optional and is only needed if the PFX is encrypted.
 
-`$pfx`, in this case, is a PFX object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$pfx` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$pfx`, in this case, is a PFX object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$pfx` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <PFXEncrypted />
 
@@ -50,7 +50,7 @@ If an encrypted PFX is loaded without a password then `\phpseclib4\Exception\NoP
 
 All elements and subelements of the above PFX objects can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php).
 
-To learn more about the capabilities afforded to the PFX class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+To learn more about the capabilities afforded to the PFX class by virtue of it being a thin wrapper around \phpseclib4\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
 ### getAll()
 
@@ -108,7 +108,7 @@ Returns a PFX object containing all private key and X509 objects that are contai
 Consider the following:
 
 ```php
-use phpseclib3\File\PFX;
+use phpseclib4\File\PFX;
 
 $pfx = new PFX();
 echo $pfx;
@@ -184,7 +184,7 @@ Valid hash algorithms are:
 
 ## Creating signatures
 
-Signatures can be created from strings or from objects implementing the `phpseclib3\File\Common\Signable` interface.
+Signatures can be created from strings or from objects implementing the `phpseclib4\File\Common\Signable` interface.
 
 Example:
 

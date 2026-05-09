@@ -9,7 +9,7 @@ All C code samples use [OpenSSL](https://en.wikipedia.org/wiki/OpenSSL).
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -72,7 +72,7 @@ PKCS8 private keys can be loaded using this technique as well. OAEP is also supp
 Here's the phpseclib code to encrypt something with OAEP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx

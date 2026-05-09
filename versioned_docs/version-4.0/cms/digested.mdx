@@ -11,7 +11,7 @@ One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedi
 The method for loading a SignedData CMS is the same as loading any other CMS type:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('digested.pem'));
 
@@ -19,7 +19,7 @@ print_r($cms);
 ```
 <sup>([download digested.pem](pathname:///asn1/digested.pem.txt))</sup>
 
-`$cms`, in this case, is a `CMS\DigestedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$cms`, in this case, is a `CMS\DigestedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <DigestedData />
 
@@ -30,7 +30,7 @@ The digested content can be validaed by calling `$cms->validate()`.
 ## Creating DigestedData
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = new CMS\DigestedData(file_get_contents('...'));
 echo $cms;

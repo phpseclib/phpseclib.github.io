@@ -6,7 +6,7 @@ sidebar_position: 2
 ## Password
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $ssh = new SSH2('localhost');
 if (!$ssh->login('username', 'password')) {
@@ -19,8 +19,8 @@ If you're absolutely certain that the password / username you've entered are cor
 ## Public Key
 
 ```php
-use phpseclib3\Net\SSH2;
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Net\SSH2;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load(file_get_contents('privatekey'));
 
@@ -37,8 +37,8 @@ Public Key Authentication is one of the most secure ways to connect to a server.
 ## Password Protected Public Key
 
 ```php
-use phpseclib3\Net\SSH2;
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Net\SSH2;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load(file_get_contents('privatekey'), 'password');
 
@@ -51,7 +51,7 @@ if (!$ssh->login('username', $key)) {
 ## Keyboard-Interactive
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $ssh = new SSH2('localhost', 22);
 $result = $ssh->login('username', [
@@ -71,7 +71,7 @@ The method utilized in this example is mainly useful when you have multiple keyb
 ## Multi Factor
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $ssh = new SSH2('localhost');
 if (!$ssh->login('username', 'pass1', 'code1')) {
@@ -86,8 +86,8 @@ if (!$ssh->login('username', 'pass1', 'code1')) {
 ## SSH Agent
 
 ```php
-use phpseclib3\Net\SSH2;
-use phpseclib3\System\SSH\Agent;
+use phpseclib4\Net\SSH2;
+use phpseclib4\System\SSH\Agent;
 
 $agent = new Agent;
 
@@ -115,7 +115,7 @@ echo $ssh->exec('ssh user@domain.tld "ls -latr"');
 ## No Authentication
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $ssh = new SSH2('localhost');
 $ssh->login('username');

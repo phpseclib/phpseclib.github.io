@@ -23,7 +23,7 @@ Signatures can be verified and multiple signatures can be present.
 The method for loading a SignedData CMS is the same as loading any other CMS type:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('sample.p7m'));
 
@@ -31,7 +31,7 @@ print_r($cms);
 ```
 <sup>([download sample.p7m](pathname:///asn1/signed.p7m))</sup>
 
-`$cms`, in this case, is a `CMS\SignedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$cms`, in this case, is a `CMS\SignedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <SignedData />
 
@@ -65,7 +65,7 @@ Note that even if the distinguished names match, if the key usage extension isn'
 
 Additionally, if an [Enhanced Security Service (ESS)](https://datatracker.ietf.org/doc/html/rfc5035) attribute is present then both that AND the [SignerIdentifier](https://www.rfc-editor.org/rfc/rfc5652#section-5.3) will need to match the certificate.
 
-`getSigners()` returns an array of Signer objects and `findSigner()` returns either a single Signer object or null. The full namespace for the Signer object is `\phpseclib3\File\CMS\SignedData\Signer`.
+`getSigners()` returns an array of Signer objects and `findSigner()` returns either a single Signer object or null. The full namespace for the Signer object is `\phpseclib4\File\CMS\SignedData\Signer`.
 
 ### Extracting X509 certs
 
@@ -93,7 +93,7 @@ The same stipulations [discussed above](#extracting-signers) for `$cms->findSign
 Whereas `$cms->findSigner()` can take in an externally loaded X.509 certificate, `$signer->getCertificate()` looks _exclusively_ at certificates embedded within the CMS itself. <strong>If no corresponding certificate can be found then the signature will fail validation.</strong> If you have the certificate but it just does not happen to be embedded within the CMS you can add it to the CMS thusly:
 
 ```php
-$x509 = \phpseclib3\File\X509::load('...');
+$x509 = \phpseclib4\File\X509::load('...');
 $cms->addCertificate($x509);
 ```
 
@@ -127,7 +127,7 @@ The existance of an attribute can be tested for by doing `$signer->hasSignedAttr
 ### Minimalistic Example
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = new CMS\SignedData('');
 echo $cms;
@@ -187,7 +187,7 @@ The simplest way to create a signer - and to add a signature - is to do this:
 ```php
 $pfx->sign($cms);
 ```
-`$pfx`, in this case, is an instance of [\phpseclib3\File\PFX](/file/pfx.mdx).
+`$pfx`, in this case, is an instance of [\phpseclib4\File\PFX](/file/pfx.mdx).
 
 Doing that is _exactly_ the same thing as doing this:
 
@@ -213,7 +213,7 @@ Another way to add a signer:
 ```php
 $private->sign($cms);
 ```
-Where `$private` is an instance of `\phpseclib3\Crypt\Common\PrivateKey`.
+Where `$private` is an instance of `\phpseclib4\Crypt\Common\PrivateKey`.
 
 Doing that is basically the same thing as doing this:
 

@@ -9,7 +9,7 @@ Despite the fact that PHP has built-in support for some cryptographic operations
 Encryption with PHP / phpseclib:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx

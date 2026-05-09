@@ -4,7 +4,7 @@
     <details>
       <summary>utf8String</summary>
       <details open>
-        <summary>phpseclib3\File\ASN1\Types\UTF8String</summary>
+        <summary>phpseclib4\File\ASN1\Types\UTF8String</summary>
         <div>John Doe</div>
       </details>
     </details>
@@ -14,7 +14,7 @@
     <details>
       <summary>utf8String</summary>
       <details open>
-        <summary>phpseclib3\File\ASN1\Types\UTF8String</summary>
+        <summary>phpseclib4\File\ASN1\Types\UTF8String</summary>
         <div>111 Anywhere St</div>
       </details>
     </details>
@@ -24,7 +24,7 @@
     <details>
       <summary>utf8String</summary>
       <details open>
-        <summary>phpseclib3\File\ASN1\Types\UTF8String</summary>
+        <summary>phpseclib4\File\ASN1\Types\UTF8String</summary>
         <div>Anytown, TX, USA</div>
       </details>
     </details>

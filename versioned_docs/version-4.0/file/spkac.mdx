@@ -10,7 +10,7 @@ SPKAC is an acronym for [Signed Public Key and Challenge](https://en.wikipedia.o
 ## Reading SPKACs
 
 ```php
-use phpseclib3\File\SPKAC;
+use phpseclib4\File\SPKAC;
 
 $spkac = SPKAC::load(file_get_contents('spkac.txt'));
 
@@ -18,19 +18,19 @@ print_r($spkac);
 ```
 <sup>([download spkac.txt](pathname:///asn1/spkac.txt))</sup>
 
-`$spkac`, in this case, is a SPKAC object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$spkac` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$spkac`, in this case, is a SPKAC object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$spkac` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <GoodSPKAC />
-All elements and subelements of the above SPKAC object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$spkac['publicKeyAndChallenge']['spki']` or you could do `$spkac->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib3\File\ASN1\Constructed.
+All elements and subelements of the above SPKAC object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$spkac['publicKeyAndChallenge']['spki']` or you could do `$spkac->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib4\File\ASN1\Constructed.
 
-To learn more about the capabilities afforded to the SPKAC class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+To learn more about the capabilities afforded to the SPKAC class by virtue of it being a thin wrapper around \phpseclib4\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
 ### getPublicKey()
 
 ```php
 echo $spkac->getPublicKey();
 ```
-Returns a `\phpseclib3\Crypt\Common\PublicKey` object that, by default, gets cast to a PKCS8-encoded public key:
+Returns a `\phpseclib4\Crypt\Common\PublicKey` object that, by default, gets cast to a PKCS8-encoded public key:
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -64,7 +64,7 @@ Very rarely, SPKACs may not have a public key at all. You can test for this by d
 Consider the following:
 
 ```php
-use phpseclib3\File\SPKAC;
+use phpseclib4\File\SPKAC;
 
 $spkac = new SPKAC();
 echo $spkac;
@@ -85,7 +85,7 @@ If you did `print_r($spkac)` on that SPKAC you'd get this:
 Let's say you created your public key thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();
@@ -114,7 +114,7 @@ The challenge can be set by calling `$spkac->setChallenge()` and passing a strin
 Let's say you created your public key thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();

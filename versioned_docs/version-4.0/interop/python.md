@@ -9,7 +9,7 @@ All Python code samples use [PyCryptodome](https://www.pycryptodome.org/en/lates
 Encrypting a string using AES-128-CBC with phpseclib:
 
 ```php
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 $cipher = new AES('cbc');
 $cipher->setKey(str_repeat('a', 16));
@@ -40,7 +40,7 @@ Keep in mind that phpseclib, by default, pads it's ciphertext's. To disable this
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -85,7 +85,7 @@ PKCS1 keys are loaded in the same way as PKCS8 keys.
 OAEP encryption is supported as well. Here's the phpseclib code to encrypt something with OAEP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -133,7 +133,7 @@ print(plaintext)
 Signature creation with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PRIVATE KEY-----
 MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
@@ -177,7 +177,7 @@ else:
 PSS signatures are supported as well. Here's the phpseclib code to sign something with PSS:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('...')
     //->withPadding(RSA::SIGNATURE_PSS)

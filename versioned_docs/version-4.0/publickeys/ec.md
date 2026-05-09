@@ -60,7 +60,7 @@ Parameters consist of either the curve name or the curve parameters. They corres
 
 PKCS1 is the only format that supports Parameters. They can be extracted from a private or public key by doing `$key->getParameters()`.
 
-Whereas public and private keys are instances of `\phpseclib3\Crypt\Common\PublicKey` and `\phpseclib3\Crypt\Common\PrivateKey`, respectively, parameters are an instance of `phpseclib3\Crypt\EC\Parameters` (which is what `$key->getParameters()` returns).
+Whereas public and private keys are instances of `\phpseclib4\Crypt\Common\PublicKey` and `\phpseclib4\Crypt\Common\PrivateKey`, respectively, parameters are an instance of `phpseclib4\Crypt\EC\Parameters` (which is what `$key->getParameters()` returns).
 
 ## Supported Curves
 
@@ -114,7 +114,7 @@ A named curve can also be saved as a specified curve by doing `$key->toString('P
 Keys can be created thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('Ed25519');
 $public = $private->getPublicKey();
@@ -149,7 +149,7 @@ This format used with [JSON Web Signatures](https://en.wikipedia.org/wiki/JSON_W
 
 > This encoding was also proposed by the [IEEE 1363-2000](https://standards.ieee.org/ieee/1363/2049/) standard, and is sometimes referred to as the IEEE P1363 format. It differs from the [X.509](https://www.itu.int/rec/T-REC-X.509) signature structure, which is the default format produced by some tools and libraries such as [OpenSSL](https://www.openssl.org/).
 
-In the case of JSON Web Signatures the signature should also be passed through `\phpseclib3\Common\Functions\Strings::base64url_encode()`.
+In the case of JSON Web Signatures the signature should also be passed through `\phpseclib4\Common\Functions\Strings::base64url_encode()`.
 
 ### Raw
 

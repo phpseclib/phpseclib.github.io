@@ -16,7 +16,7 @@ So like if you wanted to sign multiple files you'd need multiple CMS's, one for 
 All CMS's are read basically the same way:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('sample.p7m'));
 

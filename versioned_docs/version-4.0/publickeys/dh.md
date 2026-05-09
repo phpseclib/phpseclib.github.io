@@ -6,7 +6,7 @@ Loading and saving keys is discussed in [Public Keys: Overview](overview.mdx).
 
 ## Supported Formats
 
-ECDH keys can be in any of the formats discussed in [Elliptic Curves: Supported Formats](ec.md#supported-formats). Calling `\phpseclib3\Crypt\PublicKeyLoader::load()` on keys of that formats will return a `\phpseclib3\Crypt\EC` object.
+ECDH keys can be in any of the formats discussed in [Elliptic Curves: Supported Formats](ec.md#supported-formats). Calling `\phpseclib4\Crypt\PublicKeyLoader::load()` on keys of that formats will return a `\phpseclib4\Crypt\EC` object.
 
 Regular DH keys can be of the following formats:
 
@@ -17,7 +17,7 @@ Regular DH keys can be of the following formats:
 
 A more in-depth discussion of these two formats can be found in [Common Key Formats](overview.mdx#common-key-formats).
 
-DH Public / Private keys will not be instances of `\phpseclib3\Crypt\Common\PublicKey` or `\phpseclib3\Crypt\Common\PrivateKey` but rather of `phpseclib3\Crypt\DH\PublicKey` and `phpseclib3\Crypt\DH\PrivateKey`.
+DH Public / Private keys will not be instances of `\phpseclib4\Crypt\Common\PublicKey` or `\phpseclib4\Crypt\Common\PrivateKey` but rather of `phpseclib4\Crypt\DH\PublicKey` and `phpseclib4\Crypt\DH\PrivateKey`.
 
 ## Creating Keys
 
@@ -26,7 +26,7 @@ ECDH keys can be created using the technique described in [Elliptic Curves: Crea
 Regular DH keys are created thusly:
 
 ```php
-use phpseclib3\Crypt\DH;
+use phpseclib4\Crypt\DH;
 
 $params = DH::createParameters(...);
 $private = DH::createKey($params, 160);
@@ -39,8 +39,8 @@ A discussion of the parameters that `DH::createParameters()` accepts follows:
 ### Specifying Prime and Base
 
 ```php
-use phpseclib3\Crypt\DH;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Crypt\DH;
+use phpseclib4\Math\BigInteger;
 
 $prime = new BigInteger('...');
 $base = new BigInteger(2);
@@ -54,7 +54,7 @@ $key = DH::createKey($params);
 The base, in this case, is assumed to be **2**.
 
 ```php
-use phpseclib3\Crypt\DH;
+use phpseclib4\Crypt\DH;
 
 $params = DH::createParameters(1024);
 DH::createKey($params);
@@ -63,7 +63,7 @@ DH::createKey($params);
 ### By Name
 
 ```php
-use phpseclib3\Crypt\DH;
+use phpseclib4\Crypt\DH;
 
 $params = DH::createParameters('diffie-hellman-group1-sha1');
 DH::createKey($params);
@@ -85,12 +85,12 @@ The following named primes are supported:
 
 Shared secrets can be computed by calling `DH::computeSecret($private, $public)`.
 
-The private key must be an instance of either `\phpseclib3\Crypt\DH\PrivateKey` or `\phpseclib3\Crypt\EC\PrivateKey`.
+The private key must be an instance of either `\phpseclib4\Crypt\DH\PrivateKey` or `\phpseclib4\Crypt\EC\PrivateKey`.
 
 ### With ECDH
 
-The public key can be either an instance `\phpseclib3\Crypt\EC\PublicKey` or a string representing an encoded coordinate.
+The public key can be either an instance `\phpseclib4\Crypt\EC\PublicKey` or a string representing an encoded coordinate.
 
 ### With DH
 
-The public key can either be an instance of `\phpseclib3\Crypt\DH\PublicKey`, a string (that will ultimately be parsed as a base-256 BigInteger) or an instance of `\phpseclib3\Math\BigInteger`.
+The public key can either be an instance of `\phpseclib4\Crypt\DH\PublicKey`, a string (that will ultimately be parsed as a base-256 BigInteger) or an instance of `\phpseclib4\Math\BigInteger`.

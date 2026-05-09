@@ -15,11 +15,11 @@ These describe *who someone is* and *what keys they hold*. They're the building 
 
 | Format | What it is | Class |
 | --- | --- | --- |
-| [X.509](x509.mdx) | A [certificate](https://en.wikipedia.org/wiki/X.509) - a public key bound to an identity, signed by a CA | `phpseclib3\File\X509` |
-| [CSR](csr.mdx) | A [Certificate Signing Request](https://en.wikipedia.org/wiki/Certificate_signing_request) - what you send to a CA to get an X.509 cert issued | `phpseclib3\File\CSR` |
-| [SPKAC](spkac.mdx) | A simpler alternative to CSRs ([Signed Public Key And Challenge](https://en.wikipedia.org/wiki/SPKAC)) | `phpseclib3\File\SPKAC` |
-| [CRL](crl.mdx) | A [Certificate Revocation List](https://en.wikipedia.org/wiki/Certificate_revocation_list) - what a CA publishes to announce that previously-issued certs are no longer valid | `phpseclib3\File\CRL` |
-| [PFX](pfx.mdx) | A bundle ([PKCS #12](https://en.wikipedia.org/wiki/PKCS_12)) that packages a private key together with its certificate (and often a chain), optionally encrypted with a password | `phpseclib3\File\PFX` |
+| [X.509](x509.mdx) | A [certificate](https://en.wikipedia.org/wiki/X.509) - a public key bound to an identity, signed by a CA | `phpseclib4\File\X509` |
+| [CSR](csr.mdx) | A [Certificate Signing Request](https://en.wikipedia.org/wiki/Certificate_signing_request) - what you send to a CA to get an X.509 cert issued | `phpseclib4\File\CSR` |
+| [SPKAC](spkac.mdx) | A simpler alternative to CSRs ([Signed Public Key And Challenge](https://en.wikipedia.org/wiki/SPKAC)) | `phpseclib4\File\SPKAC` |
+| [CRL](crl.mdx) | A [Certificate Revocation List](https://en.wikipedia.org/wiki/Certificate_revocation_list) - what a CA publishes to announce that previously-issued certs are no longer valid | `phpseclib4\File\CRL` |
+| [PFX](pfx.mdx) | A bundle ([PKCS #12](https://en.wikipedia.org/wiki/PKCS_12)) that packages a private key together with its certificate (and often a chain), optionally encrypted with a password | `phpseclib4\File\PFX` |
 
 ### Message wrapping
 
@@ -29,10 +29,10 @@ the [Cryptographic Message Syntax](https://en.wikipedia.org/wiki/Cryptographic_M
 
 | Format | What it does | Class |
 | --- | --- | --- |
-| [SignedData](cms/signed.mdx) | Signs a payload so recipients can verify origin and integrity | `phpseclib3\File\CMS\SignedData` |
-| [EncryptedData](cms/encrypted.mdx) | Encrypts a payload with a symmetric key | `phpseclib3\File\CMS\EncryptedData` |
-| [DigestedData](cms/digested.mdx) | Attaches a hash of a payload (no signature) | `phpseclib3\File\CMS\DigestedData` |
-| [CompressedData](cms/compressed.mdx) | Compresses a payload, typically as an inner layer before signing or encrypting | `phpseclib3\File\CMS\CompressedData` |
+| [SignedData](cms/signed.mdx) | Signs a payload so recipients can verify origin and integrity | `phpseclib4\File\CMS\SignedData` |
+| [EncryptedData](cms/encrypted.mdx) | Encrypts a payload with a symmetric key | `phpseclib4\File\CMS\EncryptedData` |
+| [DigestedData](cms/digested.mdx) | Attaches a hash of a payload (no signature) | `phpseclib4\File\CMS\DigestedData` |
+| [CompressedData](cms/compressed.mdx) | Compresses a payload, typically as an inner layer before signing or encrypting | `phpseclib4\File\CMS\CompressedData` |
 
 CMS containers stack. To sign-then-encrypt a payload, you wrap it in a `SignedData` and then wrap _that_ in an `EncryptedData`.
 

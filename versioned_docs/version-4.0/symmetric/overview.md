@@ -10,15 +10,15 @@ ChaCha20-Poly1305 is the best practices algorithm to be using at the time of thi
 
 Cryptography is easy to get wrong. If you don't know what you're doing you might use a bad algorithm (eg. DES), you might use a bad mode (eg. ECB), you might use a short password as a key, etc.
 
-phpseclib2 was pretty tolerant about this. A key that wasn't long enough would be null padded. An IV that wasn't provided would be assumed to be all null bytes. It was very forgiving and in so doing it almost enabled bad cryptography. phpseclib3, in contrast, has a much less forgiving API. If you leave a step out or don't provide enough data an Exception will be thrown.
+phpseclib2 was pretty tolerant about this. A key that wasn't long enough would be null padded. An IV that wasn't provided would be assumed to be all null bytes. It was very forgiving and in so doing it almost enabled bad cryptography. phpseclib4, in contrast, has a much less forgiving API. If you leave a step out or don't provide enough data an Exception will be thrown.
 
-Sure, phpseclib3 could be made to only include "good" algorithms and modes, but they might still be needed for interoperability purposes.
+Sure, phpseclib4 could be made to only include "good" algorithms and modes, but they might still be needed for interoperability purposes.
 
 ## StreamCipher vs BlockCipher
 
-All symmetric key classes extend `\phpseclib3\Crypt\Common\SymmetricKey` (as opposed to `\phpseclib3\Crypt\Common\AsymmetricKey`).
+All symmetric key classes extend `\phpseclib4\Crypt\Common\SymmetricKey` (as opposed to `\phpseclib4\Crypt\Common\AsymmetricKey`).
 
-Symmetric key classes extend either `\phpseclib3\Crypt\Common\StreamCipher` or `\phpseclib3\Crypt\Common\BlockCipher`, depending on whether or not they're a stream or block cipher, respectively.
+Symmetric key classes extend either `\phpseclib4\Crypt\Common\StreamCipher` or `\phpseclib4\Crypt\Common\BlockCipher`, depending on whether or not they're a stream or block cipher, respectively.
 
 The chief difference between the two is that stream ciphers only support one mode of operation whereas block ciphers support multiple modes of operation.
 
@@ -43,8 +43,8 @@ phpseclib provides implementations for the following block ciphers:
 ## High Level Example (using AES)
 
 ```php
-use phpseclib3\Crypt\AES;
-use phpseclib3\Crypt\Random;
+use phpseclib4\Crypt\AES;
+use phpseclib4\Crypt\Random;
 
 $cipher = new AES('ctr');
 $cipher->setIV(Random::string(16));
@@ -121,8 +121,8 @@ Padding is enabled by default.
 Normally `$cipher->encrypt('...') === $cipher->encrypt('...')` but, if you do `$cipher->enableContinuousBuffer()` then that will no longer be the case. Consider the following example:
 
 ```php
-use phpseclib3\Crypt\AES;
-use phpseclib3\Crypt\Random;
+use phpseclib4\Crypt\AES;
+use phpseclib4\Crypt\Random;
 
 $cipher = new AES('ctr');
 $cipher->setIV(Random::string(16));

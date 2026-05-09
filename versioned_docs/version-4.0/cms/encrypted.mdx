@@ -24,7 +24,7 @@ Also, technically, this class combines the [EnvelopedData](https://datatracker.i
 The method for loading an applicable CMS is the same as loading any other CMS type type:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('enveloped-keyagreerecipient.pem'));
 
@@ -32,7 +32,7 @@ print_r($cms);
 ```
 <sup>([download enveloped-keyagreerecipient.pem](pathname:///asn1/enveloped-keyagreerecipient.pem.txt))</sup>
 
-`$cms`, in this case, is a `CMS\EncryptedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$cms`, in this case, is a `CMS\EncryptedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <KeyAgreeRecipient />
 This particular example is using the KeyAgreeRecipient type.
@@ -42,7 +42,7 @@ This particular example is using the KeyAgreeRecipient type.
 If you know the content encryption key you can decrypt the underlying data as follows:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('sample.p7m'));
 
@@ -54,7 +54,7 @@ If you don't know the content encryption key but are able to derive it with pass
 ```php
 $message = $cms->deriveWithPassword('...')->decrypt();
 ```
-If you don't know the content encryption key but are able to derive it with another key, be it a symmetric key or a private key (an instance of `\phpseclib3\Crypt\Common\PrivateKey`), you can do so thusly:
+If you don't know the content encryption key but are able to derive it with another key, be it a symmetric key or a private key (an instance of `\phpseclib4\Crypt\Common\PrivateKey`), you can do so thusly:
 
 ```php
 $message = $cms->deriveWithKey($key)->decrypt();
@@ -99,7 +99,7 @@ Also, note that certificates and CRLs are only present if recipients are present
 ### Minimalistic Example
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = new CMS\EncryptedData('hello, world!');
 echo $cms;

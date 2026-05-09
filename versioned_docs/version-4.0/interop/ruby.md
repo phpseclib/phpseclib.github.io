@@ -9,7 +9,7 @@ All the ruby code samples can be previewed on https://replit.com/languages/ruby
 Signature creation with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PRIVATE KEY-----
 MIIBOgIBAAJBAKj34GkxFhD90vcNLYLInFEX6Ppy1tPf9Cnzj4p4WGeKLs1Pt8Qu
@@ -49,7 +49,7 @@ puts key.verify(OpenSSL::Digest::SHA256.new, signature, plaintext) ?
 PSS signatures are supported as well. Here's the phpseclib code to sign something with PSS:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('...')
     //->withPadding(RSA::SIGNATURE_PSS)

@@ -8,7 +8,7 @@ sidebar_position: 1
 As the "secure" part of Secure Shell (SSH) implies, SSH is designed to work over hostile networks. SSH encrypts your data so that eavesdroppers cannot read the data being sent back and forth and it provides a method that can be used to verify that the server you're connecting to hasn't been replaced with a hostile server. To facilitate the latter SSH servers have a host public key. Data that's unique to the SSH session is signed by the server and should be verified by the client with the host public key. Of course, simply verifying the signature is insufficient - you need to verify that the host public key is correct. X.509 / SSL / TLS does this with [certificate authorities](https://en.wikipedia.org/wiki/Certificate_authority) but in SSH, in theory, you'd get the host public key through some [out-of-band method](https://en.wikipedia.org/wiki/Out-of-band_agreement). In practice, however, people usually just cache the key the first time they connect to a server and assume all subsequent connections should be using that same key. How the expected host key is saved is up to the application designer (OpenSSH saves them in `~/.ssh/known_hosts`) but here is an example of how the host key would be retrieved from the SSH server (prior to authentication) and checked against the expected value (`$expected`):
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $ssh = new SSH2('localhost', 22);
 if ($expected != $ssh->getServerPublicHostKey()) {
@@ -23,7 +23,7 @@ The port number, incidentally, is optional. If not specified it will be assumed 
 ## Using an HTTP Proxy
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 $fsock = fsockopen('127.0.0.1', 80, $errno, $errstr, 1);
 if (!$fsock) {
@@ -47,7 +47,7 @@ echo $ssh->exec('ls -latr');
 ## Using a SOCKS5 Proxy
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 // SSH connection info
 $port = 22;
@@ -95,7 +95,7 @@ When specifying a numerical IPv6 address (e.g. `fe80::1`), you must enclose the 
 ## Binding to a Specific IP Address
 
 ```php
-use phpseclib3\Net\SSH2;
+use phpseclib4\Net\SSH2;
 
 // http://php.net/manual/en/context.socket.php
 $opts = [

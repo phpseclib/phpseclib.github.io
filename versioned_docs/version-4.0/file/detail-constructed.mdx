@@ -9,13 +9,13 @@ import { data, columns } from '@site/src/data/asn1ConstructedTable';
 
 ## Overview
 
-A `\phpseclib3\File\ASN1\Constructed` object (hereinafter referred to as `Constructed`) most typically corresponds to either an [ASN.1 SEQUENCE](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/sequence.html) or an [ASN.1 SET](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/set.html) and contains one or more child elements. They're essentially [trees](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) whose leaf nodes are non-`Constructed` instances of `\phpseclib3\File\ASN1\Types\BaseType`.
+A `\phpseclib4\File\ASN1\Constructed` object (hereinafter referred to as `Constructed`) most typically corresponds to either an [ASN.1 SEQUENCE](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/sequence.html) or an [ASN.1 SET](https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference/set.html) and contains one or more child elements. They're essentially [trees](https://en.wikipedia.org/wiki/Tree_(abstract_data_type)) whose leaf nodes are non-`Constructed` instances of `\phpseclib4\File\ASN1\Types\BaseType`.
 
 The following code sample shows how to load an X.509 certificate as a `Constructed` object:
 
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\File\ASN1\Maps\Certificate;
+use phpseclib4\File\ASN1;
+use phpseclib4\File\ASN1\Maps\Certificate;
 
 $x509 = ASN1::extractBER(file_get_contents('google.crt'));
 $x509 = ASN1::decodeBER($x509);
@@ -38,10 +38,10 @@ Superficially this looks identical to the [X509: Reading Certificates](x509#read
   None of the helper methods (`getPublicKey()`, `listExtensions()`, `getExtension()`, `setExtension()`, etc.) exist on a Constructed object. Constructed is intentionally generic and doesn't know enough about any specific data structure to define them.
 - **subjectPublicKey is a BitString.**
 
-  `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString` rather than a `phpseclib3\Crypt\Common\PublicKey`. `Constructed` doesn't know how to decode the bit string into a structured public key.
+  `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib4\File\ASN1\Types\BitString` rather than a `phpseclib4\Crypt\Common\PublicKey`. `Constructed` doesn't know how to decode the bit string into a structured public key.
 - **Extensions are OctetStrings.**
 
-  None of the entries in `$x509['tbsCertificate']['extensions']` are fleshed out. For example, `$x509['tbsCertificate']['extensions'][1]['extnValue']` (`id-ce-cRLDistributionPoints`) is a `\phpseclib3\File\ASN1\Types\OctetString` rather than a parsed distribution-points structure - again, because `Constructed` has no knowledge of individual extension formats.
+  None of the entries in `$x509['tbsCertificate']['extensions']` are fleshed out. For example, `$x509['tbsCertificate']['extensions'][1]['extnValue']` (`id-ce-cRLDistributionPoints`) is a `\phpseclib4\File\ASN1\Types\OctetString` rather than a parsed distribution-points structure - again, because `Constructed` has no knowledge of individual extension formats.
 - **getEncoded() returns an empty string after changes.**
 
   Modifying any value invalidates the cached encoding, and `Constructed` has no way to regenerate it. See [getEncoded()](#getencoded) and [Cache Invalidation](#cache-invalidation) for details.
@@ -49,7 +49,7 @@ Superficially this looks identical to the [X509: Reading Certificates](x509#read
 
   When the schema marks a field as `ASN1::TYPE_ANY` - meaning the bytes inside could be any valid ASN.1 structure - the decoder has no map to apply, so it leaves the field as a raw `Constructed`. This rarely surfaces in X.509 (most `ANY` fields there are leaf-shaped) but it's pervasive in [CMS](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax), where the format is built around content-type-tagged payloads that can only be decoded once you know which map to apply.
 
-Despite these differences, `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. That means both `X509` - and any class built the same way - share the following features:
+Despite these differences, `phpseclib4\File\X509` is described as a thin wrapper around `Constructed`. That means both `X509` - and any class built the same way - share the following features:
 
 ## getEncoded()
 
@@ -63,7 +63,7 @@ The interesting use case is signature validation. Let's start with a CSR, since 
 The straightforward path is [$csr->validateSignature()](csr.mdx#validating-signatures). The manual equivalent looks like this:
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = CSR::load(file_get_contents('csr.csr'));
 
@@ -95,8 +95,8 @@ What happens to `->getEncoded()` if you change a value inside an already-encoded
 #### Loading through ASN1:
 
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\File\ASN1\Maps\Certificate;
+use phpseclib4\File\ASN1;
+use phpseclib4\File\ASN1\Maps\Certificate;
 
 $x509 = ASN1::extractBER(file_get_contents('google.crt'));
 $x509 = ASN1::decodeBER($x509);
@@ -115,7 +115,7 @@ Changing the serial number invalidates the cached encoding, and the resulting ob
 #### Loading through X509:
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = X509::load(file_get_contents('google.crt'));
 
@@ -130,7 +130,7 @@ The X509 class re-encodes changed sub-structures on every [`offsetGet()`](https:
 #### Holding a reference into the structure:
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = X509::load(file_get_contents('google.crt'));
 
@@ -163,8 +163,8 @@ To compare these approaches, we'll use [bigcrl.bin](pathname:///asn1/bigcrl.crl)
 The following function is used for all tests. The performance changes based on whether the input is an array or an object, and whether the `unset()` line is active (which the `$optimize` parameter toggles).
 
 ```php
-use phpseclib3\File\CRL;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\File\CRL;
+use phpseclib4\Math\BigInteger;
 
 function findSN(CRL|array $crl, BigInteger $sn, bool $optimize = false): ?int
 {
@@ -258,8 +258,8 @@ This creates a potential denial-of-service vector. An attacker can craft a techn
 
 #### Example Attack Payload
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\File\ASN1;
+use phpseclib4\Math\BigInteger;
 
 $map = [
     'type' => ASN1::TYPE_SEQUENCE,
@@ -304,8 +304,8 @@ A drawback of lazy loading is that errors can go unnoticed.
 Consider this lazy-loaded X.509 certificate:
 
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\File\X509;
+use phpseclib4\File\ASN1;
+use phpseclib4\File\X509;
 
 $x509 = file_get_contents('google.crt');
 $x509 = ASN1::extractBER($x509);
@@ -320,8 +320,8 @@ The `id-ce-cRLDistributionPoints` extension is displayed without issue, despite 
 Now consider the eagerly loaded equivalent:
 
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\File\X509;
+use phpseclib4\File\ASN1;
+use phpseclib4\File\X509;
 
 $x509 = file_get_contents('google.crt');
 $x509 = ASN1::extractBER($x509);
@@ -339,8 +339,8 @@ But _where_, exactly? That's the subject of the next section.
 Consider the following code:
 
 ```php
-use phpseclib3\File\ASN1;
-use phpseclib3\File\X509;
+use phpseclib4\File\ASN1;
+use phpseclib4\File\X509;
 
 ASN1::enableBlobsOnBadDecodes();
 
@@ -354,7 +354,7 @@ Without the `ASN1::enableBlobsOnBadDecodes()` call, this would throw an exceptio
 
 <BadX509_1 />
 
-`$x509['tbsCertificate']['issuer']` is now an instance of `phpseclib3\File\ASN1\MalformedData` - pinpointing exactly where the corruption is.
+`$x509['tbsCertificate']['issuer']` is now an instance of `phpseclib4\File\ASN1\MalformedData` - pinpointing exactly where the corruption is.
 
 ## Array-Like Interface
 

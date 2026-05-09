@@ -12,7 +12,7 @@ import EmptyX509 from './inc/x509-empty.md';
 ## Reading Certificates
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = X509::load(file_get_contents('google.crt'));
 
@@ -20,17 +20,17 @@ print_r($x509);
 ```
 <sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
 
-`$x509`, in this case, is an X509 object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$x509` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$x509`, in this case, is an X509 object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$x509` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <GoodX509 />
 
-All elements and subelements of the above X509 object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$x509['tbsCertificate']['subjectPublicKeyInfo']` or you could do `$x509->getPublicKey()`. It's these helper functions that set the X509 class apart from \phpseclib3\File\ASN1\Constructed.
+All elements and subelements of the above X509 object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$x509['tbsCertificate']['subjectPublicKeyInfo']` or you could do `$x509->getPublicKey()`. It's these helper functions that set the X509 class apart from \phpseclib4\File\ASN1\Constructed.
 
-To learn more about the capabilities afforded to the X509 class by virtue of it being a thin wrapper around \phpseclib3\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
+To learn more about the capabilities afforded to the X509 class by virtue of it being a thin wrapper around \phpseclib4\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
 ### getPublicKey()
 
-Returns an instance of [\phpseclib3\Crypt\Common\PublicKey](publickeys/overview.mdx#publickey-vs-privatekey).
+Returns an instance of [\phpseclib4\Crypt\Common\PublicKey](publickeys/overview.mdx#publickey-vs-privatekey).
 
 ```php
 echo $x509->getPublicKey();
@@ -64,7 +64,7 @@ Running the above will produce an array with all the extensions that are in the 
 
 ### getExtension()
 
-Returns an array representing the first instance of an extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib3\File\ASN1\Types\BaseType`.
+Returns an array representing the first instance of an extension even if there are multiple instances. In this array `extnId` is a string, `critical` is a boolean and `extnValue` is an instance of `phpseclib4\File\ASN1\Types\BaseType`.
 
 If said extension isn't present then null is returned.
 
@@ -112,7 +112,7 @@ Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (D
 Consider the following:
 
 ```php
-use phpseclib3\File\X509;
+use phpseclib4\File\X509;
 
 $x509 = new X509();
 echo $x509;
@@ -156,7 +156,7 @@ That said, even when doing this, there are 3x things that are (probably) going t
 
 1. The serial number. It's set to be a random 160-bit positive number by default.
 
-   If you want to set your own serial number you can do so by calling `$x509->setSerialNumber()`. That function has one required parameter - `$serial` - and one optional parameter - `$base`. `$serial` can be a string or an instance of `phpseclib3\Math\BigInteger`. If it's a BigInteger then `$base` is ignored. If it's a string then that string will be intrepreted as a base-256 number by default unless you change the value of `$base`.
+   If you want to set your own serial number you can do so by calling `$x509->setSerialNumber()`. That function has one required parameter - `$serial` - and one optional parameter - `$base`. `$serial` can be a string or an instance of `phpseclib4\Math\BigInteger`. If it's a BigInteger then `$base` is ignored. If it's a string then that string will be intrepreted as a base-256 number by default unless you change the value of `$base`.
 
 2. The start date. It's set to the current time by default.
 
@@ -175,7 +175,7 @@ That said, even when doing this, there are 3x things that are (probably) going t
 Let's say you created your public key thusly:
 
 ```php
-use phpseclib3\Crypt\EC;
+use phpseclib4\Crypt\EC;
 
 $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();
@@ -194,7 +194,7 @@ echo $x509;
 ```
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = new CSR($public);
 $x509 = new X509($csr);
@@ -226,10 +226,10 @@ Issuer DN Methods:
 - [`addIssuerDNProps()`](detail-dns.mdx#adddnprops)
 - [`removeIssuerDNProps()`](detail-dns.mdx#removednprops)
 
-Additionally, the subject DN can be set by passing an instance of [`\phpseclib3\File\CSR`](csr.mdx) to the X509 constructor.
+Additionally, the subject DN can be set by passing an instance of [`\phpseclib4\File\CSR`](csr.mdx) to the X509 constructor.
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = CSR::load('...');
 $x509 = new X509($csr);
@@ -250,7 +250,7 @@ Some extensions have built in dedicated functions for manipulating them:
   In the case of `$x509->addDomains()`, if the subject DN does not already have `id-at-commonName` set then `$x509->addDomains()` will set it to the first domain name that you passed to it.
 - **id-ce-authorityKeyIdentifier** and **id-ce-subjectKeyIdentifier**
 
-  These extensions can be modified by calling `$x509->setAuthorityKeyIdentifier()` and `$x509->setSubjectKeyIdentifier()`, respectively. Both functions have one parameter - `$value` - that can be either a string or an instance of `\phpseclib3\File\ASN1\Types\OctetString`.
+  These extensions can be modified by calling `$x509->setAuthorityKeyIdentifier()` and `$x509->setSubjectKeyIdentifier()`, respectively. Both functions have one parameter - `$value` - that can be either a string or an instance of `\phpseclib4\File\ASN1\Types\OctetString`.
 
   [RFC5280 § 4.2.1.2. Subject Key Identifier](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.2) defines two methods for automatically generating `id-ce-subjectKeyIdentifier`. `$x509->createSubjectKeyIdentifier()`, by default, uses the first method, however, if you want the second method to be used, you can call `$x509->createSubjectKeyIdentifier(2)` instead.
 
@@ -337,7 +337,7 @@ Some of the things that are copied over, by default, shouldn't be copied over ve
 Here's an example of how some of the questionable fields could be removed and, in one case, full on replaced:
 
 ```php
-use phpseclib3\File\CSR;
+use phpseclib4\File\CSR;
 
 $csr = CSR::load('...');
 $x509 = new X509($csr);
@@ -363,8 +363,8 @@ Certificates can be signed with [private key objects](publickeys/overview.mdx) o
 Here's an example of how you'd create a self signed CA cert with a private key object:
 
 ```php
-use phpseclib3\Crypt\EC;
-use phpseclib3\File\X509;
+use phpseclib4\Crypt\EC;
+use phpseclib4\File\X509;
 
 $CAprivate = EC::createKey('nistp256');
 $CApublic = $CAprivate->getPublicKey();
@@ -378,7 +378,7 @@ $CAprivate->sign($CAX509);
 Here's an example of how you'd create a CA signed cert with a PFX object that builds on the above:
 
 ```php
-use phpseclib3\File\PFX;
+use phpseclib4\File\PFX;
 
 $pfx = new PFX();
 $pfx->add($CAprivate);

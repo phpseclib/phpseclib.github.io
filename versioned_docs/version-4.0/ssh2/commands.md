@@ -199,7 +199,7 @@ This outputs `passwd: password updated successfully` so I guess we're done! At t
 ## ANSI Escape Codes
 
 ```php
-use phpseclib3\File\ANSI;
+use phpseclib4\File\ANSI;
 
 $ansi = new ANSI;
 
@@ -212,7 +212,7 @@ echo $ansi->getScreen(); // outputs HTML
 
 Some commands issued to a terminal may yield [ANSI escape codes](http://en.wikipedia.org/wiki/ANSI_escape_code). eg. `^[[H`. These provide the terminal with information on the formating of the characters and their positioning.
 
-Since \phpseclib3\Net\SSH2 uses vt100 as the "TERM environment variable value" a [VT100](http://en.wikipedia.org/wiki/VT100) [terminal emulator](http://en.wikipedia.org/wiki/Terminal_emulator) is needed to properly handle the ANSI escape codes. \phpseclib3\File\ANSI aims to be such an emulator. The default screen size is 80x24.
+Since \phpseclib4\Net\SSH2 uses vt100 as the "TERM environment variable value" a [VT100](http://en.wikipedia.org/wiki/VT100) [terminal emulator](http://en.wikipedia.org/wiki/Terminal_emulator) is needed to properly handle the ANSI escape codes. \phpseclib4\File\ANSI aims to be such an emulator. The default screen size is 80x24.
 
 `$ansi->getScreen()` returns what'd be seen on the current screen. In the case of top this is desirable as it'll produce output like this:
 
@@ -241,7 +241,7 @@ Both functions return HTML with the various formatting properties specified by H
 ## Sending Special Characters
 
 ```php
-use phpseclib3\File\ANSI;
+use phpseclib4\File\ANSI;
 
 $ssh->setTimeout(2);
 $ssh->read();

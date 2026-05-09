@@ -13,7 +13,7 @@ Note that this feature requires the [zlib extension be installed](https://www.ph
 The method for loading a SignedData CMS is the same as loading any other CMS type:
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = CMS::load(file_get_contents('compressed.pem'));
 
@@ -21,7 +21,7 @@ print_r($cms);
 ```
 <sup>([download compressed.pem](pathname:///asn1/compressed.pem.txt))</sup>
 
-`$cms`, in this case, is a `CMS\CompressedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib3\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
+`$cms`, in this case, is a `CMS\CompressedData` object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](file/detail-constructed.mdx).  Passing `$cms` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <CompressedData />
 
@@ -32,7 +32,7 @@ The decompressed content can be extracted by calling `$cms->getContent()`.
 ## Creating CompressedData
 
 ```php
-use phpseclib3\File\CMS;
+use phpseclib4\File\CMS;
 
 $cms = new CMS\CompressedData(file_get_contents('...));
 echo $cms;

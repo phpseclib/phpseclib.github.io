@@ -18,7 +18,7 @@ See [Introduction - Speed § Security Tradeoffs](intro/speed.md#security-tradeof
 The recommended way to load public keys is to do so thusly:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load(file_get_contents('/path/to/key.pem'), $password = false);
 ```
@@ -26,20 +26,20 @@ The password is optional.
 
 So let's say you have a key that looks like `-----BEGIN PRIVATE KEY-----`. Is that an RSA key, a DSA key, an EC key, or what? With this approach you don't need to know what type the key is - it'll be automatically determined for you. Even passing in an X.509 certificate will work - you'll get back the public key portion of that certificate [^x509]
 
-If a key can't be loaded either a `phpseclib3\Exception\NoKeyLoadedException` exception will be thrown or a `phpseclib3\Exception\PasswordNeededException` will be thrown (if the key is encrypted and no password has been provided).
+If a key can't be loaded either a `phpseclib4\Exception\NoKeyLoadedException` exception will be thrown or a `phpseclib4\Exception\PasswordNeededException` will be thrown (if the key is encrypted and no password has been provided).
 
 If you know whether or not a key is a public or private but just don't know the type (eg. RSA, DSA, EC, etc) you can do `PublicKeyLoader::loadPublicKey()` or `PublicKeyLoader::loadPrivateKey()`.
 
 If you have a key that you believe should have been loadable but wasn't you can get more detailed information on why it didn't load if you know the key type (RSA, DSA, EC, etc) and the format. eg.
 
 ```php
-use phpseclib3\Crypt\RSA;
+use phpseclib4\Crypt\RSA;
 
 $key = RSA::loadFormat('PKCS1', file_get_contents('/path/to/key.pem'), 'password');
 ```
 (again, the password is optional)
 
-All successfully loaded keys are an instance of `phpseclib3\Crypt\Common\AsymmetricKey`.
+All successfully loaded keys are an instance of `phpseclib4\Crypt\Common\AsymmetricKey`.
 
 The format of a successfully loaded key can be determined by looking at `$key->getLoadedFormat()`. This will return a string. Note that keys embedded within X.509 certificates will not identify themselves as X.509 - rather, they'll identify themselves as PKCS8, due to various technical reasons.
 
@@ -52,9 +52,9 @@ The format of a successfully loaded key can be determined by looking at `$key->g
 Public and Private Keys can be distinguished as follows:
 
 ```php
-echo $key instanceof \phpseclib3\Crypt\Common\PublicKey ? 'public key' : 'private key';
+echo $key instanceof \phpseclib4\Crypt\Common\PublicKey ? 'public key' : 'private key';
 echo "\n";
-echo $key instanceof \phpseclib3\Crypt\Common\PrivateKey ? 'private key' : 'public key';
+echo $key instanceof \phpseclib4\Crypt\Common\PrivateKey ? 'private key' : 'public key';
 ```
 `PrivateKey` is an interface implementing the following methods:
 
@@ -104,7 +104,7 @@ d1dcce77ecc95e9fc8453fd2f07d`;
 
 The yellow highlighted portion is the signature subject and the blue highlighted portion is the signature, itself.
 
-Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib3\File\Common\Signable` interface.
+Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib4\File\Common\Signable` interface.
 
 The CMS in this example excludes certificates, has a detached signature, uses sha1 as the message digest and nistp192 as the curve, for brevity.
 
@@ -116,7 +116,7 @@ All AsymmetricKey objects are [immutable](https://en.wikipedia.org/wiki/Immutabl
 
 ## Supported Key Formats
 
-Supported key formats for a given algorithm can be determined by doing `\phpseclib3\Crypt\RSA::getSupportedKeyFormats()` (replace `RSA` with `DSA` or `EC` or whatever, as appropriate). What's returned is an associative array wherein the key is the name of the format and the value is the namespaced classname of the plugin that enables phpseclib to read the format.
+Supported key formats for a given algorithm can be determined by doing `\phpseclib4\Crypt\RSA::getSupportedKeyFormats()` (replace `RSA` with `DSA` or `EC` or whatever, as appropriate). What's returned is an associative array wherein the key is the name of the format and the value is the namespaced classname of the plugin that enables phpseclib to read the format.
 
 ## Common Key Formats
 
@@ -165,7 +165,7 @@ If you want to save an encrypted private key _without_ encryption then you'll ne
 By default, PKCS1 private keys uses AES-128-CBC as the encryption algorithm / mode. This can be configured thusly:
 
 ```php
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS1;
+use phpseclib4\Crypt\Common\Formats\Keys\PKCS1;
 
 PKCS1::setEncryptionAlgorithm('DES-EDE3-CBC');
 
@@ -249,7 +249,7 @@ Valid options for `PKCS8::setPRF` are as follows:
 Putting everthing together here's a complete example of how you'd change these parameters up:
 
 ```php
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS8;
+use phpseclib4\Crypt\Common\Formats\Keys\PKCS8;
 
 PKCS8::setEncryptionAlgorithm('id-PBES2');
 PKCS8::setEncryptionScheme('aes256-CBC-PAD');
@@ -275,7 +275,7 @@ echo $key
 Uniquely, the PKCS8 class has a `extractEncryptionAlgorithm` that'll let you see the encryption algorithm the key is using. This method does not exist for other key formats because, with other key formats, the format is in plain ASCII. In the case of PKCS8 it's embedded into the keys ASN.1 structure with OIDs. Here's an example of that:
 
 ```php
-use phpseclib3\Crypt\Common\Formats\Keys\PKCS8;
+use phpseclib4\Crypt\Common\Formats\Keys\PKCS8;
 
 print_r(PKCS8::extractEncryptionAlgorithm($key));
 ```
@@ -287,7 +287,7 @@ PuTTY private keys only support one encryption algorithm (aes256-cbc) so there a
 Both PuTTY public and private keys support comments, which can be changed thusly:
 
 ```php
-use phpseclib3\Crypt\Common\Formats\Keys\PuTTY;
+use phpseclib4\Crypt\Common\Formats\Keys\PuTTY;
 
 PuTTY::setComment('whatever');
 echo $key->toString('PuTTY');
@@ -304,7 +304,7 @@ PuTTY private keys only support one encryption algorithm (aes256-ctr) so there a
 Both OpenSSH public and private keys support comments, which can be changed thusly:
 
 ```php
-use phpseclib3\Crypt\Common\Formats\Keys\OpenSSH;
+use phpseclib4\Crypt\Common\Formats\Keys\OpenSSH;
 
 OpenSSH::setComment('whatever');
 echo $key->toString('OpenSSH');
@@ -316,12 +316,12 @@ echo $key->toString('OpenSSH', ['comment' => 'whatever']);
 
 ## Custom Key Formats
 
-Custom key formats can be added by doing `\phpseclib3\Crypt\RSA::addFileFormat()`. So let's say you wanted to be able to load keys created by [PEAR's Crypt_RSA](https://pear.php.net/package/Crypt_RSA). The following would be sufficient:
+Custom key formats can be added by doing `\phpseclib4\Crypt\RSA::addFileFormat()`. So let's say you wanted to be able to load keys created by [PEAR's Crypt_RSA](https://pear.php.net/package/Crypt_RSA). The following would be sufficient:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
-use phpseclib3\Crypt\RSA;
-use phpseclib3\Math\BigInteger;
+use phpseclib4\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\RSA;
+use phpseclib4\Math\BigInteger;
 
 class PEAR
 {

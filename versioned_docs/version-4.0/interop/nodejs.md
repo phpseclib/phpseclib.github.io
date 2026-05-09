@@ -7,7 +7,7 @@ title: Node.js
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\AES;
+use phpseclib4\Crypt\AES;
 
 $cipher = new AES('cbc');
 $cipher->setKey(str_repeat('a', 16));
@@ -39,7 +39,7 @@ console.log(plaintext.toString(CryptoJS.enc.Utf8));
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx
@@ -88,7 +88,7 @@ PKCS8 keys are supported as well as OAEP padding.
 Encryption with PHP:
 
 ```php
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $key = PublicKeyLoader::load('-----BEGIN RSA PUBLIC KEY-----
 MEgCQQCo9+BpMRYQ/dL3DS2CyJxRF+j6ctbT3/Qp84+KeFhnii7NT7fELilKUSnx

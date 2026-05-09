@@ -2,7 +2,7 @@
 title: Overview
 ---
 
-All exceptions thrown by phpseclib implement the `\phpseclib3\Exception\BaseException` interface and extend `\Exception`. Consequently, if you wanted to catch exceptions thrown _exclusively_ by phpseclib one could do `catch (\phpseclib3\Exception\BaseException $e)`.
+All exceptions thrown by phpseclib implement the `\phpseclib4\Exception\BaseException` interface and extend `\Exception`. Consequently, if you wanted to catch exceptions thrown _exclusively_ by phpseclib one could do `catch (\phpseclib4\Exception\BaseException $e)`.
 
 Exceptions are organized into several categories as elaborated below.
 

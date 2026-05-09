@@ -27,7 +27,7 @@ Parameters consist of P (prime), Q (group order) and G (group generator). Public
 
 PKCS1 is the only format that supports Parameters. They can be extracted from a private or public key by doing `$key->getParameters()`.
 
-Whereas public and private keys are instances of `\phpseclib3\Crypt\Common\PublicKey` and `\phpseclib3\Crypt\Common\PrivateKey`, respectively, parameters are an instance of `phpseclib3\Crypt\DSA\Parameters` (which is what `$key->getParameters()` returns).
+Whereas public and private keys are instances of `\phpseclib4\Crypt\Common\PublicKey` and `\phpseclib4\Crypt\Common\PrivateKey`, respectively, parameters are an instance of `phpseclib4\Crypt\DSA\Parameters` (which is what `$key->getParameters()` returns).
 
 ## Creating Keys
 
@@ -44,7 +44,7 @@ By providing **N** (length of group order Q) and **L** (length of prime P), the 
 An example follows:
 
 ```php
-use phpseclib3\Crypt\DSA;
+use phpseclib4\Crypt\DSA;
 
 $L = 2048;
 $N = 224;
@@ -60,7 +60,7 @@ With this approach P (prime), Q (group order) and G (group generator) are pre-co
 Here's an example of doing it using with `createParameters`:
 
 ```php
-use phpseclib3\Crypt\DSA;
+use phpseclib4\Crypt\DSA;
 
 $private = DSA::createKey(DSA::createParameters(2048, 224));
 $public = $private->getPublicKey();
@@ -70,8 +70,8 @@ This is basically the same thing as doing `DSA::createKey(2048, 224)`.
 Here's an example of creating a key by loading an existant parameters file:
 
 ```php
-use phpseclib3\Crypt\DSA;
-use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib4\Crypt\DSA;
+use phpseclib4\Crypt\PublicKeyLoader;
 
 $private = DSA::createKey(PublicKeyLoader::load(file_get_contents('...')));
 $public = $private->getPublicKey();
@@ -83,7 +83,7 @@ If no parameters are provided then the default paramters for `DSA::createParamet
 An example follows:
 
 ```php
-use phpseclib3\Crypt\DSA;
+use phpseclib4\Crypt\DSA;
 
 $private = DSA::createKey();
 $public = $private->getPublicKey();
