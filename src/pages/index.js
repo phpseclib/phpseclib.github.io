@@ -34,7 +34,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--secondary button--md"
-            to="/docs/file/x509">
+            to="/docs/file/overview">
             X509 / PFX / CMS / etc
           </Link>
         </div>
