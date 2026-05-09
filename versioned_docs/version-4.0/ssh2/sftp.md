@@ -472,8 +472,8 @@ For further reading see [PHP: fileperms - Manual](https://www.php.net/manual/en/
 ## File Attributes
 
 ```php
-$sftp->chmod(0777, 'filename.remote');
-//$sftp->chmod(0777, 'dirname.remote', true); // recursively change permissions on a directory
+$sftp->chmod('filename.remote', 0777);
+//$sftp->chmod('dirname.remote', 0777, true); // recursively change permissions on a directory
 // has the same syntax as http://php.net/touch
 $sftp->touch('filename.remote');
 $sftp->chown('filename.remote', $uid);
