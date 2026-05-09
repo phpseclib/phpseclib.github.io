@@ -53,14 +53,14 @@ In spite of that `phpseclib3\File\X509` is described as a thin wrapper around `C
 
 ## getEncoded()
 
-If you wanted to get the original BER encoding of the above X.509 certificate one need simply do this:
+`getEncoded()` returns the original BER-encoded bytes of an object. For our earlier X.509 certificate, that's just:
 
 ```php
 $x509->getEncoded();
 ```
-That's not super useful, however, so let's consider how one might validate a CSR signature. CSR's are easier to deal with in this case because you don't have to look at extensions or the date or anything like that.
+The interesting use case is signature validation. Let's start with a CSR, since CSRs avoid the complications of extensions, validity periods, and the rest of what comes with X.509.
 
-The easiest way to validate a CSR signature would be to call [$csr->validateSignature()](csr.mdx#validating-signatures), however, one could also do this:
+The straightforward path is [$csr->validateSignature()](csr.mdx#validating-signatures). The manual equivalent looks like this:
 
 ```php
 use phpseclib3\File\CSR;
@@ -76,23 +76,23 @@ echo $result ? 'valid' : 'invalid';
 ```
 <sup>([download csr.csr](pathname:///asn1/csr.txt))</sup>
 
-The output of that is `valid`.
+The output is `valid`.
 
-In this example `CSR::load()` is being used instead of `ASN1` exclusive methods because it makes getting the public key easier and makes for a more succinct example.
+A few notes on the example:
 
-In theory, for CSR's, the specific hashes could be auto set from `$csr['signatureAlgorithm']['algorithm']`, however, that doesn't work as well for (for example) X.509 certificates. Like for those, the signed cert would be the one that'd need to identify what algorithm the signing cert used - not the other way around. Plus, you should really be using `$x509->validateSignature()` instead, anyway.
+- **`CSR::load()` rather than the raw `ASN1` methods.** The resultant CSR object exposes `getPublicKey()` directly, which keeps the example short.
+- **The hash is hardcoded to `'sha1'`.** In principle it could be read from `$csr['signatureAlgorithm']['algorithm']`, but that pattern doesn't generalize. With X.509 certificates, for example, the relevant algorithm lives on the ∗signing∗ certificate, not the one being verified - and at that point you should be using `$x509->validateSignature()` anyway.
+- **`substr($csr['signature'], 1)` strips the leading octet.** Per [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2:
 
-`$csr['signature']` has the first byte dropped (vis-a-vis `substr()`) for this reason (from [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2):
+  > The initial octet shall encode, as an unsigned binary integer with bit 1 as the least significant bit, the number of unused bits in the final subsequent octet. The number shall be in the range zero to seven.
 
-> The initial octet shall encode, as an unsigned binary integer with bit 1 as the least significant bit, the number of unused bits in the final subsequent octet. The number shall be in the range zero to seven.
-
-`substr($csr['signature'], 1)` is an over simplification of that but (1) I have never seen a DER encoded string where the initial octet was anything other than 0 and (2) even if I had I'm trying to keep this example short and sweet.
+  Strictly speaking the leading octet could be nonzero, but I've never seen a real-world DER signature where it is, and handling the general case would only bloat the example.
 
 ### Cache Invalidation
 
-At this point an inquiring mind might wonder what happens to `->getEncoded()` if you change the value of something that's within the scope of the encoded variable. The answer depends on how you load it.
+What happens to `->getEncoded()` if you change a value inside an already-encoded structure ultimately depends on which class owns the data.
 
-Revisiting our original X.509 example:
+#### Loading through `ASN1`:
 
 ```php
 use phpseclib3\File\ASN1;
@@ -108,9 +108,11 @@ echo strlen($x509->getEncoded()) . "\n";
 ```
 <sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
 
-In this example, the first `strlen($x509->getEncoded())` returns 805 and the second `strlen($x509->getEncoded())` returns 0. The reason being that the encoded cache has been invalidated.
+Output: `805`, then `0`.
 
-Now let's switch things up:
+Changing the serial number invalidates the cached encoding, and the resulting object - an instance of `Constructed` - has no machinery to regenerate it.
+
+#### Loading through `X509`:
 
 ```php
 use phpseclib3\File\X509;
@@ -121,9 +123,11 @@ echo strlen($x509->getEncoded()) . "\n";
 $x509['tbsCertificate']['serialNumber'] = new BigInteger('deadbeef', 16);
 echo strlen($x509->getEncoded()) . "\n";
 ```
-In this example, the first `strlen($x509->getEncoded())` returns 805 and the second `strlen($x509->getEncoded())` returns 794. This is because the X509 class recompiles the changed portions of the X.509 certificates everytime [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) is called.
+Output: `805`, then `794`.
 
-Now let's switch things up yet again:
+The X509 class re-encodes changed sub-structures on every [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) call.
+
+#### Holding a reference into the structure:
 
 ```php
 use phpseclib3\File\X509;
@@ -138,84 +142,103 @@ echo strlen($x509['tbsCertificate']->getEncoded()) . "\n"; // outputs 643
 $cert = &$x509['tbsCertificate'];
 echo strlen($cert->getEncoded()) . "\n";                   // outputs 643
 ```
-In this example the first `strlen($cert->getEncoded())` returns 654 and the second `strlen($cert->getEncoded())` returns 0. This is because it's the `X509` class doing the recompiling - not the `Constructed` class. `$x509['tbsCertificate']` is calling [`offsetGet()`](https://www.php.net/manual/en/arrayaccess.offsetget.php) on the `X509` class but `$cert` isn't an instance of `X509` - it's an instance of `Constructed`. `Constructed` doesn't know how to reencode things so it doesn't - it just deletes the cached encoding information after it's been invalidated with a change.
+Once you take a reference, you're operating on a `Constructed` directly, and the `X509` re-encoding logic is bypassed. Going back through `$x509['tbsCertificate']` re-enters `X509::offsetGet()` and the value is rebuilt; refreshing `$cert` then picks up the rebuilt copy.
 
-At this point one might wonder what the benefit of having a cache even is. [Constructed: A Case Study](file/constructed-example.mdx) shows how it can introduce gotchas. The fact that it prevents gratuitous re-encoding notwithstanding it's also needed for signature validation. Like the definition for [CRLs](/file/crl.mdx) ([RFC 5280 pp. 56](https://www.rfc-editor.org/rfc/rfc5280#page-56)) says this of the version number:
+:::caution Why the encoding is cached
+[Constructed: A Case Study](file/constructed-example.mdx) covers the gotchas this caching creates, so it's fair to question why we even do it. Avoiding needless re-encoding is one reason, but the decisive one is signature validation. The CSR example above hints at it: `$csr['certificationRequestInfo']->getEncoded()` returns the bytes the signature was computed over, and those bytes must exactly match what the signer signed. Re-encoding doesn't always reproduce the original byte sequence - even under DER - so caching the original is what keeps that round trip reliable.
 
-```
-   TBSCertList  ::=  SEQUENCE  {
-        version                 Version OPTIONAL,
-                                     -- if present, MUST be v2
-```
+[RFC 4055 pp. 6](https://datatracker.ietf.org/doc/html/rfc4055#page-6) gives a concrete example involving the AlgorithmIdentifier parameters of RSASSA-PSS and RSAES-OAEP:
 
-So even if we're using the distinguished encoding rules (DER) the presence of that field is still up to the discretion of the software that created the CRL and just because phpseclib encodes it one way doesn't mean that OpenSSL would encode it the same way. Like it's valid ASN.1 encoding in either case but if you reconstruct the signature subject incorrectly then a signature that would have otherwise successfully validated all of a sudden might not.
+> [...] some implementations encode parameters as a NULL element while others omit them entirely. The correct encoding is to omit the parameters field; however, when RSASSA-PSS and RSAES-OAEP were defined, it was done using the NULL parameters rather than absent parameters.
+>
+> All implementations MUST accept both NULL and absent parameters as legal and equivalent encodings.
+:::
 
 ## Lazy and Eager Loading
 
-By default `Constructed` objects are [lazy loaded](https://en.wikipedia.org/wiki/Lazy_loading). To eager load a `Constructed` object (or any class that thinly wraps around said objects) one need only do `->toArray()` on the object in question.
+By default, `Constructed` objects **[lazy loaded](https://en.wikipedia.org/wiki/Lazy_loading)**. This means the library identifies the boundaries of the ASN.1 structure but defers the actual decoding of values until they are accessed. Calling `->toArray()` on a `Constructed` object will **eager load** it, converting the entire structure into a standard PHP array immediately.
 
-Some of the consequences of choosing one approach over another are discussed below.
+To compare these approaches, we'll use [bigcrl.bin](pathname:///asn1/bigcrl.crl), a **2.2MB** CRL containing **41,326** revoked serial numbers, and we'll search for the 40,000th entry (`120cd8`).
 
-### Speed and Memory Usage
-
-The chief advantage of lazy loading is lower memory usage.
-
-To illustrate this we'll use [bigcrl.bin](pathname:///asn1/bigcrl.crl), a 2.2mb CRL that has 41,326 revoked serial numbers, each with the `id-ce-cRLReasons` extension present. `120cd8` is the 40,000'th revoked serial number.
-
-We'll use this function to do the searching:
+The following function is used for all tests. The performance changes based on whether the input is an array or an object, and whether the `unset()` line is active (which the `$optimize` parameter toggles).
 
 ```php
-function findSN(CRL|array $crl, BigInteger $sn): ?int
+use phpseclib3\File\CRL;
+use phpseclib3\Math\BigInteger;
+
+function findSN(CRL|array $crl, BigInteger $sn, bool $optimize = false): ?int
 {
     $list = $crl['tbsCertList']['revokedCertificates'];
     $total = count($list);
     for ($i = 0; $i < $total; $i++) {
         if ($list[$i]['userCertificate']->equals($sn)) {
-            echo "found\n";
             return $i;
         }
-        //unset($list[$i]->decoded);
+        if ($optimize) {
+            // Immediately delete the decoded result to save RAM
+            unset($list[$i]->decoded);
+        }
     }
     return null;
 }
 ```
-Note the commented out `unset()`. We'll revisit that.
 
-Now let's run `findSN()` with some eager loading:
+#### Strategy 1: Eager Loading
+
+This strategy decodes every single entry in the CRL before the search even begins.
 
 ```php
-use phpseclib3\File\CRL;
-
 $sn = new BigInteger('120cd8', 16);
-
 $crl = CRL::load(file_get_contents('bigcrl.bin'));
 
-// lazy load $crl
 $start = microtime(true);
-$crl = $crl->toArray();
-$elapsed = microtime(true) - $start;
-echo "eager loading took $elapsed seconds\n";
+$eagerCrl = $crl->toArray(); // Decode everything now
+findSN($eagerCrl, $sn);
 
-// benchmark serial number search
-$start = microtime(true);
-findSN($crl, $sn);
-$elapsed = microtime(true) - $start;
-echo "searching took $elapsed seconds\n";
-echo 'peak memory usage was ' . memory_get_peak_usage() . "\n";
+echo "Time: " . (microtime(true) - $start) . "s\n";
+echo "Peak Memory: " . (memory_get_peak_usage() / 1024 / 1024) . "MB\n";
 ```
-On my computer, with PHP 8.3.14, eager loading via `->toArray()` took about **2s**. Searching took about **0.01s** and peak memory usage was **~323mb**, bringing the total script execution time to about **2.01s**.
 
-Now let's consider the same code with a suboptimal form of lazy loading. To do this all we need to do is comment out the `$crl = $crl->toArray()` line. When this is done searching, at least on my system, took **0.44s** and peak memory usage was **~151mb**. The total script execution time was **~1.57s faster**.
+- **Time:** ~2.0s to load, 0.01s to search.
+- **Peak Memory:** ~323MB
 
-Superficially, one might conclude that subsequent searches would also take ~0.44s, however, that's not the case, because, unless you explictly delete the decoded results (the `unset()` I mentioned earlier), things, once decoded, remain decoded. So if you do `findSN($crl, $sn)` a second time that second time, on my system, only took **0.08s**. Not as good as the 0.01s from when we did `->toArray()` but still better than 0.44s. The peak memory usage remains _relatively_ constant.
+#### Strategy 2: Standard Lazy Loading
 
-Now let's consider a more optimized form of lazy loading wherein we do the `unset()`. ie. after we test each entry in the CRL to see if it's a match we immediately delete the decoded results. If we do that `findSN($crl, $sn)` takes **0.44s**, as before, but peak memory usage drops to **~43mb**. Subsequent `findSN($crl, $sn)` calls take **0.38s**.
+Here, phpseclib only decodes entries as the loop hits them. Once decoded, entries are cached for future access.
 
-So, if all you're going to be doing is looking for a single serial number, the most efficient way to do so would be to make use of the "more optimized" approach.  Indeed, this is what [`isRevoked()`, `getRevokedInfo()` and `getRevokedIndex()`](crl.mdx#isrevoked) all do.
+```php
+$crl = CRL::load(file_get_contents('bigcrl.bin'));
 
-If, however, you're going to be searching for a whole bunch of serial numbers, it'd be faster to eager load the whole CRL.
+$start = microtime(true);
+findSN($crl, $sn); // Lazy loading happens inside the loop
 
-### Comparison Table
+echo "Time: " . (microtime(true) - $start) . "s\n";
+echo "Peak Memory: " . (memory_get_peak_usage() / 1024 / 1024) . "MB\n";
+```
+
+- **Time:** ~0.44s for the first search, ~0.08s for the second.
+- **Peak Memory:** ~151MB
+
+#### Strategy 3: Optimized Lazy Loading
+
+By manually unsetting the decoded property, we prevent the cache from growing.
+
+```php
+$crl = CRL::load(file_get_contents('bigcrl.bin'));
+
+$start = microtime(true);
+findSN($crl, $sn, true); // Use the optimize flag
+
+echo "Time: " . (microtime(true) - $start) . "s\n";
+echo "Peak Memory: " . (memory_get_peak_usage() / 1024 / 1024) . "MB\n";
+```
+
+- **Time:** ~0.44s for the first search, ~0.36s for the second.
+- **Peak Memory:** ~43MB (less than [PHP's default 128M memory limit](https://www.php.net/manual/en/ini.core.php#ini.sect.resource-limits))
+
+### Comparison Summary
+
+_Benchmarks performed on PHP 8.3.14_
 
 <SortableTable
   columns={columns}
@@ -226,41 +249,6 @@ If, however, you're going to be searching for a whole bunch of serial numbers, i
   getRowId={(r) => r.name}
   onRowSelect={(row, id) => console.log('selected', id, row)}
 />
-
-### Error Concealment
-
-A disadvantage of lazy loading is that errors may be overlooked.
-
-Consider the following lazy loaded X.509 certificate:
-
-```php
-use phpseclib3\File\X509;
-
-$x509 = file_get_contents('google.crt');
-$x509 = ASN1::extractBER($x509);
-$x509[100] = '.';
-$x509 = X509::load($x509);
-print_r($x509['tbsCertificate']['extensions'][1]->toArray());
-```
-<sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
-
-The `id-ce-cRLDistributionPoints` extension is able to be displayed without issue.
-
-Now consider the following eagerly loaded X.509 certificate:
-
-```php
-use phpseclib3\File\X509;
-
-$x509 = file_get_contents('google.crt');
-$x509 = ASN1::extractBER($x509);
-$x509[100] = '.';
-print_r(X509::load($x509)->toArray());
-```
-That throws an Exception.
-
-Lazy loading only results in exceptions being thrown if you try to access the malformed part of the X.509 certificate. So like `$x509['tbsCertificate']['extensions'][1]->toArray()` doesn't result in an error but `$x509['tbsCertificate']->toArray()` does.
-
-But where exactly is the error? That brings us to our next topic of discussion.
 
 ### Security Implications
 
@@ -309,14 +297,40 @@ Unlike a fixed-width integer, arc length is arbitrary. Using a [Variable Length 
 To calculate the final value, the parser must strip those 8th bits and "stitch" the remaining 7-bit chunks together. For massive, attacker-crafted OIDs, this requires intensive bit-shifting and BigInteger math. While most common arcs are small, the parser must be prepared for much larger values, like [128-bit UUIDs encoded under the 2.25 arc](https://healthcaresecprivacy.blogspot.com/2011/02/creating-and-using-unique-id-uuid-oid.html). Because these values exceed the 64-bit limit of native PHP integers, phpseclib uses BigInteger to ensure standards compliance and prevent overflow errors.
 :::
 
-#### Comparison Summary
+### Error Concealment
 
-| Feature | phpseclib v1 - v3 | phpseclib v4 |
-| :--- | :--- | :--- |
-| **Parsing Model** | Eager (Full Decode first) | Lazy (Decode on-demand) |
-| **Memory Profile** | Spikes with input size | Constant (Stream-based) |
-| **Vulnerability Fix** | Hard-coded size limits | Architectural isolation |
-| **Performance** | Blocked by complex children | Instant failure on invalid maps |
+A disadvantage of lazy loading is that errors may be overlooked.
+
+Consider the following lazy loaded X.509 certificate:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = file_get_contents('google.crt');
+$x509 = ASN1::extractBER($x509);
+$x509[100] = '.';
+$x509 = X509::load($x509);
+print_r($x509['tbsCertificate']['extensions'][1]->toArray());
+```
+<sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
+
+The `id-ce-cRLDistributionPoints` extension is able to be displayed without issue.
+
+Now consider the following eagerly loaded X.509 certificate:
+
+```php
+use phpseclib3\File\X509;
+
+$x509 = file_get_contents('google.crt');
+$x509 = ASN1::extractBER($x509);
+$x509[100] = '.';
+print_r(X509::load($x509)->toArray());
+```
+That throws an Exception.
+
+Lazy loading only results in exceptions being thrown if you try to access the malformed part of the X.509 certificate. So like `$x509['tbsCertificate']['extensions'][1]->toArray()` doesn't result in an error but `$x509['tbsCertificate']->toArray()` does.
+
+But where exactly is the error? That brings us to our next topic of discussion.
 
 ## Error Pinpointing
 
