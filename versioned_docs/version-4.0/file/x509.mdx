@@ -46,13 +46,13 @@ iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
 LWmtwHos+tDaIBKY0wIDAQAB
 -----END PUBLIC KEY-----
 ```
-Note that if the key is in an unsupported format then `$x509->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$x509['tbsCertificate']['subjectPublicKeyInfo']`.
+Note that if the key is in an unsupported format then `$x509->getPublicKey()` will throw a [UnexpectedValueException](exceptions/overview.md#unexpectedvalueexception). If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$x509['tbsCertificate']['subjectPublicKeyInfo']`.
 
 Very rarely, X.509 certificates may not have a public key at all. You can test for this by doing `$x509->hasPublicKey()`, which returns a boolean based on whether or not the certificate in question has a public key or not.
 
 ### listExtensions()
 
-"_Extensions can convey such data as additional subject identification information, key attribute information, policy information, and certification path constraints._" -- [RFC520 pp. 10](https://www.rfc-editor.org/rfc/rfc5280#page-10)
+"_Extensions can convey such data as additional subject identification information, key attribute information, policy information, and certification path constraints._" -- [RFC5280 pp. 10](https://www.rfc-editor.org/rfc/rfc5280#page-10)
 
 ```php
 print_r($x509->listExtensions());

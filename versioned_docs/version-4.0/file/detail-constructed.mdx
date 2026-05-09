@@ -25,31 +25,31 @@ print_r($x509);
 ```
 <sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
 
-In this example the `ASN1::extractBER()` is only needed because the X.509 certificate is a base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail). If it were a so-called DER (which stands for [Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), which is a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding)) then the `ASN1::extractBER()` call would be unnecessary.
+`ASN1::extractBER()` is only needed because the X.509 certificate is a base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail). If it were a DER ([Distinguished Encoding Rules](https://en.wikipedia.org/wiki/X.690#DER_encoding), a subset of the [Basic Encoding Rules](https://en.wikipedia.org/wiki/X.690#BER_encoding)) the call would be unnecessary.
 
-Anyway, the output of the above code snippet is this:
+The output looks like this:
 
 <SimpleX509 />
 
-Superficially this looks identical to the [X509: Reading Certificates](x509#reading-certificates) example but there are a few key differences:
+Superficially this looks identical to the [X509: Reading Certificates](x509#reading-certificates) example, but there are a few key differences:
 
-- **Helper methods not defined**
+- **Helper methods are not defined.**
 
-  None of the helper methods (eg. `getPublicKey()`, `listExtensions()`, `getExtension()`, `setExtension()`, etc) are present. `Constructed` classes are super generic and don't know enough about the underlying data structure to define helper methods.
-- **PublicKey is a BitString**
+  None of the helper methods (`getPublicKey()`, `listExtensions()`, `getExtension()`, `setExtension()`, etc.) exist on a Constructed object. Constructed is intentionally generic and doesn't know enough about any specific data structure to define them.
+- **subjectPublicKey is a BitString.**
 
-  `$x509['tbsCertificate']['subjectPublicKeyInfo']` is _not_ an instance of `phpseclib3\Crypt\Common\PublicKey` - it's an instance of `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString`. This is because `Constructed` is super generic and doesn't know how to further decode that.
-- **Extensions are OctetStrings**
+  `$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey']` is an instance of `\phpseclib3\File\ASN1\Types\BitString` rather than a `phpseclib3\Crypt\Common\PublicKey`. `Constructed` doesn't know how to decode the bit string into a structured public key.
+- **Extensions are OctetStrings.**
 
-  None of the extensions (`$x509['tbsCertificate']['extensions']`) are fleshed out. Like `$x509['tbsCertificate']['extensions'][1]['extnValue']` (id-ce-cRLDistributionPoints) is an instance of `\phpseclib3\File\ASN1\Types\OctetString`. As before, this is because `Constructed` is super generic and doesn't know how to further decode extensions.
-- **getEncoded() returns empty string when changes are made**
+  None of the entries in `$x509['tbsCertificate']['extensions']` are fleshed out. For example, `$x509['tbsCertificate']['extensions'][1]['extnValue']` (`id-ce-cRLDistributionPoints`) is a `\phpseclib3\File\ASN1\Types\OctetString` rather than a parsed distribution-points structure - again, because `Constructed` has no knowledge of individual extension formats.
+- **getEncoded() returns an empty string after changes.**
 
-  [getEncoded()](#getencoded) and it's subsection, [Cache Invalidation](#cache-invalidation), talk about this more, at length.
-- **ASN1::TYPE_ANY types are Elements**
+  Modifying any value invalidates the cached encoding, and `Constructed` has no way to regenerate it. See [getEncoded()](#getencoded) and [Cache Invalidation](#cache-invalidation) for details.
+- **Unmapped substructures stay as Constructed.**
 
-  This isn't a big issue in X.509 certificates (altho it may be for certain extensions) but in CMS's it's a much bigger issue from the get go. Like if a constructed TLV is encountered it can't be decoded any further without knowing what map to apply. Consequently, it'll be saved as an instance of `Constructed`.
+  When the schema marks a field as `ASN1::TYPE_ANY` - meaning the bytes inside could be any valid ASN.1 structure - the decoder has no map to apply, so it leaves the field as a raw `Constructed`. This rarely surfaces in X.509 (most `ANY` fields there are leaf-shaped) but it's pervasive in [CMS](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax), where the format is built around content-type-tagged payloads that can only be decoded once you know which map to apply.
 
-In spite of that `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. What that means is that both `X509` (or any class that's a "thin wrapper" around `Constructed`) has the following features:
+Despite these differences, `phpseclib3\File\X509` is described as a thin wrapper around `Constructed`. That means both `X509` - and any class built the same way - share the following features:
 
 ## getEncoded()
 
@@ -80,9 +80,9 @@ The output is `valid`.
 
 A few notes on the example:
 
-- **`CSR::load()` rather than the raw `ASN1` methods.** The resultant CSR object exposes `getPublicKey()` directly, which keeps the example short.
-- **The hash is hardcoded to `'sha1'`.** In principle it could be read from `$csr['signatureAlgorithm']['algorithm']`, but that pattern doesn't generalize. With X.509 certificates, for example, the relevant algorithm lives on the ∗signing∗ certificate, not the one being verified - and at that point you should be using `$x509->validateSignature()` anyway.
-- **`substr($csr['signature'], 1)` strips the leading octet.** Per [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2:
+- **CSR::load() is used rather than the raw ASN1 methods.** The resultant CSR object exposes `getPublicKey()` directly, which keeps the example short.
+- **The hash is hardcoded to 'sha1'.** In principle it could be read from `$csr['signatureAlgorithm']['algorithm']`, but that pattern doesn't generalize. With X.509 certificates, for example, the relevant algorithm lives on the ∗signing∗ certificate, not the one being verified - and at that point you should be using `$x509->validateSignature()` anyway.
+- **substr($csr['signature'], 1) strips the leading octet.** Per [X.690](https://en.wikipedia.org/wiki/X.690) &sect; 8.6.2.2:
 
   > The initial octet shall encode, as an unsigned binary integer with bit 1 as the least significant bit, the number of unused bits in the final subsequent octet. The number shall be in the range zero to seven.
 
@@ -92,7 +92,7 @@ A few notes on the example:
 
 What happens to `->getEncoded()` if you change a value inside an already-encoded structure ultimately depends on which class owns the data.
 
-#### Loading through `ASN1`:
+#### Loading through ASN1:
 
 ```php
 use phpseclib3\File\ASN1;
@@ -112,7 +112,7 @@ Output: `805`, then `0`.
 
 Changing the serial number invalidates the cached encoding, and the resulting object - an instance of `Constructed` - has no machinery to regenerate it.
 
-#### Loading through `X509`:
+#### Loading through X509:
 
 ```php
 use phpseclib3\File\X509;
@@ -299,11 +299,12 @@ To calculate the final value, the parser must strip those 8th bits and "stitch" 
 
 ### Error Concealment
 
-A disadvantage of lazy loading is that errors may be overlooked.
+A drawback of lazy loading is that errors can go unnoticed.
 
-Consider the following lazy loaded X.509 certificate:
+Consider this lazy-loaded X.509 certificate:
 
 ```php
+use phpseclib3\File\ASN1;
 use phpseclib3\File\X509;
 
 $x509 = file_get_contents('google.crt');
@@ -314,11 +315,12 @@ print_r($x509['tbsCertificate']['extensions'][1]->toArray());
 ```
 <sup>([download google.crt](pathname:///asn1/google.crt.txt))</sup>
 
-The `id-ce-cRLDistributionPoints` extension is able to be displayed without issue.
+The `id-ce-cRLDistributionPoints` extension is displayed without issue, despite the corruption introduced at byte 100.
 
-Now consider the following eagerly loaded X.509 certificate:
+Now consider the eagerly loaded equivalent:
 
 ```php
+use phpseclib3\File\ASN1;
 use phpseclib3\File\X509;
 
 $x509 = file_get_contents('google.crt');
@@ -326,17 +328,18 @@ $x509 = ASN1::extractBER($x509);
 $x509[100] = '.';
 print_r(X509::load($x509)->toArray());
 ```
-That throws an Exception.
+This throws an exception.
 
-Lazy loading only results in exceptions being thrown if you try to access the malformed part of the X.509 certificate. So like `$x509['tbsCertificate']['extensions'][1]->toArray()` doesn't result in an error but `$x509['tbsCertificate']->toArray()` does.
+With lazy loading, an exception is raised only if you actually touch the malformed part of the certificate. `$x509['tbsCertificate']['extensions'][1]->toArray()` succeeds because byte 100 falls outside that subtree; `$x509['tbsCertificate']->toArray()` fails because the corruption is somewhere within `tbsCertificate`.
 
-But where exactly is the error? That brings us to our next topic of discussion.
+But _where_, exactly? That's the subject of the next section.
 
 ## Error Pinpointing
 
 Consider the following code:
 
 ```php
+use phpseclib3\File\ASN1;
 use phpseclib3\File\X509;
 
 ASN1::enableBlobsOnBadDecodes();
@@ -347,22 +350,22 @@ $x509[100] = '.';
 $x509 = X509::load($x509)->toArray();
 print_r($x509);
 ```
-If it weren't for the `ASN1::enableBlobsOnBadDecodes()` call, the above code would throw an exception. With that method call, however, we get this:
+Without the `ASN1::enableBlobsOnBadDecodes()` call, this would throw an exception. With it, we get:
 
 <BadX509_1 />
 
-From that we can see that `$x509['tbsCertificate']['issuer']` is set to an instance of `phpseclib3\File\ASN1\MalformedData`. This is where the issue is.
+`$x509['tbsCertificate']['issuer']` is now an instance of `phpseclib3\File\ASN1\MalformedData` - pinpointing exactly where the corruption is.
 
 ## Array-Like Interface
 
-Despite being an object, the dynamic elements of `Constructed` objects are accessed using array syntax. eg. `$x509['tbsCertificate']['extensions']`. This is due to `Constucted` objects implementing the [`ArrayAccess`](https://www.php.net/manual/en/class.arrayaccess.php) interface.
+Despite being objects, `Constructed` instances expose their dynamic elements through array syntax - e.g., `$x509['tbsCertificate']['extensions']`. This is because `Constructed` implements the [`ArrayAccess`](https://www.php.net/manual/en/class.arrayaccess.php) interface.
 
-Because `Constructed` objects implement the [`Countable`](https://www.php.net/manual/en/class.countable.php) interface you can do `count($x509['tbsCertificate']['extensions'])` and because `Constructed` objects implement the [`Iterator`](https://www.php.net/manual/en/class.iterator.php) interface you can do `foreach` on a `Constructed` object.
+It also implements [`Countable`](https://www.php.net/manual/en/class.countable.php) and [`Iterator`](https://www.php.net/manual/en/class.iterator.php), so `count($x509['tbsCertificate']['extensions']`) works as expected and foreach iterates over child elements directly.
 
-There are some things that PHP can do with arrays that don't make a lot of sense in the context `Constructed`. For example, it's unclear why one would want to [`sort()`](https://www.php.net/sort) a `Constructed` object. It is actually for that reason that `Constructed` objects do NOT implement the [`ArrayObject`](https://www.php.net/manual/en/class.arrayobject.php).
+What Constructed does _not_ implement is [`ArrayObject`](https://www.php.net/manual/en/class.arrayobject.php). PHP can do many things with arrays that don't translate sensibly to a `Constructed` - it's unclear, for example, what it would mean to [`sort()`](https://www.php.net/sort) one - so those operations are deliberately left out.
 
-That said, there are other things that PHP can do with arrays that _would_ make sense for `Constructed` objects to support but for which no mechanism exists in PHP. The most notable example of this is probably [`array_keys()`](https://www.php.net/array-keys), however, one can get similar functionality by doing `->keys()`.
+In the other direction, there are array operations that would make sense for `Constructed` but for which PHP exposes no overridable hook. The most notable is [`array_keys()`](https://www.php.net/array-keys); the closest equivalent is the `->keys()` method on the object itself.
 
 ## Wrapping Constructed
 
-As has already been observed, `Constructed` objects don't have any bells and whistles. If you wanted to build out a new class with bells and whistles one can find a limited tutorial at [Constructed: A Case Study](constructed-example.mdx).
+As noted earlier, `Constructed` objects are deliberately bare-bones. If you want to build a class that adds higher-level conveniences on top of one - the way `X509` does - there's a walkthrough at [Constructed: A Case Study](constructed-example.mdx).

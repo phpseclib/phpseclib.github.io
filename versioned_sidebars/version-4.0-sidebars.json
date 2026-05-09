@@ -44,6 +44,7 @@
       "type": "category",
       "label": "Files",
       "items": [
+        "file/overview",
         "file/x509",
         "file/pfx",
         "file/csr",
