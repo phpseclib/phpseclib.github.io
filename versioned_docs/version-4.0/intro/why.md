@@ -6,7 +6,7 @@ phpseclib provides pure-PHP implementations of SSH2, SFTP, RSA, DSA, Elliptic Cu
 
 ## Portability
 
-The only requirement that phpseclib 3.0 has is that you must be using PHP 5.6+.
+The only requirement that phpseclib 4.0 has is that you must be using PHP 8.1.0+
 
 Extensions like bcmath, gmp, libsodium and openssl, if they're available, for speed, but they're not required.
 

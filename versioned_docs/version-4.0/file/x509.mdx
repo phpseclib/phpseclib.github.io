@@ -421,7 +421,7 @@ When validating a signature it may be necessary to download intermediate certs f
 
 If you want to disable the fetching of intermediate certificates via URI's altogether you can do so by calling `X509::disableURLFetch()`.  The fetching of said certificates can be re-enabled by calling `X509::enableURLFetch()`.
 
-To validate a certificate against certificate revocation lists one would need to pass a custom [anonymous function](https://www.php.net/manual/en/functions.anonymous.php) to [X509::setInCRLFunction()](crl.mdx#using-crls-in-practice).
+To validate a certificate against certificate revocation lists one would need to pass a custom [anonymous function](https://www.php.net/manual/en/functions.anonymous.php) to [X509::setCRLLookupCallback()](crl.mdx#using-crls-in-practice).
 
 By default the key usage is checked when a signature is validated. Like is the issuer actually authorized to sign children certificates? To disable this check one need simply call `X509::ignoreKeyUsage()`. To re-enable this check one need simply call `X509::checkKeyUsage()`.
 

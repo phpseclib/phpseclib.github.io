@@ -232,13 +232,13 @@ echo $crl->getRevokedExtension(
 
 Real world CRLs can be fairly large. For example, [Deep Dive: ASN1\Constructed Objects: Speed and Memory Usage](detail-constructed.mdx#speed-and-memory-usage) discusses a 2.2mb CRL, and who wants to download 2.2mb every time you're making an AJAX request for 10 bytes of data? This is why CRLs have thisUpdate and nextUpdate as fields (`$crl['tbsCertList']['thisUpdate']` and `$crl['tbsCertList']['nextUpdate']`, respectively).
 
-Of course, those fields are only of use if you _already_ have downloaded the CRL. So how do you store a CRL that's valid for ten days from the moment that you first downloaded it? That's where `X509::setInCRLFunction()` comes into play. Here's an example of its being used:
+Of course, those fields are only of use if you _already_ have downloaded the CRL. So how do you store a CRL that's valid for ten days from the moment that you first downloaded it? That's where `X509::setCRLLookupCallback()` comes into play. Here's an example of its being used:
 
 ```php
 $x509 = X509::load('google.crt');
 $CRLCache = [];
 $cacheHits = $cacheMisses = 0;
-X509::setInCRLFunction(function(string $url, BigInteger $serial) use (&$CRLCache, &$cacheHits, &$cacheMisses): bool {
+X509::setCRLLookupCallback(function(string $url, BigInteger $serial) use (&$CRLCache, &$cacheHits, &$cacheMisses): bool {
     if (isset($CRLCache[$url])) {
         $cacheHits++;
     } else {
@@ -250,7 +250,7 @@ X509::setInCRLFunction(function(string $url, BigInteger $serial) use (&$CRLCache
 });
 echo $x509->validateNonRevokedStatus() ? 't' : 'f';
 ```
-Whatever the function that's being passed to `X509::setInCRLFunction()` is, it needs to have two parameters - `$url` (a string) and `$serial` (an instance of \phpseclib4\Math\BigInteger). The output should be a boolean, true if the serial number is in the certificate, false if it isn't.
+Whatever the function that's being passed to `X509::setCRLLookupCallback()` is, it needs to have two parameters - `$url` (a string) and `$serial` (an instance of \phpseclib4\Math\BigInteger). The output should be a boolean, true if the serial number is in the certificate, false if it isn't.
 
 Changes you'd want to make to that function before using it in the real world:
 
