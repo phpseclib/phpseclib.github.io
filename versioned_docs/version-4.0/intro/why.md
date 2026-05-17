@@ -14,7 +14,7 @@ Extensions like bcmath, gmp, libsodium and openssl, if they're available, for sp
 
 Given that phpseclib 3 will continue to be supported for the foreseeable future (just as phpseclib 2 has yet to be EOL'd, there's no reason to assume v3 will be EOL'd even years out), one might wonder why they should expend the energy to upgrade to v4. Among other things, v4 adds features that really weren't possible with v3, and it addresses a number of pain points with v3.
 
-### Dedicated classes for X.509, CSR, CRL, and SPKAC
+### Dedicated X.509, CSR, CRL, SPKAC classes
 
 In phpseclib 3, all four formats lived inside a single `File\X509` super-class. You'd `new X509()` and then call `loadX509()` or `loadCSR()` or `loadCRL()` or `loadSPKAC()` on the same object, and the object would change personality depending on what you'd loaded into it most recently. Saving worked the same way (`saveX509()`, `saveCSR()`, `saveCRL()`, `saveSPKAC()`), and the methods you could meaningfully call between load and save depended on which kind of file you were holding. The class was big, the modes overlapped in unexpected places, and the type system couldn't help you tell a "CSR mode" `X509` apart from a "cert mode" one.
 
@@ -33,12 +33,14 @@ $crl  = CRL::load(file_get_contents('list.crl'));
 
 That gives you smaller, more focused classes, proper types you can write in your own function signatures, and an API surface where every method on every class is unambiguously applicable to the file it lives on. PEM output is via `echo $csr` (or `(string) $csr`); binary DER is via `$csr->toString(['binary' => true])`.
 
+See the per-class references for the full API: [X509](../file/x509.mdx), [CSR](../file/csr.mdx), [CRL](../file/crl.mdx), [SPKAC](../file/spkac.mdx).
+
 ### Brand-new PFX and CMS support
 
 phpseclib 4 adds first-class support for two formats that 3.0 didn't cover at all:
 
-- **`phpseclib4\File\PFX`** for reading and writing password-protected PFX / PKCS#12 bundles (certificates + private keys + metadata; the format Windows and Apple Keychain use for identity import/export).
-- **`phpseclib4\File\CMS`** for reading and writing CMS / PKCS#7 envelopes: `SignedData`, `EnvelopedData`, `EncryptedData`, `CompressedData`, `DigestedData`. Files with `.p7m` / `.p7s` extensions.
+- **`phpseclib4\File\PFX`** for reading and writing password-protected PFX / PKCS#12 bundles (certificates + private keys + metadata; the format Windows and Apple Keychain use for identity import/export). See [the PFX reference](../file/pfx.mdx).
+- **`phpseclib4\File\CMS`** for reading and writing [CMS / PKCS#7 envelopes](../cms/overview.md): `SignedData`, `EnvelopedData`, `EncryptedData`, `CompressedData`, `DigestedData`. Files with `.p7m` / `.p7s` extensions.
 
 3.0 codebases that needed either of these had to fall back on PHP's `openssl_pkcs12_*` / `openssl_cms_*` functions or shell out to the `openssl` CLI. In 4.0 it's all native. See the OpenSSL comparison below for what phpseclib's versions do that PHP's `openssl_*` bindings don't.
 
@@ -78,7 +80,9 @@ echo $x509;             // PEM of the signed cert, either way
 
 The thing being signed is anything that implements `Signable`: `X509`, `CSR`, `CRL`, `SPKAC`, or `CMS\SignedData`. Same shape whether you're signing a CSR you got from a customer, building a CRL, or producing a CMS-signed document. Raw byte signing (`$priv->sign($bytes)` returning the raw signature) works identically; `$bytes` is just one of several things you can pass.
 
-### ASN.1 designed to eliminate a class of parser vulnerabilities, not patch around them
+The signing surface is covered in detail in the [PFX](../file/pfx.mdx), [X509](../file/x509.mdx), [CSR](../file/csr.mdx), [CRL](../file/crl.mdx), and [CMS SignedData](../cms/signed.mdx) references.
+
+### Hardened ASN.1 parsing
 
 This one is worth a moment.
 
@@ -89,6 +93,8 @@ phpseclib 3 parsed ASN.1 eagerly. `decodeBER()` consumed the entire input and pr
 phpseclib 4 parses lazily and shape-first. `decodeBER()` returns a one-level summary; nested constructed types appear as `phpseclib4\File\ASN1\Constructed` objects that decode only when something actually reaches into them. The schema check runs against the shallow structure first, and the interior is only decoded if the schema is happy. Combined with hard caps on things like OID encoded length, this architecturally eliminates the parser-DoS attack surface: the malicious bytes never reach a parser that could be tricked into running expensive operations on them.
 
 This is the kind of change that's invisible if your inputs are all well-formed (which they usually are), and it's the kind of change you can't easily backport without rewriting the parser, which is what 4.0 did.
+
+If you're parsing custom ASN.1 with `ASN1::decodeBER()` directly, the [Deep Dive: ASN1\Constructed Objects](../file/detail-constructed.mdx) reference walks through what the new shape looks like and how to work with it.
 
 ### Type hints throughout
 
@@ -101,12 +107,12 @@ phpseclib 3 had to run on PHP 5.6, which meant no scalar type declarations, no r
 ### Other notable changes
 
 - **`Crypt\Random` is gone.** Use PHP's built-in `random_bytes()`.
-- **Exceptions instead of `false` returns** in most places, with a consistent `phpseclib4\Exception\` hierarchy (v3 threw a mix of `\RuntimeException`, `\UnexpectedValueException`, etc., for effectively identical conditions). Recursive SFTP operations like `delete()` on a directory tree are the exception (they keep going past partial failures and report via `SFTP::getErrors()`). See the [migration guide](/migrating-3-to-4.md) for the details.
+- **Exceptions instead of `false` returns** in most places, with a consistent [`phpseclib4\Exception\`](../exceptions/overview.md) hierarchy (v3 threw a mix of `\RuntimeException`, `\UnexpectedValueException`, etc., for effectively identical conditions). Recursive SFTP operations like `delete()` on a directory tree are the exception (they keep going past partial failures and report via `SFTP::getErrors()`). See the [migration guide](migrating.md) for the details.
 - **`SFTP::chmod()` argument order swapped.** It's `chmod($path, $mode)` now, consistent with every other SFTP method. (3.0 had `chmod($mode, $path)`, the lone outlier.)
 
 The namespace has also been changed from `\phpseclib3` to `\phpseclib4`.
 
-For specifics on how to migrate, see [Migrating from 3.0 to 4.0](/migrating-3-to-4.md).
+For specifics on how to migrate, see [Migrating from 3.0](migrating.md).
 
 phpseclib 1.0 / 2.0 documentation lives at http://phpseclib.sourceforge.net/
 
@@ -146,13 +152,13 @@ For the things PHP's OpenSSL bindings *do* cover, there's still a lot phpseclib 
 
 PHP's OpenSSL bindings don't have any CRL support at all. phpseclib has a full `phpseclib4\File\CRL` class: load a CRL, inspect its contents, build one, sign one, validate one against a CA.
 
-phpseclib also handles real-world CRL ergonomics that, as far as we know, no other X.509 implementation does. Real-world CRLs can be large (multi-megabyte is common for big CAs), and re-downloading them on every signature check is unworkable. CRLs carry `thisUpdate` and `nextUpdate` fields specifically so that consumers can cache them, but actually wiring that caching into your validation path is something every other X.509 implementation we've looked at leaves entirely to the caller. phpseclib gives you `X509::setCRLLookupCallback()`: a hook where you wire up whatever cache backend you want (MySQL, MongoDB, the local filesystem, whatever) and `$x509->validateSignature()` uses it transparently. See [Using CRLs in Practice](file/crl.mdx#using-crls-in-practice) for the full pattern.
+phpseclib also handles real-world CRL ergonomics that, as far as we know, no other X.509 implementation does. Real-world CRLs can be large (multi-megabyte is common for big CAs), and re-downloading them on every signature check is unworkable. CRLs carry `thisUpdate` and `nextUpdate` fields specifically so that consumers can cache them, but actually wiring that caching into your validation path is something every other X.509 implementation we've looked at leaves entirely to the caller. phpseclib gives you `X509::setCRLLookupCallback()`: a hook where you wire up whatever cache backend you want (MySQL, MongoDB, the local filesystem, whatever) and `$x509->validateSignature()` uses it transparently. See [Using CRLs in Practice](../file/crl.mdx#using-crls-in-practice) for the full pattern.
 
 ### X.509 editability
 
 PHP's OpenSSL bindings let you read certificates (`openssl_x509_parse`) and produce signed ones from a CSR-shaped intent (`openssl_csr_sign`), but they don't give you a way to *edit* a parsed certificate field-by-field. You can't load a cert, swap out an extension, and re-serialize it. You can't twiddle a single byte of a SignedAttr and see what happens.
 
-phpseclib's `X509` (and `CSR`, `CRL`, `SPKAC`, `CMS`) objects implement `ArrayAccess` over their parsed ASN.1 structures. Every field is reachable both via a helper method (`getSubjectDN()`, `getExtension()`) *and* via the array path (`$x509['tbsCertificate']['subject']`, `$x509['tbsCertificate']['extensions']`). The two paths return the same typed objects; ArrayAccess isn't a lower-level escape hatch, it's a parallel API.
+phpseclib's [X509](../file/x509.mdx) (and [CSR](../file/csr.mdx), [CRL](../file/crl.mdx), [SPKAC](../file/spkac.mdx), and CMS) objects implement `ArrayAccess` over their parsed ASN.1 structures. Every field is reachable both via a helper method (`getSubjectDN()`, `getExtension()`) *and* via the array path (`$x509['tbsCertificate']['subject']`, `$x509['tbsCertificate']['extensions']`). The two paths return the same typed objects; ArrayAccess isn't a lower-level escape hatch, it's a parallel API. The [Deep Dive: ASN1\Constructed Objects](../file/detail-constructed.mdx) reference covers the parallel API in detail.
 
 That fine granularity is what makes serious work possible. Want to produce intentionally malformed certificates to fuzz a TLS implementation? phpseclib has an explicit escape hatch, `phpseclib4\File\ASN1\Element`, that lets you substitute raw DER bytes anywhere phpseclib would normally accept a value to encode. Want to register a custom extension OID so phpseclib understands a private-CA extension? `X509::registerExtension()`. Want to copy one field from one cert to another? Trivial. With PHP's OpenSSL bindings, none of that is reachable: you get the fields the parser chose to expose, in the format the parser chose to expose them in, and that's it.
 
@@ -256,7 +262,7 @@ Why didn't top or sudo work? With phpseclib you can get logs. They look like thi
 
 In 4.0, error reporting is via typed exceptions rather than `getErrors()` / `getLastError()` (both of which are gone). Wrap your SSH2 / SFTP calls in `try` / `catch` and inspect the exception. Every phpseclib exception implements `phpseclib4\Exception\BaseException` and extends `\RuntimeException`, so a single `catch (\RuntimeException $e)` will sweep up everything the library can throw.
 
-See [SSH2: Diagnosing Issues](/ssh2/diagnosis.md) for more information.
+See [SSH2: Diagnosing Issues](../ssh2/diagnosis.md) for more information.
 
 ### Changing Directories
 
@@ -266,7 +272,7 @@ I don't see any cd or chdir functions at [http://php.net/ssh2](http://php.net/ss
 
 Let's try to do sudo on the remote system.
 
-With phpseclib: [read() with regular expressions: sudo](/ssh2/commands.md#read-with-regular-expressions-sudo)
+With phpseclib: [read() with regular expressions: sudo](../ssh2/commands.md#read-with-regular-expressions-sudo)
 
 With libssh2? I have no clue. My best guess (doesn't work):
 
@@ -284,4 +290,4 @@ if (preg_match('#[pP]assword[^:]*:#', $output)) {
 }
 echo fread($shell, 1024*1024);
 ```
-It is additionally unclear how to get top working with libssh2 but it works perfectly fine with phpseclib: [exec() with and without a PTY vs Interactive Shells: top](/ssh2/commands.md#top)
+It is additionally unclear how to get top working with libssh2 but it works perfectly fine with phpseclib: [exec() with and without a PTY vs Interactive Shells: top](../ssh2/commands.md#top)
