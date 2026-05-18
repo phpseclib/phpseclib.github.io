@@ -141,7 +141,7 @@ The silent-break shape here is worth watching for during migration. Code that ca
 A short list of common 3.0 patterns that work identically in 4.0:
 
 - **Raw byte signing and verification.** `$priv->sign($bytes)` and `$pub->verify($bytes, $sig)` are unchanged.
-- **Symmetric ciphers.** AES, DES, 3DES, Twofish, Blowfish, same API.
+- **Symmetric ciphers.** AES, DES, 3DES, Twofish, Blowfish, same API. One small caveat: the symmetric engine name string `'OpenSSL (GCM)'` was renamed to `'OpenSSL (AEAD)'` (and the constant `ENGINE_OPENSSL_GCM` to `ENGINE_OPENSSL_AEAD`). Only matters if your code string-compares `getEngine()` output or passes the literal `'OpenSSL (GCM)'` to `setPreferredEngine()` / `isValidEngine()`. See [changes](changes.md#symmetric-cipher-engine-name) for the details.
 - **Key creation, loading, format export.** `createKey()` / `load()` / `withPassword()` / `toString()` for RSA / EC / DSA have the same shape, including all the PEM / DER / OpenSSH / PuTTY / XML format wrangling.
 - **BigInteger.** Mostly stable. One breaking change: `modInverse()` returns `null` instead of `false` when there's no inverse.
 - **SSH2 connect / login / exec.** Basic flow unchanged. Error handling around it changed (exceptions, not `false`), but the success path looks the same.

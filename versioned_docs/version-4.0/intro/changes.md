@@ -18,7 +18,10 @@ A bulk find-and-replace of `phpseclib3\` to `phpseclib4\` will get the namespace
 | `Crypt_RSA`, `File_X509`, `Net_SSH2` (pre-3.0 names) | [Namespace and autoloading](#namespace-and-autoloading) |
 | `phpseclib3\Crypt\Random` | [Random bytes](#random-bytes) |
 | `Random::string()` | [Random bytes](#random-bytes) |
-| `RSA::useBestEngine()` / `useInternalEngine()` / `getEngine()` | [Engine selection](#engine-selection) |
+| `RSA::useBestEngine()` / `useInternalEngine()` / `getEngine()` | [Engine selection: Asymmetric keys](#asymmetric-keys) |
+| `'OpenSSL (GCM)'` engine name string | [Engine selection: Symmetric cipher engine name](#symmetric-cipher-engine-name) |
+| `ENGINE_OPENSSL_GCM` constant | [Engine selection: Symmetric cipher engine name](#symmetric-cipher-engine-name) |
+| `SymmetricKey::setPreferredEngine()` / `getEngine()` / `isValidEngine()` | [Engine selection: Symmetric cipher engine name](#symmetric-cipher-engine-name) |
 | `$sftp->chmod(0777, $path)` | [SSH2 and SFTP](#ssh2-and-sftp) |
 | `$sftp->getSFTPErrors()` / `getLastSFTPError()` | [SSH2 and SFTP](#ssh2-and-sftp) |
 | `$ssh->getErrors()` / `getLastError()` | [SSH2 and SFTP](#ssh2-and-sftp) |
@@ -391,7 +394,11 @@ The entire `Crypt\Random` class is gone in 4.0. PHP's built-in `random_bytes()` 
 
 ## Engine selection
 
-The methods used to pin a specific cryptographic backend (libsodium / OpenSSL / pure-PHP) were renamed:
+phpseclib has two parallel engine-selection APIs: one for asymmetric keys (`RSA`, `EC`, `DSA`), one for symmetric ciphers (anything extending `SymmetricKey`). Both changed in subtly different ways between 3.0 and 4.0.
+
+### Asymmetric keys
+
+The methods used to pin a specific cryptographic backend (libsodium / OpenSSL / pure-PHP) on `RSA` / `EC` / `DSA` were renamed:
 
 | phpseclib 3.0 (pre-3.0.51) | phpseclib 3.0.51+ and 4.0 |
 | --- | --- |
@@ -404,6 +411,20 @@ The 4.0 signature: `public static function forceEngine(?string $engine = null): 
 This rename was backported to 3.0.51. If you're on a current 3.0 release, the new names already work and there's no migration to do.
 
 These methods are almost exclusively used by phpseclib's own unit tests. Production code rarely needs them.
+
+### Symmetric cipher engine name
+
+Symmetric ciphers have their own engine-selection API on `phpseclib4\Crypt\Common\SymmetricKey`: `setPreferredEngine()`, `getEngine()`, `isValidEngine()`. Those method names did **not** change between 3.0 and 4.0.
+
+What *did* change is one of the engine name strings:
+
+| 3.0 | 4.0 |
+| --- | --- |
+| `'OpenSSL (GCM)'` (`ENGINE_OPENSSL_GCM`) | `'OpenSSL (AEAD)'` (`ENGINE_OPENSSL_AEAD`) |
+
+The rename reflects that the same OpenSSL AEAD bindings now back more than just GCM (Poly1305 in particular). The other engine name strings (`'OpenSSL'`, `'libsodium'`, `'Eval'`, `'PHP'`) are unchanged.
+
+This only matters if 3.0 code does string-compares against `getEngine()` output (e.g. `if ($cipher->getEngine() === 'OpenSSL (GCM)')`), calls `setPreferredEngine('OpenSSL (GCM)')` or `isValidEngine('OpenSSL (GCM)')`, or references the `ENGINE_OPENSSL_GCM` constant directly. In practice almost no application code does any of this: engine selection for symmetric ciphers is auto, and the rare manual override is usually `'PHP'` to force pure-PHP for testing. If a codebase doesn't mention `'OpenSSL (GCM)'` or `ENGINE_OPENSSL_GCM`, there is nothing to migrate here.
 
 ## BigInteger
 
