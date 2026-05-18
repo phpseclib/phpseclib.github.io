@@ -16,18 +16,25 @@ Because the SFTP class extends the SSH2 class the SFTP class has all the methods
 
 ## Uploading Files
 
+The function definition for `put()` is as follows:
+
+```php
+public function put(
+    string $remote_file,
+    #[SensitiveParameter] mixed $data,
+    int $mode = self::SOURCE_STRING,
+    int $start = -1,
+    int $local_start = -1,
+    ?\Closure $progressCallback = null
+): void
+```
+
 ```php
 // puts a three-byte file named filename.remote on the SFTP server
 $sftp->put('filename.remote', 'xxx');
 // puts an x-byte file named filename.remote on the SFTP server,
 // where x is the size of filename.local
 $sftp->put('filename.remote', 'filename.local', SFTP::SOURCE_LOCAL_FILE);
-```
-
-The function definition for `put()` is as follows:
-
-```php
-function put($remote_file, $data, $mode = SFTP::SOURCE_STRING, $start = -1, $local_start = -1, $progressCallback = null)
 ```
 
 ### Uploading strings vs. files
@@ -78,17 +85,23 @@ This will append all but the first `$sftp->size('filename.remote')` bytes of fil
 
 ## Downloading Files
 
+The function definition for `get()` is as follows:
+
+```php
+public function get(
+    string $remote_file,
+    mixed $local_file = null,
+    int $offset = 0,
+    int $length = -1,
+    ?\Closure $progressCallback = null
+): ?string
+```
+
 ```php
 // outputs the contents of filename.remote to the screen
 echo $sftp->get('filename.remote');
 // copies filename.remote to filename.local from the SFTP server
 $sftp->get('filename.remote', 'filename.local');
-```
-
-The function definition for `get()` is as follows:
-
-```php
-function get($remote_file, $local_file = false, $offset = 0, $length = -1, $progressCallback = null)
 ```
 
 Returns a string containing the contents of `$remote_file` if `$local_file` is left undefined or a boolean false if the operation was unsuccessful. If `$local_file` is defined, returns true or false depending on the success of the operation.
@@ -122,7 +135,11 @@ $sftp->rmdir('test'); // delete the directory
 phpseclib's mkdir accepts the same parameters as PHP's [mkdir](https://www.php.net/mkdir). Here's the method definition:
 
 ```php
-public function mkdir($dir, $mode = -1, $recursive = false)
+public function mkdir(
+    string $dir,
+    int $mode = -1,
+    bool $recursive = false
+): void
 ```
 If `$mode` isn't specified (or if it's -1) then the operating system will most likely use the [umask](https://en.wikipedia.org/wiki/Umask). If you do want to specify the permission note that it needs to be in octal. So instead of passing `777` you'd pass in `0777`. The preceeding 0 is how PHP knows to treat an integer as an octal number as opposed to a decimal number.
 
@@ -387,15 +404,8 @@ $sftp->setListOrder();
 
 ### Empty Directories
 
-In 1.0 / 2.0 `$sftp->nlist()` doesn't return empty directories in recursive mode. Here's the sample output you'd get back from `nlist()`:
-```
-dir/file.ext
-file.ext
-.
-..
-```
-If `dir` was an empty directory you wouldn't see it because . and .. were only included in the root directory - not in subdirectories.
-Here's the output you'll get in 3.0:
+In recursive mode `$sftp->nlist()` includes `.` and `..` for every directory, not just the root. This means empty directories show up in the output:
+
 ```
 dir/.
 dir/..
@@ -404,6 +414,8 @@ file.ext
 .
 ..
 ```
+
+If `dir` were an empty directory it'd still appear in the listing (as `dir/.` and `dir/..`).
 
 ### Permissions
 
@@ -543,7 +555,7 @@ See [Permissions](#permissions) for more information on `mode` or `fileperms()`.
 
 `is_readable()` and `is_writeable()` only work on files. They work by actually opening up a file for reading or writing and then closing the file immediately thereafter. The same technique does not work for directories.
 
-As of phpseclib v3.0.20 `filesize()` accepts an optional second parameter - `$recursive`. By default this parameter is `false` but if you set it to `true` it'll recurse through a directory and return the size of all the files in that directory and it's subdirectories.
+`filesize()` accepts an optional second parameter - `$recursive`. By default this parameter is `false` but if you set it to `true` it'll recurse through a directory and return the size of all the files in that directory and it's subdirectories.
 
 ## Delete and Rename
 
@@ -561,7 +573,7 @@ There are seven different versions of SFTP that are defined (v0 through v6). Ope
 
 SFTP servers that support multiple versions will have a default version (usually v3) and will specifiy what other SFTP versions they support through the use of an extension.
 
-If you're running phpseclib &#8805; 3.0.11 you can set the preferred version by calling `setPreferredVersion(6)`. You can see what version was ultimately negotiated by calling `getNegotiatedVersion()`. You can see what versions the server supports by calling `getSupportedVersions()`. When multiple verisons of SFTP are supported here's what the output of this method will look like:
+You can set the preferred version by calling `setPreferredVersion(6)`. You can see what version was ultimately negotiated by calling `getNegotiatedVersion()`. You can see what versions the server supports by calling `getSupportedVersions()`. When multiple verisons of SFTP are supported here's what the output of this method will look like:
 
 <div class="tree">
 <details>

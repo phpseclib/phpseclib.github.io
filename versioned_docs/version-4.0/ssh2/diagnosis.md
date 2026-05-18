@@ -15,7 +15,13 @@ SSH2.php doesn't connect to a server after the constructor has been called - it 
 
 Calling `isConnected()` prior to any of these methods will return `bool(false)`. Premature closure of the session will also result in `isConnected()` returning `bool(false)`.
 
-`isConnected()` optionally takes a `$level` parameter that can be used to select the method used to test if the connection is still opened or not. The various levels are:
+The function definition for `isConnected()` is as follows:
+
+```php
+public function isConnected(int $level = 0): bool
+```
+
+The `$level` parameter selects the method used to test if the connection is still open:
 
 - `isConnected(0)`. The default method.  Calls `feof()` on the socket object, which often means that the [server has closed the connection](https://stackoverflow.com/a/1321716/569976)
 - `isConnected(1)`. Sends a SSH_MSG_IGNORE packet to the server.
@@ -104,6 +110,6 @@ The logging options are largely the same as they are for SSH2, with the caveat t
 
 ## getServerAlgorithms()
 
-If you get a "No compatible ... algorithms found" error it may be beneficial to do `$ssh->getServerAlgorithms()`.
+If you get a "No compatible ... algorithms found" error it may be beneficial to do `$ssh->getServerAlgorithms()`. The corresponding exception type is `phpseclib4\Exception\NoSupportedAlgorithmsException`. See [Failure Modes](connect.md#failure-modes) for the full list.
 
 You can additionally see the algorithms that were negotiated by doing `$ssh->getAlgorithmsNegotiated()`. See [Using a Custom Cipher Suite](connect.md#using-a-custom-cipher-suite) for more info.

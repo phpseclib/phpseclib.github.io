@@ -18,7 +18,42 @@ if ($expected != $ssh->getServerPublicHostKey()) {
 
 All subsequent code samples omit this part for brevity but if you're concerned about eavesdroppers (which isn't always a legit concern; eg. if you're connecting to localhost) it should not be skipped.
 
-The port number, incidentally, is optional. If not specified it will be assumed to be 22.
+The constructor signature is:
+
+```php
+public function __construct(
+    mixed $host,
+    int $port = 22,
+    int $timeout = 10
+)
+```
+
+The port number is optional and defaults to 22. The third argument is the TCP connect timeout in seconds.
+
+## Connection is Lazy
+
+The constructor doesn't actually connect to anything. The TCP connection and SSH handshake only happen on the first call to one of:
+
+- `login()`
+- `getServerIdentification()`
+- `getServerAlgorithms()`
+- `getAlgorithmsNegotiated()`
+- `getServerPublicHostKey()`
+
+This is intentional. It lets you configure the instance (algorithm preferences, terminal type, quirks toggles) before any wire activity starts. Calling `isConnected()` before any of the above will return `bool(false)`.
+
+## Failure Modes
+
+When the connection itself fails, phpseclib throws one of the following exceptions. All extend `\RuntimeException` and implement `phpseclib4\Exception\BaseException`, so a single `catch (\RuntimeException $e)` covers all of them.
+
+|Failure|Exception|
+|---|---|
+|TCP connect failed|`phpseclib4\Exception\UnableToConnectException`|
+|Connection dropped mid-handshake|`phpseclib4\Exception\ConnectionClosedException`|
+|No mutually supported KEX / host-key / cipher / MAC / compression|`phpseclib4\Exception\NoSupportedAlgorithmsException`|
+|Server identification string malformed|`phpseclib4\Exception\UnexpectedValueException`|
+
+Note that authentication failure does _not_ throw. `$ssh->login()` returns `bool(false)` instead. See [Authenticating](auth.md) for more on that.
 
 ## Using an HTTP Proxy
 
@@ -43,6 +78,8 @@ $ssh = new SSH2($fsock);
 $ssh->login('username', 'password');
 echo $ssh->exec('ls -latr');
 ```
+
+When you pass a stream resource as the first argument, the `$port` argument is ignored but the `$timeout` argument is still honored.
 
 ## Using a SOCKS5 Proxy
 
@@ -90,7 +127,7 @@ echo $ssh->exec('ls -latr');
 
 ## Connecting to an IPv6 address
 
-When specifying a numerical IPv6 address (e.g. `fe80::1`), you must enclose the IP in square brackets—for example, `tcp://[fe80::1]:22`.
+When specifying a numerical IPv6 address (e.g. `fe80::1`), you must enclose the IP in square brackets, for example `tcp://[fe80::1]:22`.
 
 ## Binding to a Specific IP Address
 
@@ -127,11 +164,25 @@ You can tell phpseclib which algorithms you'd like to use by doing `$ssh->setPre
 | Index | Meaning | Supported Values |
 |---|---|---|
 | crypt | List of crypto methods to advertise, comma separated in order of preference. | _aes128-gcm@openssh.com_, _aes256-gcm@openssh.com_, _arcfour256_, _arcfour128_, _aes128-ctr_, _aes192-ctr_, _aes256-ctr_, _chacha20-poly1305@openssh.com_, _twofish128-ctr_, _twofish192-ctr_, _twofish256-ctr_, _aes128-cbc_, _aes192-cbc_, _aes256-cbc_, _twofish128-cbc_, _twofish192-cbc_, _twofish256-cbc_, _twofish-cbc_, _blowfish-ctr_, _blowfish-cbc_, _3des-ctr_, _3des-cbc_. Pretty much anything returned by `$ssh->getSupportedEncryptionAlgorithms()` |
-| comp | List of compression methods to advertise, comma separated in order of preference. | _none_, _zlib@openssh.com_, _zlib_. Pretty much anything returned by `$ssh->getSupportedCompressionAlgorithms()`. Support for the latter two was introduced in phpseclib v3.0.11, requires PHP 7.0+ and that the [zlib extension be installed](https://www.php.net/manual/en/zlib.installation.php) (until such time that a shim can be written). |
+| comp | List of compression methods to advertise, comma separated in order of preference. | _none_, _zlib@openssh.com_, _zlib_. Pretty much anything returned by `$ssh->getSupportedCompressionAlgorithms()`. The latter two require that the [zlib extension be installed](https://www.php.net/manual/en/zlib.installation.php) (until such time that a shim can be written). |
 | mac | List of MAC methods to advertise, comma separated in order of preference. | _hmac-sha2-256-etm@openssh.com_, _hmac-sha2-512-etm@openssh.com_, _umac-64-etm@openssh.com_, _umac-128-etm@openssh.com_, _hmac-sha1-etm@openssh.com_, _hmac-sha2-256_, _hmac-sha2-512_, _umac-64@openssh.com_, _umac-128@openssh.com_, _hmac-sha1-96_, _hmac-sha1_, _hmac-md5-96_, _hmac-md5_. Pretty much anything returned by `$ssh->getSupportedMACAlgorithms()` |
 
 Note that a given algorithm will only be used if it's supported by both phpseclib and the server. The algorithms that the server supports can be determined by doing `$ssh->getServerAlgorithms()`. The algorithms that ultimately wind up being used can be determined by doing `$ssh->getAlgorithmsNegotiated()`.
 
-Using a custom cipher suite is not recommended. phpseclib's prioritization of algorithms is intended to maximize speed and security. For example, if OpenSSL is installed and you're using PHP >= 7.1.0 then _aes128-gcm@openssh.com_ will be the preferred algorithm. If (1) OpenSSL is not installed or you're using PHP < 7.1.0 BUT (2) libsodium is installed, then _aes256-gcm@openssh.com_ will be the preferred algorithm. You can make either of those the preferred algorithms even if neither OpenSSL or libsodium are installed but your connection will be slowed down because the pure-PHP implemenation of both of those is not nearly as fast as OpenSSL / libsodium.
+Using a custom cipher suite is not recommended. phpseclib's prioritization of algorithms is intended to maximize speed and security. For example, if OpenSSL is installed _aes128-gcm@openssh.com_ will be the preferred encryption algorithm. If OpenSSL is not installed but libsodium is, then _aes256-gcm@openssh.com_ will be preferred. If neither OpenSSL nor libsodium is installed the preferred encryption algorithm will be _aes128-ctr_. You can override this priority and force a slower algorithm to be used, but your connection will be slowed down because the pure-PHP implementations of those algorithms are not nearly as fast as OpenSSL / libsodium.
 
 _chacha20-poly1305@openssh.com_ is the latest hotness in the cryptographic community but it is not prioritized higher because (1) while OpenSSL supports ChaCha20, it doens't support Poly1305 and (2) libsodium doesn't use Poly1305 in the same way that SSH uses it. Despite that, _chacha20-poly1305@openssh.com_ is still pretty fast but not as fast as some of the other available algorithms.
+
+## Additional Tweaks
+
+A handful of servers misbehave in protocol corners. phpseclib provides toggles for working around them. Reach for these only when a connection fails against a specific buggy server. Don't apply them prophylactically.
+
+```php
+$ssh->sendIdentificationStringFirst();   // send our SSH-2.0-... before reading the server's
+$ssh->sendIdentificationStringLast();    // wait for the server's identification string first
+
+$ssh->sendKEXINITFirst();                // send SSH_MSG_KEXINIT before the server does
+$ssh->sendKEXINITLast();                 // wait for the server to send it first
+```
+
+The SSH protocol allows either side to send their identification string and `KEXINIT` packet first, so neither order is wrong, but a buggy server may only accept one of the two. If you're seeing handshake failures and the protocol logs (see [getLog()](diagnosis.md#getlog)) show the connection dying before authentication, one of these toggles may help.

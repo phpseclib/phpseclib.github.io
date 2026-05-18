@@ -10,6 +10,15 @@ echo $ssh->exec('pwd');
 echo $ssh->exec('ls -la');
 ```
 
+The function definition for `exec()` is as follows:
+
+```php
+public function exec(
+    string $command,
+    ?\Closure $callback = null
+): ?string
+```
+
 By default `$ssh->exec()` returns both stdout and stderr. To suppress stderr you can call `$ssh->enableQuietMode()`. To re-enable it call `$ssh->disableQuietMode()`.
 
 To get stderr separately from stdout you'll need to call `$ssh->enableQuietMode()` and then call `$ssh->getStdError()`. These functions do _not_ work with `$ssh->read()` (ie. when a PTY is enabled) for reasons described [here](https://superuser.com/a/1581769/172193).
@@ -53,6 +62,21 @@ You can workaround this on Linux by doing `$ssh->exec('cd /; pwd')` or `$ssh->ex
 echo $ssh->read('username@username:~$');
 $ssh->write("ls -la\n"); // note the "\n"
 echo $ssh->read('username@username:~$');
+```
+
+The function definitions for `read()` and `write()` are as follows:
+
+```php
+public function read(
+    string $expect = '',
+    int $mode = self::READ_SIMPLE,
+    ?int $channel = null
+): string|bool
+
+public function write(
+    string $cmd,
+    ?int $channel = null
+): void
 ```
 
 On a terminal you normally don't just type the command and expect to get the output. You type the command and then hit enter. To simulate that you'll need to add `"\n"` to the commands you send via `write()`
@@ -141,9 +165,9 @@ After each `$ssh->read()` the timeout resets to what you set it to last. By defa
 
 ## setKeepAlive()
 
-In some cases it may be necessary to send a "[keepalive](https://en.wikipedia.org/wiki/Keepalive)" to the server every x seconds to prevent the SSH connection from being closed by the server during long running commands. eg. if, in the target servers sshd_config, ClientAliveCountMax is 0 and ClientAliveInterval is 3, then `echo $ssh->exec('sleep 10; ls -latr')` will timeout and you'll get a "Connection closed prematurely" ConnectionClosedException. `setKeepAlive(...)` is the answer to this problem.
+In some cases it may be necessary to send a "[keepalive](https://en.wikipedia.org/wiki/Keepalive)" to the server every x seconds to prevent the SSH connection from being closed by the server during long running commands. eg. if, in the target servers sshd_config, ClientAliveCountMax is 0 and ClientAliveInterval is 3, then `echo $ssh->exec('sleep 10; ls -latr')` will timeout and you'll get a "Connection closed prematurely" `ConnectionClosedException`. `setKeepAlive(...)` is the answer to this problem.
 
-Note that `setKeepAlive()` will not keep a connection alive if you're doing a time consuming operation _outside_ of the SSH instance. eg. doing `sleep(10); echo $ssh->exec('ls -latr');` on a server with the aforementioned sshd_config will still result in a "Connection closed prematurely" ConnectionClosedException because, at the end of the day, PHP is still a synchronous language and unless phpseclib has control then the "keepalive" packets won't be sent out.
+Note that `setKeepAlive()` will not keep a connection alive if you're doing a time consuming operation _outside_ of the SSH instance. eg. doing `sleep(10); echo $ssh->exec('ls -latr');` on a server with the aforementioned sshd_config will still result in a "Connection closed prematurely" `ConnectionClosedException` because, at the end of the day, PHP is still a synchronous language and unless phpseclib has control then the "keepalive" packets won't be sent out.
 
 ## Determining what to read(): passwd
 
@@ -339,7 +363,7 @@ The number of rows and columns can be determined by calling `$ssh->getWindowRows
 
 ## Multiple Channels
 
-Let's say you ran a command with `$ssh->exec()` with a PTY open but that you also wanted to, simultaniously, run a command on an interactive shell. Nothing presented in the documentation, up to this point, really enables that, however, as of phpseclib v3.0.20, an additional parameter - `$channel` - has been added to `read()`, `write()` and `reset()`, so that now you can do this:
+Let's say you ran a command with `$ssh->exec()` with a PTY open but that you also wanted to, simultaniously, run a command on an interactive shell. The `$channel` parameter on `read()`, `write()` and `reset()` lets you do that:
 
 ```php
 $ssh->enablePTY();
@@ -347,7 +371,8 @@ $ssh->exec('sudo ls -latr');
 $ssh->write("sudo ls -latr\n", SSH2::CHANNEL_SHELL);
 $ssh->read('#[pP]assword[^:]*:|username@username:~\$#', SSH2::READ_REGEX, SSH2::CHANNEL_EXEC);
 ```
-You can also, as of phpseclib v3.0.20, see the status of a channel by calling any of the following:
+
+You can also see the status of a channel by calling any of the following:
 
 - `isShellOpen()`
 - `isPTYOpen()`
