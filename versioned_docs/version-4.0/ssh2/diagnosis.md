@@ -81,20 +81,20 @@ Several different logging options exist:
 
 * `SSH2::LOG_SIMPLE`
 
-   Can be obtained with `$ssh->getLog()`, which returns an array that, when passed through `print_r`, looks like [simple.txt](pathname:///logs/simple.txt).
+   Can be obtained with `$ssh->getLog()`, which returns an array that, when passed through `print_r`, looks like [simple.txt](pathname:///logs/simple4.0.txt).
 * `SSH2::LOG_COMPLEX`.
 
-   Can be obtained with `$ssh->getLog()`, which return a string that looks like [complex.txt](pathname:///logs/complex.txt). These logs are capped at 1 MiB.
+   Can be obtained with `$ssh->getLog()`, which return a string that looks like [complex.txt](pathname:///logs/complex4.0.txt). These logs are capped at 1 MiB.
 * `SSH2::LOG_REALTIME`.
 
-   Outputs, in realtime, logs that look like [complex.txt](pathname:///logs/complex.txt). `$ssh->getLog()` does nothing with this method.
+   Outputs, in realtime, logs that look like [complex.txt](pathname:///logs/complex4.0.txt). `$ssh->getLog()` does nothing with this method.
 * `SSH2::LOG_REALTIME_FILE`
 
    Logs data to a file realtime. Useful if your script is stalling or dying before you have a chance to call `$ssh->getLog()`.
 
    Used in conjunction with `define('NET_SSH2_LOG_REALTIME_FILENAME', 'log.txt');`.
 
-   Log sizes are capped at 1 MiB. If they go over the log file will wrap around. Outside of the wrap around boundry the log files otherwise look like [complex.txt](pathname:///logs/complex.txt).
+   Log sizes are capped at 1 MiB. If they go over the log file will wrap around. Outside of the wrap around boundry the log files otherwise look like [complex.txt](pathname:///logs/complex4.0.txt).
 
 For all log types, if you're logging in with password authentication, whatever password you were using is replaced with 'password'. So if your password was actually '123456' (the [most common password in 2019](https://en.wikipedia.org/wiki/List_of_the_most_common_passwords)) it'll be replaced with 'password' in the logs.
 
