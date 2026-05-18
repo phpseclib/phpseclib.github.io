@@ -35,7 +35,7 @@ That gives you smaller, more focused classes, proper types you can write in your
 
 See the per-class references for the full API: [X509](../file/x509.mdx), [CSR](../file/csr.mdx), [CRL](../file/crl.mdx), [SPKAC](../file/spkac.mdx).
 
-### Brand-new PFX and CMS support
+### PFX and CMS support
 
 phpseclib 4 adds first-class support for two formats that 3.0 didn't cover at all:
 
@@ -44,7 +44,7 @@ phpseclib 4 adds first-class support for two formats that 3.0 didn't cover at al
 
 3.0 codebases that needed either of these had to fall back on PHP's `openssl_pkcs12_*` / `openssl_cms_*` functions or shell out to the `openssl` CLI. In 4.0 it's all native. See the OpenSSL comparison below for what phpseclib's versions do that PHP's `openssl_*` bindings don't.
 
-### Signatures that don't make you grimace
+### Intuitive Signatures
 
 In phpseclib 3, signing a certificate looked like this:
 
@@ -66,7 +66,11 @@ X509::sign($issuer, $subject);   // static
 $issuer->sign($subject);          // instance, but only the issuer
 ```
 
-Either of those reads better than the 3.x version. But neither one is complete, because *signing requires a private key*, and a bare `X509` doesn't have one. In 3.x the workaround was to load the CA's private key into `$issuer` via a separate `setPrivateKey()` call before signing. That works, but it makes the cert object secretly a keystore: a certificate that's also carrying a private key around, with no type-level hint that this is happening.
+Either of those reads better than the 3.x version.
+
+It's worth noting that the static form wasn't historically on the table. phpseclib 1 was designed to run on PHP 4.4, and PHP didn't gain static method support until 5.0 — so when the signing API was first sketched, an instance method on `X509` was the only shape available. The X.509 API didn't change substantially between 1.0 and 3.0, which means 4.0 is the first real redesign it's had in close to twenty years. The 3.x signature is, in part, a fossil of a PHP 4 constraint that stopped mattering a long time ago.
+
+But neither one is complete, because *signing requires a private key*. In 3.x the workaround was to load the CA's private key into `$issuer` via a separate `setPrivateKey()` call before signing. That works, but it makes the cert object secretly a keystore: a certificate that's also carrying a private key around, with no type-level hint that this is happening.
 
 If only there were a standard format for a certificate-plus-private-key bundle. Something the rest of the world already uses for exactly this case. 🤔 Oh, wait, there is. It's PFX / PKCS#12.
 
