@@ -79,7 +79,7 @@ The following curves are supported:
 
 <sup>(_SECG stands for Standards for Efficient Cryptography_)</sup>
 
-The full list of curves can be found at https://github.com/phpseclib/phpseclib/tree/3.0/phpseclib/Crypt/EC/Curves
+The full list of curves can be found at https://github.com/phpseclib/phpseclib/tree/4.0/phpseclib/Crypt/EC/Curves
 
 ## Named vs Specified Curves
 
@@ -103,7 +103,7 @@ Montgomery and Twisted Edwards Curves do not have user-definable coefficients an
 
 Specified curves can be loaded and used and named curves can be saved _as_ specified curves so long as you're saving the curve in either the PKCS1 or PKCS8 formats.
 
-A named curve can be saved as a specified curve by doing `PKCS1::useSpecifiedCurve()` or `PKCS8::useSpecifiedCurve()`. One can switch back to saving named curves as named curves by doing  `PKCS1::useNamedCurve()` or `PKCS8::useSpecifiedCurve()`.
+A named curve can be saved as a specified curve by doing `PKCS1::useSpecifiedCurve()` or `PKCS8::useSpecifiedCurve()`. One can switch back to saving named curves as named curves by doing  `PKCS1::useNamedCurve()` or `PKCS8::useNamedCurve()`.
 
 A named curve can also be saved as a specified curve by doing `$key->toString('PKCS8', ['namedCurve' => false])` or `$key->toString('PKCS1', ['namedCurve' => false])`.
 
@@ -131,7 +131,9 @@ echo $private->getPublicKey()->verify($message, $signature) ?
     'valid signature' :
     'invalid signature';
 ```
-The signatures generated are _not_ deterministic, as discussed in [RFC6979](https://tools.ietf.org/html/rfc6979). Such determinism is chiefly of benefit when a [CSPRNG](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) is _not_ available and with PHP there is one that's available.
+The signatures generated are _not_ deterministic, as discussed in [RFC6979](https://tools.ietf.org/html/rfc6979). Such determinism is chiefly of benefit when a [CSPRNG](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) is _not_ available and with PHP there is one that's available, exposed via `random_bytes()`.
+
+Note that this applies to ECDSA only. EdDSA signatures (Ed25519, Ed448) are deterministic by design (see [RFC8032 § 8.2 Randomness Considerations](https://datatracker.ietf.org/doc/html/rfc8032#section-8.2)); the same `(message, key)` pair always produces the same signature.
 
 Signatures have two components - **r** and **s**. How these two components are combined to a single string depends on the signature format being employed.
 
@@ -176,3 +178,5 @@ getCurve, getLength, withContext (ed25519, ed448),
 While `withHash` accepts strings, `getHash` returns a Hash object (that can be cast to a string via [__toString](https://www.php.net/manual/en/language.oop5.magic.php#object.tostring)).
 
 `withContext` is only usable with Ed25519 and Ed448. `withHash` does not work for Curve25519, Curve448, Ed25519 or Ed448.
+
+Calling `sign()` on a Curve25519 or Curve448 key will throw a `BadMethodCallException`; these Montgomery curves are for key agreement (ECDH) only. For signing on those security levels use Ed25519 or Ed448 instead.

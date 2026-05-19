@@ -101,7 +101,7 @@ echo $private->getPublicKey()->verify($message, $signature) ?
     'valid signature' :
     'invalid signature';
 ```
-The signatures generated are _not_ deterministic, as discussed in [RFC6979](https://tools.ietf.org/html/rfc6979). Such determinism is chiefly of benefit when a [CSPRNG](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) is _not_ available and with PHP there is one that's available.
+The signatures generated are _not_ deterministic, as discussed in [RFC6979](https://tools.ietf.org/html/rfc6979). Such determinism is chiefly of benefit when a [CSPRNG](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator) is _not_ available and with PHP there is one that's available, exposed via `random_bytes()`.
 
 Signatures have two components - **r** and **s**. How these two components are combined to a single string depends on the signature format being employed.
 

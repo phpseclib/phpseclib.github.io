@@ -20,7 +20,7 @@ The recommended way to load public keys is to do so thusly:
 ```php
 use phpseclib4\Crypt\PublicKeyLoader;
 
-$key = PublicKeyLoader::load(file_get_contents('/path/to/key.pem'), $password = false);
+$key = PublicKeyLoader::load(file_get_contents('/path/to/key.pem'), $password = null);
 ```
 The password is optional.
 
@@ -58,18 +58,20 @@ echo $key instanceof \phpseclib4\Crypt\Common\PrivateKey ? 'private key' : 'publ
 ```
 `PrivateKey` is an interface implementing the following methods:
 
-- `sign($message)`
-- `getPublicKey()`
-- `toString($type, array $options = [])`
-- `withPassword($string)`
+- `sign(string|Signable $source): string`
+- `getPublicKey(): PublicKey`
+- `toString(string $type, array $options = []): array|string`
+- `withPassword(?string $string = null): PrivateKey`
+
+The `string|Signable` parameter on `sign()` is discussed in the [Signable interface](#signable-interface) section.
 
 RSA PrivateKey objects also implement `decrypt($ciphertext)` but because EC and DSA PrivateKey objects do not support encryption / decryption the interface itself does not define it.
 
 `PublicKey` is an interface implementing the following methods:
 
-- `verify($message, $signature)`
-- `toString($type, array $options = [])`
-- `getFingerprint($algorithm)`
+- `verify(string $message, string $signature): bool`
+- `toString(string $type, array $options = []): array|string`
+- `getFingerprint(string $algorithm = 'sha256'): string`
 
 RSA PublicKey objects also implement `encrypt($plaintext)` but because EC and DSA PrivateKey objects do not support encryption / decryption the interface itself does not define it.
 
@@ -124,7 +126,7 @@ Supported key formats for a given algorithm can be determined by doing `\phpsecl
 
 **<span class="default">PKCS8</span>** keys are the only keys that support all public key algorithms. Both private and public keys are supported [^pkcs8] as are PEM encoded keys and binary encoded keys. <span class="default">_This is the default format that phpseclib uses_</span>.
 
-**PuTTY** keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported [^putty] as are v2 and, as of phpseclib v3.0.14, v3 formatted keys (with v2 being the default).
+**PuTTY** keys support DSA but only keys with an N (length of group order Q) of 160 are supported because that's all SSH2 supports. Similarily, PuTTY keys do not support the full gamut of curves that phpseclib supports (most notably, secp256k1, the Bitcoin curve). Both private and public keys are supported [^putty] as are v2 and, as of phpseclib v3.0.14, v3 formatted keys (with v2 being the default). v3 keys use Argon2id for password-based key derivation and require puttygen 0.75+ (September 2021) to read; v2 remains the safer default for compatibility.
 
 **OpenSSH** keys have the same limitations as PuTTY keys. Both public and private keys are supported [^openssh]. Notably, from OpenSSH 6.5 to 9.6 (2014-2023), this was the only format that OpenSSH supported for Ed25519 [^openssh-ed25519]. Encrypted keys are supported as of phpseclib v3.0.15 [^openssh-encrypted].
 
@@ -299,7 +301,7 @@ echo $key->toString('PuTTY', ['comment' => 'whatever']);
 
 ### OpenSSH
 
-PuTTY private keys only support one encryption algorithm (aes256-ctr) so there are no methods to change it.
+OpenSSH private keys only support one encryption algorithm (aes256-ctr) so there are no methods to change it.
 
 Both OpenSSH public and private keys support comments, which can be changed thusly:
 
