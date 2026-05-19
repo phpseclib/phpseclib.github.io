@@ -1,0 +1,64 @@
+
+{
+    "version": "v1.0.0",
+    "entity": {
+        "type": "organisation",
+        "role": "maintainer",
+        "name": "phpseclib",
+        "email": "terrafrost@php.net",
+        "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
+        "webpageUrl": {
+            "url": "https://phpseclib.com/"
+        }
+    },
+    "projects": [
+        {
+            "guid": "phpseclib",
+            "name": "phpseclib",
+            "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
+            "webpageUrl": {
+                "url": "https://phpseclib.com/"
+            },
+            "repositoryUrl": {
+                "url": "https://github.com/phpseclib/phpseclib"
+            },
+            "licenses": [
+                "MIT"
+            ],
+            "tags": [
+                "security",
+                "cryptography",
+                "ssh",
+                "sftp",
+                "asn1",
+                "x509",
+                "cms",
+                "crl",
+                "pfx",
+                "csr"
+            ]
+        }
+    ],
+    "funding": {
+        "channels": [
+            {
+                "guid": "github-sponsors",
+                "type": "payment-provider",
+                "address": "https://github.com/sponsors/phpseclib",
+                "description": "Payments up to $12,000 USD per month can be made via Github Sponsors."
+            }
+        ],
+        "plans": [
+            {
+                "guid": "developer-time",
+                "status": "active",
+                "name": "Developer compensation",
+                "description": "This compensates the developers working on the project.",
+                "amount": 0,
+                "currency": "USD",
+                "frequency": "monthly",
+                "channels": ["github-sponsors"]
+            }
+        ]
+    }
+}
