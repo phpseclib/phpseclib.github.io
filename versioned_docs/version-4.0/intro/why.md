@@ -68,7 +68,7 @@ $issuer->sign($subject);          // instance, but only the issuer
 
 Either of those reads better than the 3.x version.
 
-It's worth noting that the static form wasn't historically on the table. phpseclib 1 was designed to run on PHP 4.4, and PHP didn't gain static method support until 5.0 — so when the signing API was first sketched, an instance method on `X509` was the only shape available. The X.509 API didn't change substantially between 1.0 and 3.0, which means 4.0 is the first real redesign it's had in close to twenty years. The 3.x signature is, in part, a fossil of a PHP 4 constraint that stopped mattering a long time ago.
+It's worth noting that the static form wasn't historically on the table. phpseclib 1 was designed to run on PHP 4.4, and PHP didn't gain static method support until 5.0 - so when the signing API was first sketched, an instance method on `X509` was the only shape available. The X.509 API didn't change substantially between 1.0 and 3.0, which means 4.0 is the first real redesign it's had in close to twenty years. The 3.x signature is, in part, a fossil of a PHP 4 constraint that stopped mattering a long time ago.
 
 But neither one is complete, because *signing requires a private key*. In 3.x the workaround was to load the CA's private key into `$issuer` via a separate `setPrivateKey()` call before signing. That works, but it makes the cert object secretly a keystore: a certificate that's also carrying a private key around, with no type-level hint that this is happening.
 
