@@ -6,7 +6,7 @@ phpseclib 4.0 is a substantial release. The namespace went from `phpseclib3\` to
 
 This page is the orientation: should you migrate at all, what to expect if you do, what the major shape changes look like. For the comprehensive lookup table (every renamed method, every changed signature, every removed function) see [Changes from 3.0](changes.md).
 
-## Consider the compat shim first
+## phpseclib3_compat
 
 For many existing 3.0 codebases, the right answer is **don't migrate at all**.
 
@@ -26,13 +26,13 @@ A full migration is the right answer when:
 
 You can also do both. Install the shim for legacy code paths, write new code against the native 4.0 API. The two namespaces don't conflict: `phpseclib3\File\X509` (shimmed) and `phpseclib4\File\X509` (native) are different classes and can coexist in the same file.
 
-## This is not a point upgrade
+## Migration scope
 
 If you've decided to migrate rather than shim, set expectations correctly: this is closer to switching frameworks than to running a codemod. The minimum PHP version moved from 5.6 to 8.1, which (beyond the obvious) means 4.0 uses typed properties, `match`, named arguments, and union types throughout. The X.509 API was split into four classes. Object signing got a fundamentally new shape. PFX and CMS are net-new surface area. Many `false`-on-failure return paths became typed exceptions.
 
 Each of those changes individually would have justified a major version. Together, they justify the rewrite cost, but they also justify *budgeting* for it.
 
-## The headline differences
+## Major differences
 
 The full mapping is in [Changes from 3.0](changes.md). What follows is what's most likely to bite a migration.
 
@@ -136,7 +136,7 @@ The silent-break shape here is worth watching for during migration. Code that ca
 
 (The same split applies to `RSA::load()`, `EC::load()`, `DSA::load()`, `DH::load()`, and the new `PFX::load()`. See the [exceptions overview](../exceptions/overview.md) and the [public keys overview](../publickeys/overview.mdx) for full context.)
 
-## What didn't change
+## Unchanged APIs
 
 A short list of common 3.0 patterns that work identically in 4.0:
 
@@ -149,7 +149,7 @@ A short list of common 3.0 patterns that work identically in 4.0:
 
 If you're seeing a 3.0 method that this page doesn't mention and the [list of changes](changes.md) doesn't list, it likely falls in this bucket. Update the namespace and you're done.
 
-## Suggested order of operations
+## Order of operations
 
 If you've decided to migrate, do this in order:
 

@@ -48,7 +48,7 @@ A bulk find-and-replace of `phpseclib3\` to `phpseclib4\` will get the namespace
 | PKCS#12 / PFX work in 3.0 | [PFX and CMS (no migration)](#pfx-and-cms-no-migration) |
 | CMS / PKCS#7 work in 3.0 | [PFX and CMS (no migration)](#pfx-and-cms-no-migration) |
 
-Anything not in the index above is most likely in [Things that did not change](#things-that-did-not-change).
+Anything not in the index above is most likely in [Unchanged APIs](#unchanged-apis).
 
 ## Namespace and autoloading
 
@@ -157,7 +157,7 @@ The constants moved from `X509` to `ASN1`:
 | `X509::DN_ASN1` | `ASN1::DN_ASN1` |
 | `X509::DN_CANON` | `ASN1::DN_CANON` |
 
-### DN_STRING output format changed
+### DN_STRING output format
 
 3.0's `DN_STRING` produced the phpseclib-native format: `C=À, O=B/serialNumber=C`. 4.0 produces the OpenSSL 3.0 CLI format: `C = \C3\80, O = B, serialNumber = C`.
 
@@ -430,7 +430,7 @@ This only matters if 3.0 code does string-compares against `getEngine()` output 
 
 The `BigInteger` API is mostly stable: the constructor, arithmetic, modular, bitwise, comparison, serialization, and random-generation methods all work the same as in 3.0. The relevant changes:
 
-### modInverse() no longer returns false
+### modInverse() return type
 
 In 3.0, `modInverse()` returned `false` when `$a` had no inverse modulo `$n` (i.e., when `gcd($a, $n) != 1`). In 4.0 it's declared `: ?BigInteger`, so it returns `null` in that case.
 
@@ -450,7 +450,7 @@ if ($inv === null) {
 
 The 3.0-style `=== false` check will silently never fire in 4.0. There's no `false` return path. Any code relying on that branch needs updating.
 
-### Everything else
+### Unchanged BigInteger methods
 
 Constructor, `toString` / `toHex` / `toBits` / `toBytes`, `add` / `subtract` / `multiply` / `divide`, `powMod` / `modPow`, `gcd` / `extendedGCD`, `compare` / `equals` / `between`, all the bitwise operations, `setPrecision` / `getPrecision`, `random` / `randomPrime` / `randomRange` / `randomRangePrime`, `isPrime`, `min` / `max`, `__serialize` / `jsonSerialize`: same shape, same semantics. Update the namespace and you're done.
 
@@ -458,7 +458,7 @@ Constructor, `toString` / `toHex` / `toBits` / `toBytes`, `add` / `subtract` / `
 
 If you only use phpseclib's high-level APIs (`X509::load()`, `RSA::load()`, `EC::createKey()`, etc.) you can skip this section. Almost nothing changed at the surface. The changes here are for the ~5% of users who use `ASN1::decodeBER()` / `ASN1::asn1map()` directly to parse custom ASN.1 structures (e.g., a custom protocol's binary format, or a PFX-like container that phpseclib didn't natively support in 3.0). The [Deep Dive: ASN1\Constructed Objects](../file/detail-constructed.mdx) and [Constructed example walkthrough](../file/constructed-example.mdx) references go deep on the new model.
 
-### decodeBER() return shape changed
+### decodeBER() return shape
 
 In 3.0, `ASN1::decodeBER()` did a *full eager* parse and returned a deeply-nested array reflecting the entire structure of the input. In 4.0, it does a *shallow lazy* parse and returns a one-level array where any nested constructed types are represented as `phpseclib4\File\ASN1\Constructed` objects, decoded only on demand.
 
@@ -483,7 +483,7 @@ If you have 3.0 code that walks the deeply-nested `decodeBER()` output, the migr
 1. **Use `ASN1::map()` instead** (see below). If your goal was to map the decoded structure to a known schema, the high-level path is still there.
 2. **If you specifically want the deep tree** (e.g., you're writing an `asn1parse`-style tool that displays unknown structures recursively), you can roughly simulate the 3.0 behavior by treating each `Constructed` object as a SEQUENCE of `ASN1::TYPE_ANY` and recursively decoding. This is enough work that it's typically only worth it for genuine ASN.1 inspection tools, not for application code.
 
-### Rename: asn1map() to map()
+### asn1map() rename
 
 ```php
 // 3.0
@@ -497,7 +497,7 @@ $mapped = ASN1::map($decoded, $map);          // no index
 
 Two changes in one line: the method was renamed (`asn1map` to `map`), and the input no longer needs the `[0]` index because `decodeBER()` now returns the single top-level structure directly rather than wrapping it in a one-element array.
 
-### Special callbacks became rules
+### From $special callbacks to $rules
 
 The third argument to the schema-mapping call is the most substantive 4.0 ASN.1 change after the `decodeBER()` shape and the `asn1map` to `map` rename. It's worth understanding even if you don't migrate hand-rolled ASN.1 code immediately, because every meaningful 4.0 schema map uses it.
 
@@ -640,7 +640,7 @@ try { /* phpseclib calls */ }
 catch (\RuntimeException $e) { /* ... */ }
 ```
 
-### Don't catch SPL classes by name
+### SPL exception name collisions
 
 phpseclib 4.0 has classes named `phpseclib4\Exception\UnexpectedValueException`, `phpseclib4\Exception\RuntimeException`, etc. These **share names** with the PHP SPL exception classes (`\UnexpectedValueException`, `\RuntimeException`) but are different types. The SPL `\UnexpectedValueException` extends `\RuntimeException` and is in the global namespace; the phpseclib version is in `phpseclib4\Exception\` and extends `\RuntimeException` directly (not the SPL `\UnexpectedValueException`).
 
@@ -688,7 +688,7 @@ When asked to "migrate the PKCS#12 code to phpseclib 4," look for:
 
 For CMS, the analogous PHP functions are `openssl_cms_sign()`, `openssl_cms_verify()`, `openssl_cms_encrypt()`, `openssl_cms_decrypt()`. These map onto [`CMS\SignedData`](../cms/signed.mdx) and [`CMS\EncryptedData` / `EnvelopedData`](../cms/encrypted.mdx) respectively.
 
-## Things that did not change
+## Unchanged APIs
 
 A short list of common 3.0 patterns that work identically in 4.0, to save reviewer time:
 

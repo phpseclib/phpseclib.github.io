@@ -5,7 +5,7 @@ title: Overview
 phpseclib's `File` namespace handles the file formats that appear throughout public-key cryptography - certificates, certificate requests, key bundles, revocation lists, and signed/encrypted/compressed message containers. This
 page is a map of what's covered and how the pieces fit together.
 
-## Two families
+## The two families of File formats
 
 The formats split into two groups:
 
@@ -36,7 +36,7 @@ the [Cryptographic Message Syntax](https://en.wikipedia.org/wiki/Cryptographic_M
 
 CMS containers stack. To sign-then-encrypt a payload, you wrap it in a `SignedData` and then wrap _that_ in an `EncryptedData`.
 
-## "I have a file - which class do I use?"
+## Identifying a file by its contents
 
 | If the file looks like... | It's probably... |
 | --- | --- |
@@ -49,7 +49,7 @@ CMS containers stack. To sign-then-encrypt a payload, you wrap it in a `SignedDa
 
 For CMS containers specifically, you don't need to know the variant in advance - `CMS::load()` reads the `contentType` field and returns the appropriate subclass. See [CMS Overview](cms/overview.mdx) for details.
 
-## Going deeper
+## Deep dives
 
 Two pages cover the machinery underneath every class on this list:
 
