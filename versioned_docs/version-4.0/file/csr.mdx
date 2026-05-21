@@ -44,7 +44,7 @@ iO6MjSgnJEsqXqDYFvphGEvPbWCA0zVAMnLAjxLY5U6PubL22RVeWoYxo7qGqmvI
 LWmtwHos+tDaIBKY0wIDAQAB
 -----END PUBLIC KEY-----
 ```
-Note that if the key is in an unsupported format then `$csr->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$csr['certificationRequestInfo']['subjectPKInfo']`.
+Note that if the key is in an unsupported format then `$csr->getPublicKey()` will throw a [UnexpectedValueException](exceptions/overview.md#unexpectedvalueexception). If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$csr['certificationRequestInfo']['subjectPKInfo']`.
 
 Very rarely, CSRs may not have a public key at all. You can test for this by doing `$csr->hasPublicKey()`, which returns a boolean based on whether or not the CSR in question has a public key or not.
 
@@ -315,7 +315,7 @@ Some attributes have built in dedicated functions for manipulating them:
 
   `$csr->setExtension()` and `$csr->removeExtension()`. See [Setting Extensions](#setting-extensions) for more information.
 
-_Any_ attribute can be set by calling `$csr->setAttribute()`. `$x509->setAttribute()` has two required parameters - `$type` (a string) and `$value` (which can be any number of primitive types or object types).
+_Any_ attribute can be set by calling `$csr->setAttribute()`. `$csr->setAttribute()` has two required parameters - `$type` (a string) and `$value` (which can be any number of primitive types or object types).
 
 If an attribute is present multiple times then phpseclib will only modify the first occurance of that attribute.
 
@@ -334,7 +334,7 @@ Any extension request can be set by calling `$csr->setExtension()`. `$csr->setEx
 
 If an extension is present multiple times (which really shouldn't ever happen) then phpseclib will only modify the first occurance of that extension.
 
-To remove _all_ occurances of an extension one need simply call `$x509->removeExtension('whatever')`.
+To remove _all_ occurances of an extension one need simply call `$csr->removeExtension('whatever')`.
 
 Here's an example of an extension being set:
 

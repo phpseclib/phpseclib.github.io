@@ -46,7 +46,7 @@ An unencrypted PFX (eg. [pfx2.der](pathname:///asn1/pfx2.der)) looks like this:
 
 <PFXUnencrypted />
 
-If an encrypted PFX is loaded without a password then `\phpseclib4\Exception\NoPasswordProvidedException` will be thrown.
+If an encrypted PFX is loaded without a password then `\phpseclib4\Exception\PasswordNeededException` will be thrown. If the password is wrong then `\phpseclib4\Exception\BadDecryptionException` will be thrown instead. The two are distinct so that you can prompt the user for a password in the first case and report a credential mismatch in the second.
 
 All elements and subelements of the above PFX objects can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php).
 
@@ -79,25 +79,35 @@ Returns an array containing all private key and X509 `pkcs-9-at-localKeyId` valu
 
 ### pluckByFriendlyName()
 
-Has one parameter - `$value`.
+Has one parameter - `$value`, which can be a string or any `\phpseclib4\File\ASN1\Types\BaseString` instance (use `BaseString` when you need to pin a specific ASN.1 string type for matching).
 
 Returns an array containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-friendlyName` matching `$value`.
 
 ### pluckByLocalKeyID()
 
-Has one parameter - `$value`.
+Has one parameter - `$value`, which can be a string or any `\phpseclib4\File\ASN1\Types\BaseString` instance.
 
 Returns an array containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-localKeyId` matching `$value`.
 
+A common idiom when bundling a cert with its matching private key is to give both bags the same `localKeyID` so that they can be paired up later:
+
+```php
+$keyId = random_bytes(16);
+$pfx->add($x509, friendlyName: 'production', localKeyID: $keyId);
+$pfx->add($privKey, friendlyName: 'production', localKeyID: $keyId);
+```
+
+This is what Windows and Apple Keychain use to figure out which key belongs to which cert. `pluckByLocalKeyID($keyId)` will then return both objects together.
+
 ### pfxFromFriendlyName()
 
-Has one parameter - `$value`.
+Has one parameter - `$value`, which can be a string or any `\phpseclib4\File\ASN1\Types\BaseString` instance.
 
 Returns a PFX object containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-friendlyName` matching `$value`.
 
 ### pfxFromLocalKeyID()
 
-Has one parameter - `$value`.
+Has one parameter - `$value`, which can be a string or any `\phpseclib4\File\ASN1\Types\BaseString` instance.
 
 Returns a PFX object containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-localKeyId` matching `$value`.
 
@@ -191,3 +201,10 @@ Example:
 ```php
 $pfx->sign($x509);
 ```
+
+To sign with a PFX, the PFX must contain either:
+
+- **Exactly one private key, no cert.** Behaves like signing with a bare `PrivateKey` — no auto-fill of issuer info.
+- **Exactly one private key and exactly one matching X509.** The X509's public key must match the private key's public side. In this case `sign()` additionally copies the CA cert's subject DN as the target's issuer DN, and the CA cert's `subjectKeyIdentifier` as the target's `authorityKeyIdentifier`.
+
+A PFX with more than one cert/key pair, or with non-matching cert and key, will throw `\phpseclib4\Exception\InvalidArgumentException` when you try to sign with it. If you have a PFX containing multiple identities, use [`pfxFromFriendlyName()`](#pfxfromfriendlyname) or [`pfxFromLocalKeyID()`](#pfxfromlocalkeyid) to extract the specific pair you want to sign with first.

@@ -21,7 +21,7 @@ print_r($spkac);
 `$spkac`, in this case, is a SPKAC object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$spkac` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
 <GoodSPKAC />
-All elements and subelements of the above SPKAC object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$spkac['publicKeyAndChallenge']['spki']` or you could do `$spkac->getPublicKey()`. It's these helper functions that set the CSR class apart from \phpseclib4\File\ASN1\Constructed.
+All elements and subelements of the above SPKAC object can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php). As a consequence of this there are two ways to get (for example) the public key. You could do `$spkac['publicKeyAndChallenge']['spki']` or you could do `$spkac->getPublicKey()`. It's these helper functions that set the SPKAC class apart from \phpseclib4\File\ASN1\Constructed.
 
 To learn more about the capabilities afforded to the SPKAC class by virtue of it being a thin wrapper around \phpseclib4\File\ASN1\Constructed please refer to [Deep Dive: ASN1\Constructed Objects](detail-constructed.mdx).
 
@@ -40,7 +40,7 @@ eB5g0Z6B/RXc6EpvHnX1GYMYofsfjP2U3is8qYWvuzPvmc7xD+QOb6wF5p9FXSOG
 jXmnuljjPaeLwAF3AwIDAQAB
 -----END PUBLIC KEY-----
 ```
-Note that if the key is in an unsupported format then `$spkac->getPublicKey()` will throw a `UnsupportedFormatException` exception. If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$csr['publicKeyAndChallenge']['spki']`.
+Note that if the key is in an unsupported format then `$spkac->getPublicKey()` will throw a [UnexpectedValueException](exceptions/overview.md#unexpectedvalueexception). If you want to see what the public key is, regardless of whether or not it's in a supported format, then you can do `$spkac['publicKeyAndChallenge']['spki']`.
 
 Very rarely, SPKACs may not have a public key at all. You can test for this by doing `$spkac->hasPublicKey()`, which returns a boolean based on whether or not the SPKAC in question has a public key or not.
 
@@ -109,6 +109,8 @@ You can also remove a public key be calling `$spkac->removePublicKey()`.
 
 The challenge can be set by calling `$spkac->setChallenge()` and passing a string to that function. It can also be set by setting `$spkac['publicKeyAndChallenge']['challenge']` to a string.
 
+Note that the challenge field is an `IA5String` (7-bit ASCII), so `setChallenge()` silently ANDs each byte of the input with `0x7F` to clamp it into the 7-bit range. If you pass a UTF-8 challenge with multi-byte characters, you'll get back a clamped 7-bit version rather than an error. For interoperability, pass plain ASCII.
+
 ### Signing
 
 Let's say you created your public key thusly:
@@ -128,6 +130,8 @@ $spkac = new SPKAC($public);
 $private->sign($spkac);
 echo $spkac;
 ```
+
+Note that `$pfx->sign($spkac)` works syntactically but is unusual: an SPKAC is signed by the *requester* (proving they control the private key corresponding to the embedded public key), whereas a PFX represents a CA's signing identity. In normal flows you'd use a bare `PrivateKey` to sign an SPKAC.
 
 ## Validating Signatures
 

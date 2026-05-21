@@ -7,7 +7,7 @@ import ListExtensions from './inc/x509-list-extensions.md';
 import GetExtension from './inc/x509-get-extension.md';
 import EmptyX509 from './inc/x509-empty.md';
 
-[X.509 certificates](https://en.wikipedia.org/wiki/X.509) are basically wrappers around public keys with meta information that's intrepreted in application specific contexts.
+[X.509 certificates](https://en.wikipedia.org/wiki/X.509) are basically wrappers around public keys with meta information that's interpreted in application specific contexts.
 
 ## Reading Certificates
 
@@ -100,8 +100,8 @@ Subject DN Methods:
 Issuer DN Methods:
 
 - [`getIssuerDN()`](detail-dns.mdx#getdn)
-- [`hasIssuerDNProps()`](detail-dns.mdx#hasdnprop)
-- [`getSubjectDNProps()`](detail-dns.mdx#getdnprops)
+- [`hasIssuerDNProp()`](detail-dns.mdx#hasdnprop)
+- [`getIssuerDNProps()`](detail-dns.mdx#getdnprops)
 
 Learn more about how DNs work in phpseclib at [Deep Dive: Distinguished Names (DNs)](detail-dns.mdx).
 
@@ -156,15 +156,15 @@ That said, even when doing this, there are 3x things that are (probably) going t
 
 1. The serial number. It's set to be a random 160-bit positive number by default.
 
-   If you want to set your own serial number you can do so by calling `$x509->setSerialNumber()`. That function has one required parameter - `$serial` - and one optional parameter - `$base`. `$serial` can be a string or an instance of `phpseclib4\Math\BigInteger`. If it's a BigInteger then `$base` is ignored. If it's a string then that string will be intrepreted as a base-256 number by default unless you change the value of `$base`.
+   If you want to set your own serial number you can do so by calling `$x509->setSerialNumber()`. That function has one required parameter - `$serial` - and one optional parameter - `$base`. `$serial` can be a string or an instance of `phpseclib4\Math\BigInteger`. If it's a BigInteger then `$base` is ignored. If it's a string then that string will be interpreted as a base-256 number by default unless you change the value of `$base`.
 
 2. The start date. It's set to the current time by default.
 
-   If you want to set your own start date you can do so by calling `$x509->setStartDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+   If you want to set your own start date you can do so by calling `$x509->setStartDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constructor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
 3. The end date. It's set to one year from the current time by default.
 
-   If you want to set your own start date you can do so by calling `$x509->setEndDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string.  If it's a string it'll be passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+   If you want to set your own start date you can do so by calling `$x509->setEndDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string.  If it's a string it'll be passed to the [constructor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
    If `$date` is set to `lifetime` then the end date will be set to December 31, 9999 AD 23:59:59 UTC. Per [RFC5280 § 4.1.2.5 Validity](http://tools.ietf.org/html/rfc5280#section-4.1.2.5) that value indicates "_that a certificate has no well-defined expiration date_".
 
@@ -343,12 +343,12 @@ $csr = CSR::load('...');
 $x509 = new X509($csr);
 $x509->removeSubjectDNProps('id-at-commonName');
 $x509->removeExtension('id-ce-subjectAltName');
-$x509->removeExtension('id-ca-basicConstraints');
+$x509->removeExtension('id-ce-basicConstraints');
 $x509->removeExtension('id-ce-keyUsage');
 $x509->removeExtension('id-ce-extKeyUsage');
 $x509->removeExtension('id-ce-cRLDistributionPoints');
 $x509->removeExtension('id-pe-authorityInfoAccess');
-$x509->setDomain($authorizedDomain);
+$x509->addDomains($authorizedDomain);
 $pfx->sign($x509);
 echo $x509;
 ```
@@ -388,7 +388,7 @@ $private = EC::createKey('nistp256');
 $public = $private->getPublicKey();
 
 $x509 = new X509($public);
-$ca->setDN('O=child organization');
+$x509->setDN('O=child organization');
 $pfx->sign($x509);
 ```
 This will sign the certificate and auto-set the issuer DN's to match those of the X.509 that is in the PFX.
@@ -406,14 +406,21 @@ You can also convert an X509 object to binary by doing `$x509->toString(['binary
 ### Signatures
 
 ```php
-X509::loadCA('...');
+X509::addCA('...');
 $x509 = X509::load('...');
 echo $x509->validateSignature() ? 'valid' : 'invalid';
 ```
 
 Certificate authority certificates can be downloaded from [curl - SSL CA Certificates](https://curl.haxx.se/docs/caextract.html). Parsing that is left as an exercise to the reader.
 
-`validateSignature()` takes the date into consideration when validating the signature. If you want to change the date to some date other than the current date you can do so by calling `X509::setTargetValidationDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constuctor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
+`validateSignature()` takes one optional parameter - `$caonly` (a boolean that defaults to `true`) - which controls how self-signed certs are handled:
+
+- `true` (default): a self-signed cert returns `false` unless that cert is also in the CA store. This is what you want for normal verification flows.
+- `false`: a self-signed cert verifies if its signature is valid against its own public key. Useful for inspecting or accepting self-signed certs without first loading them as CAs.
+
+`addCA()` can be called more than once to build up a trust store; each call appends a new trust root. It accepts a PEM/DER string, the same nested-array structure that `ASN1::decodeBER()` returns, a `\phpseclib4\File\ASN1\Constructed` instance, or an already-loaded `X509` object. To inspect or reset the store there's `X509::getCAs()`, which returns the current store as an array of `X509` objects, and `X509::clearCAStore()`, which removes all loaded CAs (most useful in tests).
+
+`validateSignature()` takes the date into consideration when validating the signature. If you want to change the date to some date other than the current date you can do so by calling `X509::setTargetValidationDate()`. That function has one required parameter - `$date` - which can be either an instance of `\DateTimeInterface` or a string. If it's a string it'll passed to the [constructor of `\DateTime`](https://www.php.net/manual/en/datetime.construct.php) and parsed by that.
 
 To retrieve the date currently being used to perform said validation one can call `X509::getTargetValidationDate()`, which returns either an instance of `\DateTimeInterface` or a string
 
@@ -423,9 +430,19 @@ If you want to disable the fetching of intermediate certificates via URI's altog
 
 To validate a certificate against certificate revocation lists one would need to pass a custom [anonymous function](https://www.php.net/manual/en/functions.anonymous.php) to [X509::setCRLLookupCallback()](crl.mdx#using-crls-in-practice).
 
-By default the key usage is checked when a signature is validated. Like is the issuer actually authorized to sign children certificates? To disable this check one need simply call `X509::ignoreKeyUsage()`. To re-enable this check one need simply call `X509::checkKeyUsage()`.
+By default the key usage is checked when a signature is validated. Like is the issuer actually authorized to sign children certificates? To disable this check one need simply call `X509::ignoreKeyUsage()`. To re-enable this check one need simply call `X509::checkKeyUsage()`. The current state can be queried with `X509::isCheckKeyUsageEnabled()`.
 
-By default the basic constraints are checked when a signature is validated, as well. To disable this check one need simply call `X509::ignoreBasicConstraints()`. To re-enable this check one need simply call `X509::checkBasicConstraints()`.
+By default the basic constraints are checked when a signature is validated, as well. To disable this check one need simply call `X509::ignoreBasicConstraints()`. To re-enable this check one need simply call `X509::checkBasicConstraints()`. The current state can be queried with `X509::isCheckBasicConstraintsEnabled()`.
+
+### DN comparison
+
+When `validateSignature()` walks a chain it needs to match a cert's issuer DN against the subject DN of a candidate CA cert. By default the comparison is strict: two DNs are considered different if any RDN value uses a different ASN.1 string type, so `UTF8String "ACME"` ≠ `PrintableString "ACME"`. This is correct per RFC 5280, but some real-world chains were issued with mixed string types and only validate under loose comparison.
+
+```php
+X509::looseDNComparison();           // compare underlying string values only
+X509::strictDNComparison();          // require exact ASN.1 type match (default)
+X509::isStrictDNComparisonEnabled(); // query the current state
+```
 
 ### URLs
 
@@ -439,3 +456,9 @@ echo $x509->validateURL('https://www.domain.tld/path/to/whatever.ext') ?
 ### Chains
 
 Let's say you have a [certificate chain](https://en.wikipedia.org/wiki/Chain_of_trust) that has at least one intermediate cert and let's further say that you wanted to see all the certs in this chain. To do that you could do `$x509->getValidationChain()`. That'll return an array of X509 objects who's first element is the current cert and who's last element is the CA cert.
+
+### isIssuerOf()
+
+`$x509->isIssuerOf($subject, $expectedKeyUsage = [])` tests whether this `X509` (acting as a CA cert) issued `$subject`. `$subject` can be another `X509`, a `CRL`, a `Choice`, or an array containing either an `issuerAndSerialNumber` or a `subjectKeyIdentifier`. The optional `$expectedKeyUsage` is an array of key-usage bit names that the issuer cert must have set (eg. `['keyCertSign']`).
+
+This is used internally during chain validation; usually you'd just call `validateSignature()` and let phpseclib walk the chain. `isIssuerOf()` is useful when you want to ask "did this specific CA cert sign that specific thing" without running a full validation.

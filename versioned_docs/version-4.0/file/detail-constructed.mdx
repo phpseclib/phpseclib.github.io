@@ -356,6 +356,40 @@ Without the `ASN1::enableBlobsOnBadDecodes()` call, this would throw an exceptio
 
 `$x509['tbsCertificate']['issuer']` is now an instance of `phpseclib4\File\ASN1\MalformedData` - pinpointing exactly where the corruption is.
 
+## Bypassing Encoding with ASN1\Element
+
+Everything discussed so far has been about _reading_ ASN.1 - lazy decoding, error pinpointing, walking a structure that phpseclib already understands. There's a corresponding tool for the _write_ side: `\phpseclib4\File\ASN1\Element`.
+
+`Element` is a wrapper that tells phpseclib "these bytes are already encoded - don't touch them." Anywhere phpseclib would otherwise encode a value (a DN, an extension value, even a top-level field via [ArrayAccess](#array-like-interface)), an `Element` is written through verbatim. That makes it the universal escape hatch for:
+
+- **Writing custom extensions without registering them.** [`X509::registerExtension()`](x509.mdx#custom-extensions) is the standard path for custom extensions and gives you structured read access in addition to write support. `Element` is the shorter path when you only need to write and don't care about structured read-back - eg. producing a fixture cert. Encode the bytes yourself, wrap them in `Element`, pass to `setExtension()`.
+- **Fuzzing parsers.** Real-world parsers disagree about ASN.1 edge cases, and you may want to produce intentionally-malformed certs to see how each one reacts. `Element` lets you put arbitrary bytes anywhere, including bytes that don't decode as valid ASN.1 or bytes whose outer ASN.1 type is wrong for the slot.
+- **Interop testing against external implementations** that have their own opinion about a structure.
+
+### Fuzzing with malformed values
+
+Because `Element` bypasses encoding, you can put _anything_ in any slot - including bytes that violate the schema for that field. As an extreme example, here's how to swap a certificate's signature from a `BIT STRING` to an `OCTET STRING` to see how downstream parsers react:
+
+```php
+use phpseclib4\File\{ASN1, ASN1\Element, X509};
+
+$x509 = X509::load($pem);
+
+// Replace the signature with the same bytes but tagged as OCTET STRING:
+$x509['signature'] = new Element(
+    ASN1::encodeDER("$x509[signature]", ['type' => ASN1::TYPE_OCTET_STRING])
+);
+
+echo $x509;
+// Outputs a PEM-encoded cert whose signature field is the wrong ASN.1 type.
+// Most parsers will reject it; some will silently accept it; some will crash.
+// Useful data either way.
+```
+
+This composes with the [Error Pinpointing](#error-pinpointing) tooling on the read side: produce a deliberately-broken cert with `Element`, hand it to `X509::load()`, then turn on `ASN1::enableBlobsOnBadDecodes()` to see exactly which slot a strict parser objects to.
+
+Use `Element` sparingly in production code - you lose all of phpseclib's validation - but it's the right tool for fuzzing, interop testing, and one-off custom-structure work where registration would be overkill.
+
 ## Array-Like Interface
 
 Despite being objects, `Constructed` instances expose their dynamic elements through array syntax - e.g., `$x509['tbsCertificate']['extensions']`. This is because `Constructed` implements the [`ArrayAccess`](https://www.php.net/manual/en/class.arrayaccess.php) interface.
