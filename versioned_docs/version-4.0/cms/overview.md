@@ -35,6 +35,6 @@ If you're only dealing with CMS\SignedData then you'll probably want to add an i
 
 ```php
 if (!$cms instanceof CMS\SignedData) {
-    throw new UnexpectedValueException('Expected CMS\SignedData )
+    throw new UnexpectedValueException('Expected CMS\\SignedData');
 }
 ```

@@ -10,7 +10,7 @@ Note that this feature requires the [zlib extension be installed](https://www.ph
 
 ## Reading CompressedData CMS
 
-The method for loading a SignedData CMS is the same as loading any other CMS type:
+The method for loading a CompressedData CMS is the same as loading any other CMS type:
 
 ```php
 use phpseclib4\File\CMS;
@@ -34,7 +34,7 @@ The decompressed content can be extracted by calling `$cms->getContent()`.
 ```php
 use phpseclib4\File\CMS;
 
-$cms = new CMS\CompressedData(file_get_contents('...));
+$cms = new CMS\CompressedData(file_get_contents('...'));
 echo $cms;
 ```
 

@@ -52,20 +52,33 @@ $message = $cms->withKey('...')->decrypt();
 If you don't know the content encryption key but are able to derive it with password you can do so thusly:
 
 ```php
-$message = $cms->deriveWithPassword('...')->decrypt();
+$message = $cms->deriveFromPassword('...')->decrypt();
 ```
-If you don't know the content encryption key but are able to derive it with another key, be it a symmetric key or a private key (an instance of `\phpseclib4\Crypt\Common\PrivateKey`), you can do so thusly:
+If you don't know the content encryption key but are able to derive it with another key, be it a symmetric string (for KEKRecipient) or a private key - an `\phpseclib4\Crypt\RSA\PrivateKey` (for KeyTransRecipient) or `\phpseclib4\Crypt\EC\PrivateKey` (for KeyAgreeRecipient) - you can do so thusly:
 
 ```php
-$message = $cms->deriveWithKey($key)->decrypt();
+$message = $cms->deriveFromKey($key)->decrypt();
 ```
+
+phpseclib walks the recipients, finds the first one whose mechanism matches the supplied key, and derives the CEK through it.
 
 ### getRecipients()
 
-Calling `getRecipients()` will return an array containing all recipients in the EncryptedData object. Example: 
+Calling `getRecipients()` will return an array containing all recipients in the EncryptedData object. Each entry is one of four recipient subclasses depending on how it was constructed:
+
+| Class | What `withKey()` / `withPassword()` takes |
+| --- | --- |
+| `KeyTransRecipient` | An RSA private key (the recipient cert's matching key) |
+| `KeyAgreeRecipient` | An EC private key (used with Diffie-Hellman) |
+| `KEKRecipient` | A pre-shared symmetric key as a string |
+| `PasswordRecipient` | A password as a string, via `withPassword()` |
+
+Note that on a recipient, `withKey()` takes that recipient's specific secret (eg. the RSA private key for a KeyTransRecipient) - **not** the content encryption key. The content encryption key is what `withKey()` takes on the EncryptedData itself.
+
+Example:
 
 ```php
-$message = $cms->getRecipients()[0]?->withKey('...')->decrypt();
+$message = $cms->getRecipients()[0]?->withKey($key)->decrypt();
 ```
 
 ### findRecipients()
@@ -73,7 +86,7 @@ $message = $cms->getRecipients()[0]?->withKey('...')->decrypt();
 Most recipients can be searched for with a key identifier. For some recipient types that key identifier is a string - for others, it's an [X.509 certificate](/file/x509.mdx). In either case you can search for recipients as follows:
 
 ```php
-$message = $cms->findRecipients($keyIdentifier)[0]?->withKey('...')->decrypt();
+$message = $cms->findRecipients($x509)[0]?->withKey($key)->decrypt();
 ```
 If you call `findRecipient` (singular vs plural) you'll get the _first_ recipient that matches (or a null) instead of an array of matching recipients.
 
@@ -90,7 +103,7 @@ Likewise CRLs embedded within the CMS can be extracted as follows:
 ```php
 $cms->getCRLs();
 ```
-Certificates can be added by calling `$cms->addCertificate($x509)`. There is currently no mechanism to add CRLs.
+Certificates can be added by calling `$cms->addCertificate($x509)` and CRLs by calling `$cms->addCRL($crl)`.
 
 Also, note that certificates and CRLs are only present if recipients are present (ie. if the contentType is EnvelopedData vs EncryptedData)
 
@@ -103,7 +116,7 @@ use phpseclib4\File\CMS;
 
 $cms = new CMS\EncryptedData('hello, world!');
 echo $cms;
-````
+```
 The CMS that that would produce would look something like this:
 
 ```
@@ -148,6 +161,21 @@ $key = random_bytes(32);
 $cms = new CMS\EncryptedData('hello, world!', 'aes256-CBC-PAD', $key);
 ```
 
+Note that if you pass a `$key` of the wrong length for the chosen algorithm, the constructor will throw a `\LengthException`. The safest path - especially if you're not sure what the default algorithm's key length is - is to omit `$key` entirely and let the constructor generate one. You can then retrieve the generated key with `$cms->getKey()`, which is exactly what you'll need to give to whoever needs to decrypt the data if you've not added any recipients.
+
+### Inspecting the key and algorithm
+
+`$cms->getKey()` returns the content encryption key that's in use - whether you passed it to the constructor or let phpseclib generate it. If no recipients are attached to the CMS, this is what you'd share out-of-band so the other party can decrypt:
+
+```php
+$cms = new CMS\EncryptedData('hello, world!');
+$cek = $cms->getKey();   // hand this to the recipient through a secure channel
+```
+
+`$cms->getAlgorithm()` returns the OID string for the content encryption algorithm (eg. `'aes128-CBC-PAD'`). Useful when you've loaded a CMS from somewhere and want to know what cipher was used without poking around in the underlying ASN.1.
+
+`$cms->getKeyLength()` and `$cms->getKeyLengthInBytes()` return the expected key length for the configured algorithm - in bits and in bytes respectively. Mostly useful if you want to allocate a key buffer of the right size before calling `withKey()` on a CMS where the CEK is delivered out-of-band.
+
 ### Output Format
 
 By default, CMS objects, when cast to a string, are converted to base64-encoded [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail)s. To make it so that casting to a string produces a binary encoded DERs one need simply call `CMS::enableBinaryOutput()`. To go back to PEMs calling `CMS::disableBinaryOutput()` is sufficient.
@@ -161,7 +189,7 @@ You can also convert a CMS object to binary by doing `$cms->toString(['binary' =
 To create a recipient from an [X509 object](/file/x509.mdx) one need simply do the following:
 
 ```php
-$recipient = $cms->createNewRecipientFromX509($x509)
+$recipient = $cms->createNewRecipientFromX509($x509);
 ```
 If the public key in the X.509 certificate is an RSA public then OAEP padding will be used by default with sha256 as the hash and the MGF hash and a blank label. If you want to change the OAEP parameters one need simply do this:
 
@@ -181,7 +209,7 @@ Trying to call `$x509->setPadding()` on an X.509 certificate with an EC PublicKe
 Also, note that OpenSSL, in particular, won't use the key for _any_ encryption if it's a PSS RSA key. Consequently, if you had an existing X.509 certificate with an RSA PSS public key that you wanted to use you'd need to re-attach the public key to it as a RSA PKCS1 key. Doing this would also require the key be re-signed.
 
 ```php
-$x509->setPublicKey($public->withPadding(RSA::SIGNATURE_PKCS1));
+$x509->setPublicKey($publickey->withPadding(RSA::SIGNATURE_PKCS1));
 $private->sign($x509);
 ```
 

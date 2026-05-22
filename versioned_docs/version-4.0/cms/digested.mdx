@@ -8,7 +8,7 @@ One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedi
 
 ## Reading DigestedData CMS
 
-The method for loading a SignedData CMS is the same as loading any other CMS type:
+The method for loading a DigestedData CMS is the same as loading any other CMS type:
 
 ```php
 use phpseclib4\File\CMS;
@@ -25,7 +25,7 @@ print_r($cms);
 
 ### Confirming digests
 
-The digested content can be validaed by calling `$cms->validate()`.
+The digested content can be validated by calling `$cms->validate()`.
 
 ## Creating DigestedData
 

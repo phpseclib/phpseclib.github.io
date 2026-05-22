@@ -6,7 +6,7 @@ import SignedData from './inc/signeddata.md';
 import ListAttributes from './inc/signeddata-listattributes.md';
 import EmptySignedData from './inc/signeddata-empty.md';
 
-One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax) provides is to act as a wrapper format that bundles files and [digital sigantures](https://en.wikipedia.org/wiki/Digital_signature) of those files together.
+One of the features the [Cryptographic Message Syntax (CMS)](https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax) provides is to act as a wrapper format that bundles files and [digital signatures](https://en.wikipedia.org/wiki/Digital_signature) of those files together.
 
 If a CMS contains a signatures but no file then those signatures are known as detached signatures.
 
@@ -180,6 +180,26 @@ unset($cms['content']['encapContentInfo']['eContent']);
 ```
 That, however, doesn't scale, well. Like what if you wanted to sign a 1GB file? Passing a resource to the constructor is _significantly_ more performant than loading a string of that size. Although I suppose one could use `unset` in this manner to turn an _attached_ signature into a _detached_ signature. Due to the way SignedData works resigning wouldn't be necessary if one removed the file in that manner.
 
+A cleaner way to turn an attached signature into a detached one is `$cms->detach()`. That removes the embedded content from the structure without invalidating the signatures - the signers' message digest attributes still refer to the original content, so re-attaching the same content later will validate just fine.
+
+To validate a detached signature you need to re-attach the content first. That is done by calling `$cms->attach($content)`. `$content` can be either a string (for small content) or a resource (for large content - streamed during hashing, never loaded into memory):
+
+```php
+$cms = CMS::load(file_get_contents('document.p7s'));
+
+// Small content - pass as a string:
+$cms->attach(file_get_contents('document.pdf'));
+
+// Large content - pass as a resource:
+$cms->attach(fopen('document.pdf', 'r'));
+
+foreach ($cms->getSigners() as $signer) {
+    var_dump($signer->validateSignature());
+}
+```
+
+Anything other than a string or resource passed to `attach()` will throw `\phpseclib4\Exception\UnexpectedValueException`. If `attach()` isn't called before validating a detached signature, all signers will fail since they're hashing against missing content.
+
 ### Adding Signers
 
 The simplest way to create a signer - and to add a signature - is to do this:
@@ -195,11 +215,20 @@ Doing that is _exactly_ the same thing as doing this:
 $signer = $cms->addESSSigner($x509);
 $private->sign($signer);
 ```
-Where `$x509` and `$private` could correspond to `$pfx->getCertificates()[0]` and `$pfx->getPrivateKeys()[0]`, respectively, or just indepentendly loaded / generated certificates and keys (well, independent of a PFX - not of each other).
+Where `$x509` and `$private` could correspond to `$pfx->getCertificates()[0]` and `$pfx->getPrivateKeys()[0]`, respectively, or just independently loaded / generated certificates and keys (well, independent of a PFX - not of each other).
 
 ESS signatures have an extra signed attribute - id-aa-signingCertificateV2 - that non-ESS signatures do not have. This attribute "_allows for a verifier to check that the certificate used in the verification process was the same certificate the signer intended_" ([RFC5035 § 4](https://datatracker.ietf.org/doc/html/rfc5035#section-4))
 
 Non-ESS signatures can be added by doing `$cms->addSigner($x509)`. Those still make use of signed attributes - just not id-aa-signingCertificateV2. A third type of signature - one that doesn't make use of signed attributes at all - can be added by doing `$cms->addNakedSigner($x509)`.
+
+All three of `addSigner()`, `addESSSigner()`, and `addNakedSigner()` take an optional second parameter that controls how the signer identifies its certificate in the resulting CMS:
+
+- `CMS::ISSUER_AND_DN` (the default) - identify the signing cert by its issuer DN and serial number. This is the conventional choice and what most verifiers expect.
+- `CMS::KEY_ID` - identify the signing cert by its `subjectKeyIdentifier` extension. Smaller and unambiguous, but requires that the cert actually has an SKI extension.
+
+```php
+$signer = $cms->addESSSigner($x509, CMS::KEY_ID);
+```
 
 To set the message digest you need to update the private key to use that digest. So like by default phpseclib uses sha256 for most everything but if you wanted to use sha512 you'd need to do this:
 
@@ -221,7 +250,7 @@ Doing that is basically the same thing as doing this:
 $x509 = new X509($private->getPublicKey());
 $x509->setExtension('id-ce-keyUsage', ['digitalSignature']);
 $private->sign($x509);
-$signer = $this->addESSSigner($x509);
+$signer = $cms->addESSSigner($x509);
 $private->sign($signer);
 ```
 ie. it's signed by a self signed X509 with an empty DN.
@@ -255,7 +284,7 @@ One quirky thing about adding signers and signer attributes is that they're not 
 - id-contentType (required if signedAttrs is going to be present)
 - id-messageDigest (required if signedAttrs is going to be present)
 - id-aa-signingCertificateV2 (required for ESS signers)
-- id-signingTime (which isn't required but, none-the-less, phpseclib adds it)
+- id-aa-signingTime (which isn't required but, none-the-less, phpseclib adds it)
 
 Consequently, you might think that, once you've added a signer, you'd access it by doing `$signer['signedAttrs'][4]`, but that isn't necessarily going to be the case - it could wind up being added at `$signer['signedAttrs'][0]` because of this blurb from [ITU-T Recommendation X.690 § 11.6 Set-of components](https://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf#page=27):
 
@@ -302,6 +331,6 @@ $cms->validateSignature();
 ```php
 $signer->validateSignature(false);
 ```
-`validateSignature()` will also return false if the key usage extension isn't set appropriately (eg. if neither `digitalSignature` or `nonRepudiation` are set), `findSigner()` will fail. This key usage check can be disabled by doing calling `X509::ignoreKeyUsage()`.
+`validateSignature()` will also return false if the key usage extension on the signing certificate isn't set appropriately (eg. if neither `digitalSignature` or `nonRepudiation` are set). This key usage check can be disabled by calling `X509::ignoreKeyUsage()`.
 
 Note that although there are multiple methods to add signers there's only one method to verify signatures. phpseclib's `validateSignature()` method is ESS aware whereas `openssl_cms_verify()` isn't. What that means is that if an ESS signature is detected and the ESS signature isn't valid whereas the regular signature is then phpseclib's `validateSignature()` will fail whereas `openssl_cms_verify()` won't. The reason for this failure, in this scenario, isn't because the signature is actually invalid but because the signing certificate wouldn't be locatable. eg. `$signer->getCertificate()` would return nothing because it's looking for a certificate that matches the ESS criteria and it wouldn't be able to find such a certificate.
