@@ -424,9 +424,28 @@ Certificate authority certificates can be downloaded from [curl - SSL CA Certifi
 
 To retrieve the date currently being used to perform said validation one can call `X509::getTargetValidationDate()`, which returns either an instance of `\DateTimeInterface` or a string
 
-When validating a signature it may be necessary to download intermediate certs from URI's. An intermediate certificate that linked to itself would result in an infinite loop so to prevent that we set a recursion limit. A negative number means that there is no recursion limit. That can be done by calling `X509::setRecurLimit($count)`, where `$count` is an integer that defaults to 5.
+When validating a signature it may be necessary to download intermediate certs from URI's. To do so one needs to provide a callback to `X509::setURLFetchCallback()`. eg.
 
-If you want to disable the fetching of intermediate certificates via URI's altogether you can do so by calling `X509::disableURLFetch()`.  The fetching of said certificates can be re-enabled by calling `X509::enableURLFetch()`.
+```php
+X509::setURLFetchCallback(function (string $host, string $ip, int $port, string $scheme): bool {
+    if ($scheme !== 'http' && $scheme !== 'https') {
+        return false;
+    }
+
+    $public = filter_var(
+        $ip,
+        FILTER_VALIDATE_IP,
+        FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+    );
+
+    return $public !== false; // public address -> allow; internal/reserved -> deny
+});
+```
+The callback receives the resolved IP, host, port, and scheme, and returns true to allow the connection or false to block it.
+
+While it may be tempting to just have that function always return true (it would certainly be simpler!) doing so would enable a maliciously crafted certificate to point to an address on the host's own network (eg. loopback, a cloud metadata endpoint such as 169.254.169.254, an internal-only service, etc) turning validation into a [server-side request forgery](https://en.wikipedia.org/wiki/Server-side_request_forgery) vector.
+
+Additionally, an intermediate certificate that linked to itself would result in an infinite loop so to prevent that we set a recursion limit. A negative number means that there is no recursion limit. That can be done by calling `X509::setRecurLimit($count)`, where `$count` is an integer that defaults to 5.
 
 To validate a certificate against certificate revocation lists one would need to pass a custom [anonymous function](https://www.php.net/manual/en/functions.anonymous.php) to [X509::setCRLLookupCallback()](crl.mdx#using-crls-in-practice).
 

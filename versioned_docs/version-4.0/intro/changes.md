@@ -300,8 +300,8 @@ See [the X509 reference](../file/x509.mdx) and [the CRL reference](../file/crl.m
 | `$x509->validateSignature()` | `$x509->validateSignature()` (now also runs revocation and date checks) |
 | `$x509->validateURL($url)` | `$x509->validateURL($url)` (unchanged) |
 | `$x509->validateDate($date)` | removed, see below |
-| `X509::disableURLFetch()` | `X509::disableURLFetch()` (unchanged; was already static in 3.0) |
-| `X509::enableURLFetch()` | `X509::enableURLFetch()` (unchanged) |
+| `X509::disableURLFetch()` | removed; AIA fetching is off by default in 4.0, so there's nothing to disable |
+| `X509::enableURLFetch()` | removed; opt in with `X509::setURLFetchCallback()` instead (see below) |
 | `X509::setRecurLimit($n)` | `X509::setRecurLimit($n)` (unchanged; was already static in 3.0) |
 
 New in 4.0:
@@ -310,11 +310,31 @@ New in 4.0:
 - `X509::ignoreKeyUsage()`: skip the keyUsage check on the issuer.
 - `X509::ignoreBasicConstraints()`: skip the basicConstraints check.
 - `X509::setCRLLookupCallback(callable $fn)`: supply a callback that takes a CDP URL and a serial number, returns whether that serial is listed as revoked in the corresponding CRL. Used by `validateSignature()` for revocation checking. (CRL only; phpseclib 4.0 does not currently do OCSP.)
+- `X509::setURLFetchCallback(?callable $fn)`: opt in to AIA intermediate fetching and gate where phpseclib may connect. The callback receives `(string $host, string $ip, int $port, string $scheme)` and returns `true`/`false`; phpseclib connects to the resolved `$ip` it passed you. Replaces 3.0's `disableURLFetch()` / `enableURLFetch()` (see below).
 - CSR and SPKAC have their own `validateSignature()` (always self-signed, no `addCA()` setup needed).
 
 ### validateDate() removal
 
 In 3.0, `validateDate($date)` was an explicit method: you called it with a date and it told you whether the cert was valid at that moment. In 4.0, that check is folded into `validateSignature()` automatically. If you want to check against a date other than "now," call `X509::setTargetValidationDate($date)` first and then `validateSignature()`. There is no longer a way to do a date-only check independently of the signature check, but in practice nobody wanted that; it was always the signature *and* date as a pair.
+
+### AIA intermediate fetching is now opt-in
+
+In 3.0, `validateSignature()` would, by default, follow the `caIssuers` URL in a certificate's `id-pe-authorityInfoAccess` (AIA) extension to download a missing intermediate, automatically and with no opt-in. Because that URL comes from the certificate being validated, it is attacker-controlled whenever you validate a certificate you did not issue, which made automatic fetching a server-side request forgery vector: a crafted certificate could make the validating server connect to `127.0.0.1`, a cloud metadata endpoint such as `169.254.169.254`, or any internal-only service. The only mitigation in 3.0 was `disableURLFetch()`, which most callers never knew to call.
+
+4.0 inverts the default: AIA fetching is **off** unless you opt in. If your 3.0 code relied on automatic intermediate fetching, typically when you were handed a leaf certificate without its chain and had only roots loaded, validation will stop fetching in 4.0 and may fail with an untrusted-issuer error. To restore fetching, register a callback that approves the destinations you trust:
+
+```php
+X509::setURLFetchCallback(function (string $host, string $ip, int $port, string $scheme): bool {
+    // allow only public addresses; judge $ip, do not re-resolve $host
+    return filter_var(
+        $ip,
+        FILTER_VALIDATE_IP,
+        FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+    ) !== false;
+});
+```
+
+phpseclib resolves the host once and connects to the exact `$ip` it hands the callback, so an approved address cannot be redirected by DNS rebinding, provided your callback judges `$ip` rather than resolving `$host` itself. If you run an internal CA whose `caIssuers` endpoint is on a private range, invert the filter to allow only that range. `setRecurLimit()` still caps how deep fetching recurses, but it no longer enables fetching on its own: with no callback registered, nothing is fetched regardless of the limit. If you never relied on auto-fetching (you always supplied the full chain or loaded intermediates via `addCA()`), no change is needed.
 
 ## Output format (PEM vs DER)
 
