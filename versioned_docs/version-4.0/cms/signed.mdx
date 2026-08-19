@@ -178,7 +178,7 @@ Technically, one could pass a string to the constructor and then do this:
 ```php
 unset($cms['content']['encapContentInfo']['eContent']);
 ```
-That, however, doesn't scale, well. Like what if you wanted to sign a 1GB file? Passing a resource to the constructor is _significantly_ more performant than loading a string of that size. Although I suppose one could use `unset` in this manner to turn an _attached_ signature into a _detached_ signature. Due to the way SignedData works resigning wouldn't be necessary if one removed the file in that manner.
+That, however, doesn't scale well. Like what if you wanted to sign a 1GB file? Passing a resource to the constructor is _significantly_ more performant than loading a string of that size. Although I suppose one could use `unset` in this manner to turn an _attached_ signature into a _detached_ signature. Due to the way SignedData works resigning wouldn't be necessary if one removed the file in that manner.
 
 A cleaner way to turn an attached signature into a detached one is `$cms->detach()`. That removes the embedded content from the structure without invalidating the signatures - the signers' message digest attributes still refer to the original content, so re-attaching the same content later will validate just fine.
 

@@ -156,9 +156,11 @@ $pfx->add($privKey, localKeyID: 'whatever');
 
 ### Setting Password
 
-Passwords can be set (or changed) on a PFX by calling `$pfx->setPassword('password')`.
+Passwords can be set (or changed) on a PFX by calling `$pfx->setPassword('password')`. By default, phpseclib uses the empty string as the password.
 
-Passwords can be removed from a PFX by calling `$pfx->removePassword()`.
+Passwords can be removed from a PFX by calling `$pfx->removePassword()`. Password-less PFXs do not have a [MAC](https://en.wikipedia.org/wiki/Message_authentication_code) (as MACs require a password) and are not widely supported by other softwares. [^passwordless]
+
+[^passwordless]: See, for example, [this Feb 2022 feature request for OpenSSL](https://mta.openssl.org/pipermail/openssl-users/2022-February/014901.html) or [this Aug 2016 issue for .NET](https://github.com/dotnet/runtime/issues/18254).
 
 ### Setting MAC Parameters
 
