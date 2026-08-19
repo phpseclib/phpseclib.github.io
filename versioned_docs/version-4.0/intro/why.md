@@ -122,7 +122,7 @@ phpseclib 1.0 / 2.0 documentation lives at http://phpseclib.sourceforge.net/
 
 ## phpseclib3_compat
 
-Due to the namespace change, phpseclib 4.0 can be used to emulate phpseclib 3.0. [phpseclib3_compat](https://github.com/phpseclib/phpseclib3_compat) does just that. So let's say you want to use phpseclib 4 but some of your dependencies are still using phpseclib 3. In this scenario you can require phpseclib/phpseclib:~4.0 and phpseclib/phpseclib3_compat:~1.0 and your dependencies will then start using phpseclib 4 even if they don't know it.
+Due to the namespace change, phpseclib 4.0 can be used to emulate phpseclib 3.0. [phpseclib3_compat](https://github.com/phpseclib/phpseclib3_compat) will do just that pon its release. So let's say you want to use phpseclib 4 but some of your dependencies are still using phpseclib 3. In this scenario you can require phpseclib/phpseclib:~4.0 and phpseclib/phpseclib3_compat:~1.0 and your dependencies will then start using phpseclib 4 even if they don't know it.
 
 The same arrangement still works for older code via [phpseclib2_compat](https://github.com/phpseclib/phpseclib2_compat), which can be layered on top of phpseclib3_compat. So if you have a dependency chain that includes a phpseclib 2-era package, a phpseclib 3-era package, and your own phpseclib 4 code, all three can coexist in a single `composer install`.
 

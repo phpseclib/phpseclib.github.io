@@ -10,7 +10,7 @@ This page is the orientation: should you migrate at all, what to expect if you d
 
 For many existing 3.0 codebases, the right answer is **don't migrate at all**.
 
-[`phpseclib/phpseclib3_compat`](https://github.com/phpseclib/phpseclib3_compat) is a Composer package that emulates the entire `phpseclib3\` API on top of phpseclib 4.0. Existing 3.0 code keeps working unchanged, and the package "provides" `phpseclib/phpseclib:~3.0` in Composer's eyes, which means it satisfies any other dependency that requires phpseclib 3.0.
+[`phpseclib/phpseclib3_compat`](https://github.com/phpseclib/phpseclib3_compat) is a soon to be released Composer package that emulates the entire `phpseclib3\` API on top of phpseclib 4.0. Existing 3.0 code keeps working unchanged, and the package "provides" `phpseclib/phpseclib:~3.0` in Composer's eyes, which means it satisfies any other dependency that requires phpseclib 3.0.
 
 The shim is the right answer when:
 
