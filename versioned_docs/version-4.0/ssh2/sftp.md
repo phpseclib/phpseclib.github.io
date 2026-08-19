@@ -596,7 +596,7 @@ Files can alternatively be accessed with a stream wrapper:
 use phpseclib4\Net\SFTP\Stream;
 use phpseclib4\Net\SFTP;
 
-Stream::register();
+Stream::register(); // returns true if successful, false on failure
 
 $fp = fopen('sftp://user:pass@127.0.0.1:22/home/user/filename.ext', 'r'); // the port number is optional
 
@@ -606,6 +606,33 @@ while (!feof($fp)) {
 }
 fclose($fp);
 ```
+
+`fopen()` isn't the only function that works — once the protocol is registered any of PHP's filesystem functions can be pointed at an `sftp://` URL. eg.
+
+```php
+$contents = file_get_contents('sftp://user:pass@127.0.0.1/home/user/filename.ext');
+file_put_contents('sftp://user:pass@127.0.0.1/home/user/filename.ext', 'xxx');
+copy('filename.local', 'sftp://user:pass@127.0.0.1/home/user/filename.ext');
+
+$list = scandir('sftp://user:pass@127.0.0.1/root/');
+print_r($list);
+```
+
+### Non-Password Authentication
+
+Putting the username and password in the URL is the simplest approach but there's no way to put a private key in a URL, so it doesn't work for public key authentication. The easiest way to do that is to login yourself and then use the `SFTP` object where the hostname would normally go:
+
+```php
+use phpseclib4\Crypt\PublicKeyLoader;
+
+$sftp = new SFTP('terrafrost.com', 22); // the port number is optional
+$sftp->login('root', PublicKeyLoader::load(file_get_contents('terrafrost.pem')));
+
+$list = scandir("sftp://$sftp/root/");
+print_r($list);
+```
+
+The other way is to use a stream context (see below).
 
 ### Customizing the Protocol
 
@@ -617,34 +644,27 @@ Stream::register('ssh2.sftp');
 $fp = fopen("ssh2.sftp://$sftp/home/vagrant/1mb", 'r');
 ```
 
-### Non-Password Authentication
-
-```php
-$sftp = new SFTP('127.0.0.1', 22); // the port number is optional
-$sftp->login('username', $key);
-
-$fp = fopen("sftp://$sftp/home/user/filename.ext", 'r');
-
-$temp = '';
-while (!feof($fp)) {
-    $temp.= fread($fp, 1024);
-}
-fclose($fp);
-```
+Whatever name you register is also the key you'll need to use in your stream context, so if you register `ssh2.sftp` then your context options need to be under `ssh2.sftp` as well.
 
 ### With Stream Context
 
 ```php
+use phpseclib4\Crypt\PublicKeyLoader;
+
 $protocol = 'sftp';
 
 Stream::register($protocol);
 
-$context = [
-    $protocol => ['sftp' => $sftp]
+$sftp = [
+    //'session' => new SFTP('terrafrost.com'),
+    'username' => 'root',
+    'privkey' => PublicKeyLoader::load(file_get_contents('terrafrost.pem'))
 ];
-$context = stream_context_create($context);
+$options = [$protocol => $sftp];
+$context = stream_context_create($options);
 
-$fp = fopen($protocol . '://dummy.com/home/user/filename.txt', 'r', false, $context);
+$list = scandir($protocol . '://terrafrost.com/root/', context: $context);
+print_r($list);
 ```
 
 **Context options**
@@ -656,4 +676,85 @@ $fp = fopen($protocol . '://dummy.com/home/user/filename.txt', 'r', false, $cont
 |_username_|Username to connect as|
 |_password_|Password to use with password authentication|
 |_privkey_|Public key resource to be used|
+
+If you supply `session` or `sftp` and it's an instance of `SFTP` then it'll assume you've already logged in and it'll ignore the username, password and privkey parameters. ie. do one or the other - not both.
+
+Also, if you set `session` or `sftp` then the hostname in the URL doesn't matter. Instead of doing `"$protocol://domain.tld/root/"` you can do `"$protocol://dummy/root/"`, even if the server you're connecting to is domain.tld.
+
+### Default Context
+
+If you don't want to pass the `$context` resource to every PHP function call you can set a default context:
+
+```php
+$protocol = 'sftp';
+
+Stream::register($protocol);
+
+$sftp = [
+    //'session' => new SFTP('terrafrost.com'),
+    'username' => 'root',
+    'privkey' => PublicKeyLoader::load(file_get_contents('terrafrost.pem'))
+];
+$options = [$protocol => $sftp];
+stream_context_set_default($options);
+
+$list = scandir($protocol . '://terrafrost.com/root/');
+print_r($list);
+```
+
+Note that you can't set defaults for notifications.
+
+### Notifications
+
+You can also do notifications. eg.
+
+```php
+// from https://www.php.net/manual/en/function.stream-notification-callback.php
+function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
+    switch($notification_code) {
+        case STREAM_NOTIFY_RESOLVE:
+        case STREAM_NOTIFY_AUTH_REQUIRED:
+        case STREAM_NOTIFY_COMPLETED:
+        case STREAM_NOTIFY_FAILURE:
+        case STREAM_NOTIFY_AUTH_RESULT:
+            var_dump($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max);
+            /* Ignore */
+            break;
+        case STREAM_NOTIFY_REDIRECTED:
+            echo "Being redirected to: ", $message;
+            break;
+        case STREAM_NOTIFY_CONNECT:
+            echo "Connected...";
+            break;
+        case STREAM_NOTIFY_FILE_SIZE_IS:
+            echo "Got the filesize: ", $bytes_max;
+            break;
+        case STREAM_NOTIFY_MIME_TYPE_IS:
+            echo "Found the mime-type: ", $message;
+            break;
+        case STREAM_NOTIFY_PROGRESS:
+            echo "Made some progress, downloaded ", $bytes_transferred, " so far";
+            break;
+    }
+    echo "\n";
+}
+
+$protocol = 'sftp';
+
+Stream::register($protocol);
+
+$sftp = [
+    'username' => 'root',
+    'privkey' => PublicKeyLoader::load(file_get_contents('terrafrost.pem'))
+];
+$options = [$protocol => $sftp];
+$notifications = ['notification' => 'stream_notification_callback'];
+$context = stream_context_create($options, $notifications);
+
+$list = scandir($protocol . '://terrafrost.com/root/', context: $context);
+print_r($list);
+```
+
+The callback goes in the second parameter of `stream_context_create()` - the params - and not in the first one with the rest of the options.
+
 _(inspired by [PHP: ssh2:// - Manual](https://www.php.net/manual/en/wrappers.ssh2.php))_
