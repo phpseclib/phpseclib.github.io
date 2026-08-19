@@ -25,6 +25,7 @@ A bulk find-and-replace of `phpseclib3\` to `phpseclib4\` will get the namespace
 | `$sftp->chmod(0777, $path)` | [SSH2 and SFTP](#ssh2-and-sftp) |
 | `$sftp->getSFTPErrors()` / `getLastSFTPError()` | [SSH2 and SFTP](#ssh2-and-sftp) |
 | `$ssh->getErrors()` / `getLastError()` | [SSH2 and SFTP](#ssh2-and-sftp) |
+| `$ssh->bytesUntilKeyReexchange()` | [SSH2 and SFTP](#ssh2-and-sftp) |
 | `$x509->getDN()` / `setDN()` | [Distinguished Names (DN)](#distinguished-names-dn) |
 | `X509::DN_STRING` (and other DN format constants) | [Distinguished Names (DN)](#distinguished-names-dn) |
 | `DN_STRING` output format | [Distinguished Names (DN)](#distinguished-names-dn) |
@@ -621,9 +622,19 @@ try {
 }
 ```
 
+### Renamed: `bytesUntilKeyReexchange()`
+
+| 3.0 | 4.0 |
+| --- | --- |
+| `$ssh->bytesUntilKeyReexchange($bytes)` | `$ssh->setBytesUntilKeyReexchange($bytes)` |
+
+Behavior is identical: it sets how many bytes may be transferred before phpseclib initiates a key re-exchange (default 1 GB). Only the name changed, to match the `set*` convention used by the other SSH2 configuration methods. The 4.0 signature is `public function setBytesUntilKeyReexchange(int $bytes): void`.
+
+The 3.0 name no longer exists, so a stale call fails with `Error: Call to undefined method phpseclib4\Net\SSH2::bytesUntilKeyReexchange()`. That's a loud failure, but re-exchange tuning usually lives on a configuration path that tests rarely exercise, so grep for `bytesUntilKeyReexchange(` rather than waiting for it to surface.
+
 ### Other SSH2 / SFTP changes
 
-The high-level connect / login / exec / put / get pattern is unchanged. Connection lifecycle, authentication methods, channel management, port forwarding, host key verification, and key exchange algorithm selection all carried over from 3.0 without API changes; only the surrounding error-handling style changed (exceptions instead of `false` returns).
+The high-level connect / login / exec / put / get pattern is unchanged. Connection lifecycle, authentication methods, channel management, port forwarding, host key verification, and key exchange algorithm selection all carried over from 3.0 without API changes; apart from the `setBytesUntilKeyReexchange()` rename above, only the surrounding error-handling style changed (exceptions instead of `false` returns).
 
 ## Exceptions and error handling
 

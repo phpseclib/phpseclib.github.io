@@ -36,7 +36,7 @@ print_r($pfx);
 ```
 <sup>([download pfx.der](pathname:///asn1/pfx.der))</sup>
 
-`password` is optional and is only needed if the PFX is encrypted.
+`password` is optional. If you omit it, phpseclib tries `null` first and then falls back to the empty string, so a PFX encrypted with an empty password loads without your having to know that in advance. You only need to pass the argument when the PFX was encrypted with an actual password.
 
 `$pfx`, in this case, is a PFX object which, in turn, is basically a thin wrapper around [an instance of \phpseclib4\File\ASN1\Constructed](detail-constructed.mdx).  Passing `$pfx` through `print_r()` or `var_dump()` triggers the [`__debugInfo()`](https://www.php.net/manual/en/language.oop5.magic.php#object.debuginfo) magic method which, in turn, produces the following output:
 
@@ -46,7 +46,7 @@ An unencrypted PFX (eg. [pfx2.der](pathname:///asn1/pfx2.der)) looks like this:
 
 <PFXUnencrypted />
 
-If an encrypted PFX is loaded without a password then `\phpseclib4\Exception\PasswordNeededException` will be thrown. If the password is wrong then `\phpseclib4\Exception\BadDecryptionException` will be thrown instead. The two are distinct so that you can prompt the user for a password in the first case and report a credential mismatch in the second.
+If an encrypted PFX is loaded and neither `null` nor the empty string can decrypt it, `\phpseclib4\Exception\PasswordNeededException` will be thrown. If the password is wrong then `\phpseclib4\Exception\BadDecryptionException` will be thrown instead. The two are distinct so that you can prompt the user for a password in the first case and report a credential mismatch in the second.
 
 All elements and subelements of the above PFX objects can be accessed as array elements vis-a-vis [ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php).
 
@@ -111,6 +111,8 @@ Has one parameter - `$value`, which can be a string or any `\phpseclib4\File\ASN
 
 Returns a PFX object containing all private key and X509 objects that are contained within the PFX that have a `pkcs-9-at-localKeyId` matching `$value`.
 
+Both `pfxFrom*` methods give the new PFX the same password as the one it came from, so a subset extracted from an encrypted PFX re-exports encrypted. The `pkcs-9-at-friendlyName` and `pkcs-9-at-localKeyId` attributes are *not* carried over, however — the objects are re-added without them. If you need the labels preserved, use the corresponding `pluckBy*` method and re-`add()` them yourself.
+
 ## Creating PFXs
 
 ### Minimalistic PFX
@@ -125,7 +127,7 @@ echo $pfx;
 ```
 Since PFXs are only available in binary format their output is not being included here.
 
-This PFX has no X509 certificate, no private key, no MAC code and no password.
+This PFX has no X509 certificate and no private key, but it does have a password — the empty string — and therefore a MAC.
 
 If you did `print_r($pfx)` on that PFX you'd get this:
 
@@ -156,11 +158,13 @@ $pfx->add($privKey, localKeyID: 'whatever');
 
 ### Setting Password
 
-Passwords can be set (or changed) on a PFX by calling `$pfx->setPassword('password')`. By default, phpseclib uses the empty string as the password.
+Passwords can be set (or changed) on a PFX by calling `$pfx->setPassword('password')`. By default, phpseclib uses the empty string as the password, which yields an encrypted, MAC'd PFX — this is what most other software means by a "passwordless" PFX.
 
-Passwords can be removed from a PFX by calling `$pfx->removePassword()`. Password-less PFXs do not have a [MAC](https://en.wikipedia.org/wiki/Message_authentication_code) (as MACs require a password) and are not widely supported by other softwares. [^passwordless]
+Passwords can be removed from a PFX by calling `$pfx->removePassword()`. Note that `$pfx->setPassword(null)` and a bare `$pfx->setPassword()` do the same thing; to get an empty password you have to write `$pfx->setPassword('')` explicitly. Password-less PFXs do not have a [MAC](https://en.wikipedia.org/wiki/Message_authentication_code) (as MACs require a password) and are not widely supported by other softwares. [^passwordless]
 
-[^passwordless]: See, for example, [this Feb 2022 feature request for OpenSSL](https://mta.openssl.org/pipermail/openssl-users/2022-February/014901.html) or [this Aug 2016 issue for .NET](https://github.com/dotnet/runtime/issues/18254).
+[^passwordless]: [KeyStore Explorer](https://keystore-explorer.org/) 5.6.1, for instance, cannot open them at all. See also [this Feb 2022 feature request for OpenSSL](https://mta.openssl.org/pipermail/openssl-users/2022-February/014901.html) or [this Aug 2016 issue for .NET](https://github.com/dotnet/runtime/issues/18254).
+
+Set the password before calling `add()` where you can, since `add()` bag-types things according to the password state at the time: private keys go into a `PKCS8ShroudedKeyBag` when a password is set and a plain `KeyBag` when one isn't. Setting the password afterwards re-bags everything and works fine, but going from no password to a password is the more involved path.
 
 ### Setting MAC Parameters
 
@@ -182,6 +186,18 @@ echo $key
         'saltLength' => 32
     ]);
 ```
+
+`PFX::toString()` accepts the same three options, overriding the global defaults for that one call without changing them:
+
+```php
+echo $pfx->toString([
+    'hashAlgorithm' => 'sha256',
+    'iterationCount' => 1024,
+    'saltLength' => 32
+]);
+```
+
+These apply when phpseclib *writes* a PFX. Reading one uses whatever parameters the file itself specifies.
 
 Valid hash algorithms are:
 
