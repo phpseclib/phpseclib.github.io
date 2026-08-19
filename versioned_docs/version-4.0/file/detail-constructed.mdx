@@ -356,6 +356,166 @@ Without the `ASN1::enableBlobsOnBadDecodes()` call, this would throw an exceptio
 
 `$x509['tbsCertificate']['issuer']` is now an instance of `phpseclib4\File\ASN1\MalformedData` - pinpointing exactly where the corruption is.
 
+### What MalformedData Can and Can't Tell You
+
+The example above is the happy path: one corrupted field, cleanly identified. `MalformedData` is genuinely useful, but it's a narrower tool than "show me everything wrong with this file," and it's worth understanding why before you rely on it.
+
+The mental model that predicts its behavior is this: **the decoder is trying as hard as it can to fit the bytes into the shape it was given, and it will never invent a new shape.** Everything below follows from that.
+
+#### A blob needs a key to live under
+
+`MalformedData` is substituted _into the mapped structure_, which means it can only appear where the map has a slot to put it. `$x509['tbsCertificate']['issuer']` worked in the example above because `issuer` is a field the map knows about.
+
+Data that fails to decode but doesn't correspond to any expected field has no array key to be associated with, so it simply doesn't appear. There is no `[unexpected data]` entry in the output - extra bytes are silently absent rather than flagged.
+
+The degenerate case is an element with no valid tag or length at all, which can't be delimited even as a blob:
+
+```php
+use phpseclib4\File\{ASN1\Element, X509};
+
+$x509 = new X509();
+$x509['tbsCertificate']['extensions'] = new Element('zzzzzzzzzzzz');
+$x509 = "$x509";
+
+X509::load($x509)->toArray(); // throws UnexpectedValueException
+```
+`Element('zzzzzzzzzzzz')` has no valid tag and - more importantly - no valid length, so the parser has nothing to measure. `ASN1::enableBlobsOnBadDecodes()` doesn't help here.
+
+#### A type mismatch can silently truncate everything after it
+
+When the map expects one tag and the encoding has another, the decoder doesn't blob the mismatch. It treats the element as _not a match_, fails to find what it wanted, and stops - and because the unmatched element has no key to map to, it isn't reported either. Enabling blobs mode does not change this.
+
+Here's a [Kerberos](https://en.wikipedia.org/wiki/Kerberos_(protocol)) `AS-REP` where `crealm` is declared as an `OCTET STRING` but the encoding actually uses a `GENERALSTRING`:
+
+```php
+use phpseclib4\File\ASN1;
+
+$KDC_REP = [
+    'type' => ASN1::TYPE_SEQUENCE,
+    'children' => [
+        'pvno' => [
+            'constant' => 0,
+            'optional' => true,
+            'explicit' => true,
+            'type' => ASN1::TYPE_INTEGER,
+        ],
+        'msg-type' => [
+            'constant' => 1,
+            'optional' => true,
+            'explicit' => true,
+            'type' => ASN1::TYPE_INTEGER,
+        ],
+        'padata' => [
+            'constant' => 2,
+            'optional' => true,
+            'explicit' => true,
+            'min' => 0,
+            'max' => -1,
+            'type' => ASN1::TYPE_SEQUENCE,
+            'children' => $PA_DATA,
+        ],
+        'crealm' => [ // the DER has a GENERALSTRING here, not an OCTET STRING
+            'constant' => 3,
+            'optional' => true,
+            'explicit' => true,
+            'type' => ASN1::TYPE_OCTET_STRING,
+        ],
+        // ... cname, ticket, enc-part ...
+    ],
+];
+
+ASN1::enableBlobsOnBadDecodes();
+
+$decoded = ASN1::decodeBER($der);
+print_r(ASN1::map($decoded, $AS_REP)->toArray());
+```
+The output contains `pvno`, `msg-type` and `padata` - and then nothing. The decoder never finds an `OCTET STRING` under an explicit `cont [3]`, so it considers `cont [3]` to be extra data, stops, and never looks at `cname`, `ticket` or `enc-part`.
+
+Note what the diagnostic signal is in this case. There's no `MalformedData` anywhere. The clue is that the output is _short_: the last field that decoded successfully sits immediately before the mismatch.
+
+#### toArray() is not a transcript of the DER
+
+`toArray()` and `__debugInfo()` render the _mapped_ view, and part of mapping is populating defaults for fields the schema declares a default for. Those defaults are written into the array output rather than being applied silently behind the scenes.
+
+That has a confusing consequence when a field fails to decode: the decoder skips ahead looking for something that _does_ match, and a skipped-over field with a default shows up carrying that default.
+
+```php
+use phpseclib4\File\{ASN1, ASN1\Element, X509};
+
+$x509 = new X509();
+$x509['tbsCertificate']['version'] = new Element('zzzzzzz');
+$x509 = "$x509";
+
+ASN1::enableBlobsOnBadDecodes();
+
+print_r(X509::load($x509)->toArray());
+```
+```
+Array
+(
+    [tbsCertificate] => Array
+        (
+            [version] => phpseclib4\File\ASN1\Types\Integer Object
+                (
+                    [value] => v1
+                )
+
+            [serialNumber] => phpseclib4\File\ASN1\MalformedData Object
+                (
+                    [value] => 7a7a7a7a7a7a7a
+                )
+
+            [signature] => phpseclib4\File\ASN1\MalformedData Object
+                (
+                    [value] => 34323437393530343431303534333239363136...
+                )
+
+            [issuer] => phpseclib4\File\ASN1\MalformedData Object
+                (
+                    [value] => 060100
+                )
+
+            [validity] => Array
+                (
+                )
+            ...
+        )
+    ...
+)
+```
+
+`version` reads as `v1` despite having been set to `zzzzzzz`, because the decoder couldn't read it, moved on until it found a matching element, and then filled the slot with the schema default.
+
+Notice also that the corruption _shifts_ the fields after it: the `7a7a…` bytes surface under `serialNumber`, not under `version`. `MalformedData` tells you roughly where the trouble starts, not precisely which field was corrupted.
+
+:::caution Don't infer presence from output
+Because defaults are materialized into the array, you can't conclude that a field was present in the underlying DER just because it appears in `toArray()` output. If you need to know what's actually encoded, look at the bytes.
+:::
+
+### Cross-Checking with openssl asn1parse
+
+`MalformedData` is one instrument, not the whole panel. The natural second opinion is a schema-less structural dump, and `openssl asn1parse` is the usual choice:
+
+```
+openssl asn1parse -in test.pem -inform DER
+```
+
+For the Kerberos example above, the way to find the bug is to look for `cont [3]` at a depth of 2:
+
+```
+   67:d=2  hl=2 l=  15 cons: cont [ 3 ]
+   69:d=3  hl=2 l=  13 prim: GENERALSTRING
+```
+
+which shows immediately that the field is a `GENERALSTRING`, not the `OCTET STRING` the map declared.
+
+The two tools cover different failure modes, and the split follows from where each one sits in the pipeline. OpenSSL, like phpseclib, works in two passes: first it decodes the ASN.1 tag/length structure, then it maps that structure onto X.509 (or whatever the target schema is). `asn1parse` exposes only the first pass. So:
+
+- **When the ASN.1 decode itself fails** - bad tags, bogus lengths, truncated elements - `asn1parse` is failing on the same pass and has little to show you. This is where `MalformedData` earns its keep: phpseclib keeps going and hands you the surrounding structure plus the raw bytes of the part that didn't decode.
+- **When the ASN.1 decodes cleanly but doesn't fit the schema** - wrong type, missing required field, unexpected tag - `asn1parse` is likely the easier tool, because the structure it prints is complete and correct and you only have to compare it against what the map expects. This is also exactly the case where blobs mode is least informative, per the truncation behavior described above.
+
+Staying inside PHP, a schema-less `ASN1::decodeBER()` followed by `toArray()` is the closest analogue to `asn1parse` - phpseclib's own view of the raw tag structure with no mapping imposed on it.
+
 ## Bypassing Encoding with ASN1\Element
 
 Everything discussed so far has been about _reading_ ASN.1 - lazy decoding, error pinpointing, walking a structure that phpseclib already understands. There's a corresponding tool for the _write_ side: `\phpseclib4\File\ASN1\Element`.
