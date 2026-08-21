@@ -116,8 +116,8 @@ const config = {
             label: 'Docs',
           },
           {
-            href: 'https://api.phpseclib.com/',
-            label: 'API',
+            href: 'https://github.com/phpseclib/llm-resources',
+            label: 'LLM Resources',
             position: 'right',
           },
           {
@@ -174,6 +174,10 @@ const config = {
               {
                 label: 'Docs (1.0 / 2.0)',
                 href: 'https://phpseclib.sourceforge.net/',
+              },
+              {
+                label: 'LLM Resources',
+                href: 'https://github.com/phpseclib/llm-resources',
               },
               {
                 label: 'Stack Overflow',
