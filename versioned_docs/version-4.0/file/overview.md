@@ -44,10 +44,10 @@ CMS containers stack. To sign-then-encrypt a payload, you wrap it in a `SignedDa
 | `-----BEGIN CERTIFICATE REQUEST-----` | A CSR → [CSR](csr.mdx) |
 | `-----BEGIN X509 CRL-----` | A CRL → [CRL](crl.mdx) |
 | `.p12` or `.pfx` extension | A PFX bundle → [PFX](pfx.mdx) |
-| `.p7m`, `.p7s`, or `-----BEGIN CMS-----` | A CMS container - use [`CMS::load()`](cms/overview.mdx#reading-a-cms) and let it dispatch |
+| `.p7m`, `.p7s`, or `-----BEGIN CMS-----` | A CMS container - use [`CMS::load()`](cms/overview.md#reading-a-cms) and let it dispatch |
 | Starts with `MII…` (no PEM header) | Base64-encoded DER - try [X.509](x509.mdx) or [CSR](csr.mdx) first; the load methods will tell you if you've guessed wrong |
 
-For CMS containers specifically, you don't need to know the variant in advance - `CMS::load()` reads the `contentType` field and returns the appropriate subclass. See [CMS Overview](cms/overview.mdx) for details.
+For CMS containers specifically, you don't need to know the variant in advance - `CMS::load()` reads the `contentType` field and returns the appropriate subclass. See [CMS Overview](cms/overview.md) for details.
 
 ## Deep dives
 
