@@ -103,6 +103,15 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/phpseclib-social-card.jpg',
+
+      algolia: {
+        appId: '9JAHOV00P8',
+        apiKey: 'fc750310b29e51d39b7b66d0eca261b7',
+        indexName: 'phpseclib',
+        contextualSearch: false,
+        searchParameters: {},
+      },
+
       navbar: {
         title: 'phpseclib',
         logo: {
