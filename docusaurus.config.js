@@ -128,7 +128,7 @@ const config = {
           },
           {
             href: 'https://github.com/phpseclib/llm-resources',
-            label: 'LLM Resources (4.0)',
+            label: 'LLM Resources',
             position: 'right',
           },
           {
@@ -187,7 +187,7 @@ const config = {
                 href: 'https://phpseclib.sourceforge.net/',
               },
               {
-                label: 'LLM Resources',
+                label: 'LLM Resources (4.0)',
                 href: 'https://github.com/phpseclib/llm-resources',
               },
               {
