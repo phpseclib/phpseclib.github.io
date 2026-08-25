@@ -64,7 +64,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/phpseclib/phpseclib.github.io/tree/source/',
         },
         blog: {
           showReadingTime: true,
@@ -75,7 +75,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/phpseclib/phpseclib.github.io/tree/source/',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
@@ -83,6 +83,10 @@ const config = {
         },
         theme: {
           customCss: './src/css/custom.css',
+        },
+        gtag: {
+          trackingID: 'G-7M7XG2FC7M',
+          anonymizeIP: true,
         },
       }),
     ],
@@ -106,9 +110,9 @@ const config = {
 
       algolia: {
         appId: '9JAHOV00P8',
-        apiKey: 'fc750310b29e51d39b7b66d0eca261b7',
+        apiKey: 'd88000c9cf09fd7067f2db65c22d7c87',
         indexName: 'phpseclib',
-        contextualSearch: false,
+        contextualSearch: true,
         searchParameters: {},
       },
 

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - source
+  # Lets you re-index on demand from the Actions tab without pushing.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -44,3 +46,26 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  index-search:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # deploy-pages returns as soon as the deployment is created; the CDN
+      # needs a moment before the crawler sees the new pages.
+      - name: Let the deployment propagate
+        run: sleep 60
+
+      - name: Run DocSearch scraper
+        env:
+          APPLICATION_ID: 9JAHOV00P8
+          API_KEY: ${{ secrets.ALGOLIA_ADMIN_KEY }}
+        run: |
+          docker run \
+            -e APPLICATION_ID \
+            -e API_KEY \
+            -e "CONFIG=$(jq -r tostring < docsearch-config.json)" \
+            algolia/docsearch-scraper
