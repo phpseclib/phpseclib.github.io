@@ -20,7 +20,7 @@ echo base64_encode($key->encrypt('test'));
 ```
 
 Decryption with C:
-<!-- gcc -x c test.c -lcrypto && ./a.out -->
+{/* gcc -x c test.c -lcrypto && ./a.out */}
 
 ```c
 #include <openssl/evp.h>

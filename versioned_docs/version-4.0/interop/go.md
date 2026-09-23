@@ -2,7 +2,7 @@
 title: Go
 ---
 
-<!-- go run test.go -->
+{/* go run test.go */}
 
 All the Go code samples can be previewed on https://go.dev/play/
 

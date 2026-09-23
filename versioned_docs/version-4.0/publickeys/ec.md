@@ -165,9 +165,9 @@ Returns an array with **r** and **s** as keys.
 
 All the `with` methods have corresponding `get` methods as follows:
 
-<!--
+{/*
 getCurve, getLength, withContext (ed25519, ed448), 
--->
+*/}
 
 | Setter | Getter |
 |---|---|

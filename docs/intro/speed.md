@@ -253,9 +253,9 @@ The benchmarks were [performed on GitHub Actions](https://github.com/phpseclib/b
 
 PHP 8 [introduced](https://wiki.php.net/rfc/jit) a new [Just-In-Time (JIT) compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation) engine. The specific JIT settings that were used can be seen in the Docker containers [opcache.ini](https://github.com/phpseclib/docker-php/blob/8.0jit/opcache.ini).
 
-<!--
+{/*
 PHP 8.4 introduced a new [JIT implementation based on the IR framework](https://wiki.php.net/rfc/jit-ir) but it doesn't seem to have amounted to much improvement gain where phpseclib is concerned.
--->
+*/}
 
 <table class="benchmarks" border="1">
   <thead>

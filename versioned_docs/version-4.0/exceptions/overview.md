@@ -33,10 +33,10 @@ Exceptions that extend this exception are:
 - `NoKeyLoadedException`. eg. `PublicKeyLoader::load('...')` failed to load the key in question.
 - `UnexpectedSFTPPacketException`. eg. phpseclib was expecting the SFTP server to send either an SSH_FXP_STATUS or SSH_FXP_HANDLE packet but a SSH_FXP_NAME packet was sent out instead.
 - `UnexpectedSSHMessageException`. eg. phpseclib was expecting the SSH2 server to send a SSH_MSG_NEWKEYS packet got some other packet back instead.
-<!-- the following are mainly used internally: -->
-<!-- `EncodedDataUnavailableException` -->
-<!-- `EOCException` -->
-<!-- `InvalidPacketLengthException` -->
+{/* the following are mainly used internally: */}
+{/* `EncodedDataUnavailableException` */}
+{/* `EOCException` */}
+{/* `InvalidPacketLengthException` */}
 
 ## UnsupportedValueException
 
@@ -47,7 +47,7 @@ Exceptions that extend this exception are:
 - `ExcessivelyDeepDataException`. eg. an ASN.1 SEQUENCE with a bunch of SEQUENCES recursively nested within it. Extends ResourceLimitException.
 - `KeyConstraintException`. eg. you're trying to use RSA to encrypt a string that's longer than the key length.
 - `LengthException`. eg. you're trying to use use an 80 bit key (strlen of 10) with AES.
-<!-- in some cases LengthException is thrown by RSA; maybe these ought to be replaced with KeyConstraintException? -->
+{/* in some cases LengthException is thrown by RSA; maybe these ought to be replaced with KeyConstraintException? */}
 - `NoSupportedAlgorithmsException`. eg. you're trying to connect to an SSH server that doesn't support any of the encryption algorithms that phpseclib supports.
 - `PasswordNeededException`. eg. `PublicKeyLoader::load('...')` failed because the key is encrypted and you didn't provide a password.
 - `ResourceLimitException`. eg. you're trying to test the primality of a number that's 1MB in length.

@@ -36,7 +36,16 @@ const config = {
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    mdx1Compat: {
+      comments: true,
+      admonitions: false,
+      headingIds: false,
+    },
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -89,6 +98,46 @@ const config = {
           anonymizeIP: true,
         },
       }),
+    ],
+  ],
+
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          { from: '/docs/connect', to: '/docs/3.0/ssh2/connect' },
+          { from: '/docs/auth', to: '/docs/3.0/ssh2/auth' },
+          { from: '/docs/commands', to: '/docs/3.0/ssh2/commands' },
+          { from: '/docs/special-chars', to: '/docs/3.0/ssh2/special-chars' },
+          { from: '/docs/sftp', to: '/docs/3.0/ssh2/sftp' },
+          { from: '/docs/diagnosis', to: '/docs/3.0/ssh2/diagnosis' },
+          { from: '/docs/publickeys', to: '/docs/3.0/publickeys/overview' },
+          { from: '/docs/rsa', to: '/docs/3.0/publickeys/rsa' },
+          { from: '/docs/dsa', to: '/docs/3.0/publickeys/dsa' },
+          { from: '/docs/ec', to: '/docs/3.0/publickeys/ec' },
+          { from: '/docs/dh', to: '/docs/3.0/publickeys/dh' },
+          { from: '/docs/jwt', to: '/docs/3.0/publickeys/jwt' },
+          { from: '/docs/rsa-keys', to: '/docs/3.0/publickeys/rsa-keys' },
+          { from: '/docs/dsa-keys', to: '/docs/3.0/publickeys/dsa-keys' },
+          { from: '/docs/ec-keys', to: '/docs/3.0/publickeys/ec-keys' },
+          { from: '/docs/symmetric', to: '/docs/3.0/symmetric/overview' },
+          { from: '/docs/x509', to: '/docs/3.0/file/x509' },
+          { from: '/docs/csr', to: '/docs/3.0/file/csr' },
+          { from: '/docs/spkac', to: '/docs/3.0/file/spkac' },
+          { from: '/docs/crl', to: '/docs/3.0/file/crl' },
+          { from: '/docs/interop', to: '/docs/3.0/interop/overview' },
+          { from: '/docs/python', to: '/docs/3.0/interop/python' },
+          { from: '/docs/java', to: '/docs/3.0/interop/java' },
+          { from: '/docs/javascript', to: '/docs/3.0/interop/javascript' },
+          { from: '/docs/nodejs', to: '/docs/3.0/interop/nodejs' },
+          { from: '/docs/go', to: '/docs/3.0/interop/go' },
+          { from: '/docs/ruby', to: '/docs/3.0/interop/ruby' },
+          { from: '/docs/csharp', to: '/docs/3.0/interop/csharp' },
+          { from: '/docs/c', to: '/docs/3.0/interop/c' },
+          { from: '/docs/php', to: '/docs/3.0/interop/php' },
+        ],
+      },
     ],
   ],
 

@@ -72,7 +72,7 @@ echo base64_encode($key->encrypt('test'));
 ```
 
 Decryption with C#
-<!-- csc test.cs && mono test.exe -->
+{/* csc test.cs && mono test.exe */}
 
 ```c#
 using System;
