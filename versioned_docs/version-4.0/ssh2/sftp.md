@@ -104,7 +104,7 @@ echo $sftp->get('filename.remote');
 $sftp->get('filename.remote', 'filename.local');
 ```
 
-Returns a string containing the contents of `$remote_file` if `$local_file` is left undefined or a boolean false if the operation was unsuccessful. If `$local_file` is defined, returns true or false depending on the success of the operation.
+Returns a string containing the contents of `$remote_file` if `$local_file` is left undefined. If `$local_file` is defined, the download is written to the provided file path, stream resource, or callback, and the method returns `null`.
 
 If `$local_file` is an anonymous function you can stream the download real time or whatever. eg.
 
