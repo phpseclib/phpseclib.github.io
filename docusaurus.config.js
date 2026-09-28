@@ -180,6 +180,11 @@ const config = {
             label: 'Docs',
           },
           {
+            to: 'blog',
+            label: 'Blog',
+            position: 'right'
+          },
+          {
             href: 'https://github.com/phpseclib/llm-resources',
             label: 'LLM Resources',
             position: 'right',
@@ -276,7 +281,7 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ['php', 'bash'],
+        additionalLanguages: ['php', 'bash', 'java'],
       },
     }),
 };

@@ -1,19 +1,19 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+x509:
+  label: X.509
+  permalink: /x509
+  description: Posts about X.509 certificates, CSRs, CRLs and related formats.
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+signing:
+  label: Signing
+  permalink: /signing
+  description: Posts about creating and verifying digital signatures.
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+api-design:
+  label: API Design
+  permalink: /api-design
+  description: Posts about why phpseclib's APIs are designed the way they are.
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+comparison:
+  label: Comparison
+  permalink: /comparison
+  description: Posts comparing phpseclib with other libraries and languages.
