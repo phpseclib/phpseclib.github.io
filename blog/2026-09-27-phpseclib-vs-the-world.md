@@ -268,6 +268,8 @@ Existing certificates would need to have every property manually copied over fro
 ## Go
 Go is the odd language out in that (1) X509 support is built in, natively and (2) certificate creation doesn't use OOP (Go has methods, and the x509 package uses them elsewhere, but `x509.CreateCertificate()` is a plain function). Because of that, the whole `issuer.sign(subject)` vs `subject.sign(issuer)` debate isn't really applicable. Instead, the way it works is...  you call a "[God function](https://en.wikipedia.org/wiki/God_object)" in the form of [x509.CreateCertificate](https://pkg.go.dev/crypto/x509#CreateCertificate) and pass to it the public key you want to use, the CA cert, the CA private key, a template that provides for all the X509 attributes and then out you get a byte array containing the newly generated / signed X509 certificate.
 
+### Code Sample
+
 ```go
 package main
 
