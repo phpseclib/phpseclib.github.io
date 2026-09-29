@@ -16,20 +16,25 @@ phpseclib 4 flips this on its head. Instead of the invoker being the subject the
 ## issuer.sign(subject) advantages
 
 **Mirrors How People Actually Speak**
+
 Maybe [Yoda](https://en.wikipedia.org/wiki/Yoda) might say "my report card, please sign, Dad" ([object-verb-subject](https://en.wikipedia.org/wiki/Object%E2%80%93verb%E2%80%93subject_word_order)) but actual humans tend to say "Dad, please sign my report card" ([subject-verb-object](https://en.wikipedia.org/wiki/Subject%E2%80%93verb%E2%80%93object_word_order)).
 
 **Mirrors How Signing Works When You Don't Have The Private Key**
+
 If an [HSM](https://en.wikipedia.org/wiki/Hardware_security_module) is doing the signing, an API endpoint (e.g. [ACME](https://en.wikipedia.org/wiki/Automatic_Certificate_Management_Environment)), or even an [ssh-agent](https://en.wikipedia.org/wiki/Ssh-agent), you're not going to have the private key. They're typically high availability, sign multiple times and what you send to them is the subject to be signed - not the other way around. Besides, subjects are typically only ever signed once whereas Issuers often sign multiple times.
 
 **Smart Signers**
+
 Let's say you wanted an Issuer that only conditionally signs Subjects. With `subject.signedBy(issuer)` you'd have to wrap that in an if statement, at which point, you're basically doing procedural programming. With `issuer.sign(subject)` you just extend the Issuer, following the [open-closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle), and add a new if statement to the `sign()` method, conditionally calling `parent::sign()`.
 
 **Resolves Ambiguities**
+
 `subject.signedBy(issuer)` could easily be read as `subject.isSignedBy(issuer)`, a true/false check. `issuer.sign(subject)` can't be mistaken for one. The obvious fix, `subject.sign(issuer)`, reads as though the subject is signing the issuer, which gets it backwards.
 
 ## issuer.sign(subject) disadvantages
 
 **Signature Invalidation When Changes Are Made After Signing**
+
 In most libraries the object returned by `signedBy()` is not the same object that calls `signedBy()`, preventing modification after signing has taken place. That's not the case with phpseclib 4's approach. In theory, phpseclib 4 could prevent changes to the X509 certificate object after signing has taken place, however, phpseclib 4 is also aiming to be fuzzing friendly and if you want to intentionally create a certificate with a bad signature you should be able to do so. Also, what happens if you wanted to re-sign an existing X509 certificate? If you change an already signed X509 certificate without re-signing it you're invalidating the signature, but phpseclib 4 can't possibly know at the time you modify the certificate what your intentions are later on down the line.
 
 As for why you'd want to re-sign an already signed X509 certificate...  maybe the CA cert that signed it has expired. Maybe a new private key was generated and a new CA cert to go along with it. Or maybe the company that owned the CA cert was bought out - they kept the private key but issued a new CA cert with a new Subject.
