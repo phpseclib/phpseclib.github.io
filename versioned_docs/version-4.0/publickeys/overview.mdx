@@ -104,11 +104,11 @@ d1dcce77ecc95e9fc8453fd2f07d`;
   ]}
 />
 
-The yellow highlighted portion is the signature subject and the blue highlighted portion is the signature, itself.
+The yellow highlighted portion is the first signature subject and the blue highlighted portion is the first actual signature.
 
 Resigning this would be rather difficult if you could only pass strings to the `sign()` method. Like you'd have to write a bunch of logic to do a `substr()` and then you'd have to know where to place the signature. If, in contrast, you could pass an _object_ to the `sign()` method this object could tell the `sign()` method where the signature subject could be found and where to place the signature. Such objects need to implement the `phpseclib4\File\Common\Signable` interface.
 
-The CMS in this example excludes certificates, has a detached signature, uses sha1 as the message digest and nistp192 as the curve, for brevity.
+The CMS in this example excludes certificates, uses sha1 as the message digest and nistp192 as the curve, for brevity.
 
 Hex encoding is employed instead of the more standard base64 encoding because base64 encodes data in fixed 3-byte groups, producing 4 encoded characters per group. If a byte sequence begins or ends in the middle of such a group, the corresponding base64 characters will necessarily include bits from adjacent bytes, making exact substring matching impossible. Hex encoding preserves a one-to-one mapping between bytes and text, allowing reliable byte-level substring searches.
 
