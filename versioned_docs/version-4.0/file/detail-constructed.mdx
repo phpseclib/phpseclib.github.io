@@ -144,7 +144,7 @@ echo strlen($cert->getEncoded()) . "\n";                   // outputs 643
 ```
 Once you take a reference, you're operating on a `Constructed` directly, and the `X509` re-encoding logic is bypassed. Going back through `$x509['tbsCertificate']` re-enters `X509::offsetGet()` and the value is rebuilt; refreshing `$cert` then picks up the rebuilt copy.
 
-:::caution Why the encoding is cached
+:::caution[Why the encoding is cached]
 [Constructed: A Case Study](file/constructed-example.mdx) covers the gotchas this caching creates, so it's fair to question why we even do it. Avoiding needless re-encoding is one reason, but the decisive one is signature validation. The CSR example above hints at it: `$csr['certificationRequestInfo']->getEncoded()` returns the bytes the signature was computed over, and those bytes must exactly match what the signer signed. Re-encoding doesn't always reproduce the original byte sequence - even under DER - so caching the original is what keeps that round trip reliable.
 
 [RFC 4055 pp. 6](https://datatracker.ietf.org/doc/html/rfc4055#page-6) gives a concrete example involving the AlgorithmIdentifier parameters of RSASSA-PSS and RSAES-OAEP:
@@ -287,7 +287,7 @@ When you call `X509::load($encoded)`, the library does not decode the interior e
 
 With the above example payload, which does not match the structural template of an X509 certificate, an exception is thrown **instantly** before it ever reaches the OID decoding logic. This "fail-fast" behavior provides a massive security boost, as malicious interior data is never even processed.
 
-:::caution Why OID parsing is expensive
+:::caution[Why OID parsing is expensive]
 In an OID like `1.2.840.10045.3.1.7`, each number is called an **arc**.
 
 Unlike a fixed-width integer, arc length is arbitrary. Using a [Variable Length Quantity (Base 128)](https://en.wikipedia.org/wiki/Variable-length_quantity) encoding, the parser must inspect the 8th bit of every byte:
@@ -488,7 +488,7 @@ Array
 
 Notice also that the corruption _shifts_ the fields after it: the `7a7a…` bytes surface under `serialNumber`, not under `version`. `MalformedData` tells you roughly where the trouble starts, not precisely which field was corrupted.
 
-:::caution Don't infer presence from output
+:::caution[Don't infer presence from output]
 Because defaults are materialized into the array, you can't conclude that a field was present in the underlying DER just because it appears in `toArray()` output. If you need to know what's actually encoded, look at the bytes.
 :::
 
