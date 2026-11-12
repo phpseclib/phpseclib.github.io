@@ -85,6 +85,53 @@ echo $x509->hasExtension('id-ce-cRLDistributionPoints') ? 't' : 'f';
 ```
 `hasExtension()` works largely the same way that `getExtension()` does, except that it returns true or false depending on if the extension exists or not.
 
+### getSubjectLogos() / getIssuerLogos()
+
+The logotype extension (`id-pe-logotype`) - [RFC9399](https://www.rfc-editor.org/rfc/rfc9399) - lets a certificate carry logos of its subject and of its issuer. In practice the most common place to find it is in the Verified Mark Certificates that back [BIMI](https://bimigroup.org/) mail logos.
+
+`getExtension('id-pe-logotype')` returns the whole extension but `$x509->getSubjectLogos()` and `$x509->getIssuerLogos()` are easier to work with:
+
+```php
+$logos = $x509->getSubjectLogos();
+$logos[0]['hashes']['sha256'] = bin2hex($logos[0]['hashes']['sha256']);
+print_r($logos);
+```
+
+Running the above on a certificate with an embedded SVG logo will produce something like this:
+
+```
+Array
+(
+    [0] => Array
+        (
+            [mediaType] => image/svg+xml
+            [uris] => Array
+                (
+                    [0] => data:image/svg+xml;base64,H4sIAAAAAAACA7MpLktXqMjNySu2VcooKSmw0tcvLy/XKzfWyy9K1zcyMDDQB6pQ0rcDAMT3kZMpAAAA
+                )
+
+            [hashes] => Array
+                (
+                    [sha256] => 900fbe934249ad120004bd24adf66aad8817d89586273c0cc50e187bddebb601
+                )
+
+            [data] => <svg xmlns="http://www.w3.org/2000/svg"/>
+        )
+
+)
+```
+
+Each image has four keys:
+
+- `mediaType` is the media type of the image (eg. `image/svg+xml` or `image/png`)
+- `uris` lists the URIs the image can be retrieved from
+- `hashes` maps hash names to raw (binary) hash values
+- `data` is the image itself if it's embedded in the certificate as a `data:` URL and null otherwise. gzip compressed SVGs are decompressed.
+
+Per [RFC9399 § 4.1](https://www.rfc-editor.org/rfc/rfc9399#section-4.1), "_clients MUST discard the logotype data if the computed hash value does not match the hash value in the certificate extension_". phpseclib does not fetch images from `http://` or `https://` URIs - that's left up to you - and so it doesn't check those hashes either.
+
+If there's no logo, or if the logo uses indirect addressing, an empty array is returned. Audio logotypes, the optional image info, community logos and other logos aren't returned by these methods but can still be accessed via `getExtension()`.
+
 ### getDN() / getDNProps()
 
 An X.509 certificate has a subject and an issuer distinguished name (DN for short). For self signed certs, when the subject and issuer DNs are the same, you can call [`getDN()`](detail-dns.mdx#getdn), [`hasDNProp()`](detail-dns.mdx#hasdnprop) and [`getDNProps()`](detail-dns.mdx#getdnprops).
@@ -258,6 +305,19 @@ Some extensions have built in dedicated functions for manipulating them:
 - **id-ce-keyUsage** and **id-ce-basicConstraints**
 
   These extensions can be modified by calling `$x509->makeCA()` which, in turn, sets the cRLSign, keyCertSign and digitalSignature bits in the KeyUsage bitstring and sets the cA boolean of BasicConstraints to true.
+- **id-pe-logotype**
+
+  Logos can be added by calling `$x509->addSubjectLogo()` and `$x509->addIssuerLogo()`. Both functions have two required parameters - `$mediaType` and `$data` (the image itself) - and two optional parameters - `$uris` and `$hashes`.
+
+  If `$uris` is omitted the image is embedded in the certificate as a `data:` URL. Per [RFC9399 § 5](https://www.rfc-editor.org/rfc/rfc9399#section-5) SVG images are gzip compressed when they're embedded. Otherwise `$uris` can be a string or an array of strings with the location(s) the image can be retrieved from.
+
+  `$hashes` is `sha256` by default and can be a string or an array of strings. [RFC9399 § 4.1](https://www.rfc-editor.org/rfc/rfc9399#section-4.1) says "_CAs MUST use the one-way hash function that is associated with the certificate signature to compute one hash value_" so if the certificate is going to be signed with something other than SHA-256 you'll want to pass that hash as well. For SVG images the hash is calculated over the uncompressed image with LF line endings, as RFC9399 requires.
+
+  ```php
+  $x509->addSubjectLogo('image/svg+xml', file_get_contents('logo.svg'));
+  $x509->addSubjectLogo('image/png', file_get_contents('logo.png'), 'https://example.com/logo.png', ['sha256', 'sha384']);
+  ```
+  Calling either function more than once adds alternative images to the same logo.
 
 _Any_ extension can be set by calling `$x509->setExtension()`. `$x509->setExtension()` has two required parameters - `$name` (a string) and `$value` (which can be any number of primitive types or object types) - and one optional parameter - `$critical`. If `$critical` isn't explicitly set it'll be either bool(true) or bool(false) based on what [RFC5280](https://www.rfc-editor.org/rfc/rfc5280) says about it. Like some extensions are only ever supposed have critical set to either bool(false) or bool(true) and others can be set to one or the other depending on their specific situation. If you manually set an extension to bool(true) that RFC5280 says should only ever be bool(false) phpseclib will let you do so.
 
