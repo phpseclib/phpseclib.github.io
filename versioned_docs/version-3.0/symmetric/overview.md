@@ -75,7 +75,7 @@ Supported block cipher modes of operation are as follows:
 
 `usesNonce()` tells you whether or not a cipher object uses a nonce. If a nonce is required it can be set with `setNonce()`.
 
-Nonce's and IV's are very closely related but, in the context of phpseclib, a nonce is only used with GCM. Whereas the IV length is equal to the block size the nonce length is normally 96 bits (whereas the block size is 128 bits; GCM only works on ciphers with block length of 128 bits).
+Nonce's and IV's are very closely related but, in the context of phpseclib, a nonce is only used with GCM or Poly1305. Whereas the IV length is equal to the block size the nonce length for GCM is normally 96 bits (whereas the block size is 128 bits; GCM only works on ciphers with block length of 128 bits). For Poly1305 only 64-bit nonces are supported.
 
 ### setKey() vs setPassword()
 

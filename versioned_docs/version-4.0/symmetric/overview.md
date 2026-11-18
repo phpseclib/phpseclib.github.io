@@ -72,7 +72,7 @@ Passing `'stream'` to a block cipher constructor throws `InvalidArgumentExceptio
 
 `usesNonce()` tells you whether or not a cipher object uses a nonce. If a nonce is required it can be set with `setNonce()`.
 
-Nonces and IVs are very closely related but, in the context of phpseclib, a nonce is used in two places: GCM on block ciphers, and stream ciphers (Salsa20, ChaCha20). An IV's length equals the block size of the cipher; a nonce's length depends on the algorithm. GCM nonces are typically 96 bits (against a 128-bit block, since GCM only works on ciphers with a block length of 128 bits), ChaCha20 nonces are 64 or 96 bits, and Salsa20 nonces are 64 bits.
+Nonces and IVs are very closely related but, in the context of phpseclib, a nonce is used in two places: GCM on block ciphers, and select stream ciphers (Salsa20, ChaCha20). An IV's length equals the block size of the cipher; a nonce's length depends on the algorithm. GCM nonces are typically 96 bits (against a 128-bit block, since GCM only works on ciphers with a block length of 128 bits), ChaCha20 nonces are 64 or 96 bits, and Salsa20 nonces are 64 bits.
 
 Stream ciphers' `usesIV()` always returns `false` even though they use IV-shaped values under the hood; the public contract is "set a nonce."
 
@@ -175,13 +175,16 @@ Various cipher attributes can be obtained by calling:
 
 GCM mode can be enabled by doing `$cipher = new AES('gcm')`. It can only be used on ciphers with a 128-bit block size. GCM, uniquely, requires a nonce (instead of an IV) by set by calling `$cipher->setNonce()`. See [setIV() vs setNonce()](#setiv-vs-setnonce) for more information.
 
-Poly1305 support can be enabled by doing `$cipher->enablePoly1305()`. Poly1305 keys can be set (when necessary) by doing `$cipher->setPoly1305Key('...')` (keys must be 256-bits). For Salsa20 / ChaCha20, Poly1305 keys are automatically generated using the technique described in [RFC8439 § 2.6.1. Poly1305 Key Generation in Pseudocode](https://tools.ietf.org/html/rfc8439#section-2.6.1) (altho it may still be desirable to manually set the key [eg. SSH2 uses a different key construction than that RFC describes]).
+Poly1305 support can be enabled by doing `$cipher->enablePoly1305()`. Poly1305 keys can be manually set (when necessary) by doing `$cipher->setPoly1305Key('...')` (keys must be 256-bits). For Salsa20 / ChaCha20, Poly1305 keys are automatically generated / set using the technique described in [RFC8439 § 2.6.1. Poly1305 Key Generation in Pseudocode](https://tools.ietf.org/html/rfc8439#section-2.6.1) (altho it may still be desirable to manually set the key [eg. SSH2 uses a different key construction than that RFC describes]).
 
-For both GCM and Poly1305 you may optionally set the "additional authenticated data" with `$cipher->setAAD()` (by default it's the empty string).
+For both GCM and Poly1305, you may optionally set the "additional authenticated data" with `$cipher->setAAD()` (by default it's the empty string).
 
-The tag can be set with `$cipher->setTag(...)` and retrieved with `$cipher->getTag()`. By default `getTag()` returns 16 bytes (128 bits); pass a length argument between 4 and 16 to truncate (e.g., `getTag(12)`). Truncating to 12 is common and acceptable; truncating to 4 is the minimum and gives only weak authenticity guarantees.
+When encrypting, the tag needs to be obtained after encryption by calling `$cipher->getTag()`. Prior to decrypting, the tag needs to be set with `$cipher->setTag()`. If a tag is set before decrypting the plaintext produced by the decryption operation will be compared against the tag and, if they don't match, an exception will be thrown.
 
-On the receiver, `setTag()` must be called before `decrypt()` on a GCM or Poly1305 cipher. Otherwise `decrypt()` throws `InvalidStateException`. If the tag doesn't verify, `decrypt()` throws `BadDecryptionException` instead of returning plaintext.
+By default, `getTag()` returns 16 bytes (128 bits). A length argument between 4 and 16 may be passed to `getTag()` (e.g., `getTag(12)`) to truncate the tag. Truncating to 12 is common and acceptable. Truncating to 4 is the minimum and gives only weak authenticity guarantees.
+
+When decrypting, if a tag has not been set and is needed, then `decrypt()` will throw an `InvalidStateException`. If the tag doesn't verify, then `decrypt()` will throw a `BadDecryptionException` instead of returning the plaintext.
+
 
 ## TripleDES and 3CBC
 
